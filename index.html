@@ -7,33 +7,35 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd0;display:flex;justify-content:center;align-items:center;min-height:100vh;min-height:100dvh;user-select:none;overflow:hidden;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-
 #game{width:100vw;height:100vh;height:100dvh;max-width:100vw;max-height:100dvh;display:flex;flex-direction:column;background:linear-gradient(135deg,#120a06,#0d0704);overflow:hidden;position:relative;font-size:16px}
 
 /* ── TOP BAR ── */
-#bar{padding:4px 8px;background:linear-gradient(180deg,#1a0e08,#0d0704);border-bottom:1px solid #2a180e;flex-shrink:0;z-index:10}
+#bar{padding:3px 8px;background:linear-gradient(180deg,#1a0e08,#0d0704);border-bottom:1px solid #2a180e;flex-shrink:0;z-index:10}
 #bar-top{display:flex;justify-content:space-between;align-items:center;gap:6px}
-#bar-top h1{font-size:16px;font-weight:800;color:#e8c87a;letter-spacing:1px;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,0.5)}
+#bar-top h1{font-size:15px;font-weight:800;color:#e8c87a;letter-spacing:1px;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,0.5)}
 #bar-top h1 span{color:#d4a04a}
-#bar-top .st{display:flex;gap:6px;font-size:13px;color:#7a5a3a;flex-wrap:wrap;align-items:center}
+#bar-top .st{display:flex;gap:6px;font-size:12px;color:#7a5a3a;flex-wrap:wrap;align-items:center}
 #bar-top .st b{color:#e8ddd0}
 #bar-top .st .gold{color:#ffd700}
 #bar-top .st .hgt{color:#70b0d0}
 
-/* ── XP BARS VERTICAL STACK ── */
-#xp-strip{flex-shrink:0;background:rgba(0,0,0,0.25);border-bottom:1px solid #1a0e08;padding:3px 6px}
-.xpr{display:flex;align-items:center;gap:4px;height:13px;padding:0 6px;margin:1.5px 0}
-.xpr .xlb{font-size:10px;font-weight:700;width:20px;text-align:center;flex-shrink:0}
-.xpr .xn{font-size:10px;font-weight:600;width:62px;flex-shrink:0;color:#8a7a6a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.xpr .xbarw{flex:1;height:5px;background:#0a0604;border-radius:3px;overflow:hidden;min-width:10px;position:relative}
-.xpr .xbarw .xf{height:100%;border-radius:3px;transition:width 0.3s ease;position:absolute;left:0;top:0;width:0%}
-.xpr .xbarw .xfo{height:100%;border-radius:3px;position:absolute;left:0;top:0;width:0%;transition:width 0.4s ease,opacity 0.5s ease;opacity:0}
+/* ── XP BARS ── General on top, 3 skills in a 2x container below */
+#xp-strip{flex-shrink:0;background:rgba(0,0,0,0.25);border-bottom:1px solid #1a0e08;padding:2px 6px;display:flex;flex-direction:column;gap:2px}
+#xp-general{flex-shrink:0}
+#xp-general .xpr{display:flex;align-items:center;gap:4px;height:14px;padding:0 4px}
+#xp-skills{flex:1;min-height:0;display:flex;flex-direction:column;gap:1px;padding:0}
+#xp-skills .xpr{display:flex;align-items:center;gap:4px;padding:0 4px;flex:1;min-height:0;transition:flex 0.3s ease}
+.xpr .xlb{font-size:9px;font-weight:700;width:18px;text-align:center;flex-shrink:0}
+.xpr .xn{font-size:9px;font-weight:600;width:58px;flex-shrink:0;color:#8a7a6a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.xpr .xbarw{flex:1;height:4px;background:#0a0604;border-radius:2px;overflow:hidden;min-width:10px;position:relative}
+.xpr .xbarw .xf{height:100%;border-radius:2px;transition:width 0.3s ease;position:absolute;left:0;top:0;width:0%}
+.xpr .xbarw .xfo{height:100%;border-radius:2px;position:absolute;left:0;top:0;width:0%;transition:width 0.4s ease,opacity 0.5s ease;opacity:0}
 .xpr .xbarw .xfo.sh{opacity:1}
-.xpr .xlv{font-size:10px;font-weight:700;width:16px;text-align:right;flex-shrink:0}
+.xpr .xlv{font-size:9px;font-weight:700;width:14px;text-align:right;flex-shrink:0}
 
 /* ── TABS ── */
 #tabs{display:flex;background:#0a0604;border-bottom:2px solid #2a180e;flex-shrink:0;z-index:10;overflow-x:auto}
-#tabs .t{flex:1;padding:10px 6px;background:none;color:#5a3a2a;border:none;cursor:pointer;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;transition:all 0.1s;border-bottom:3px solid transparent;font-family:inherit;white-space:nowrap;min-width:0}
+#tabs .t{flex:1;padding:9px 6px;background:none;color:#5a3a2a;border:none;cursor:pointer;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;transition:all 0.1s;border-bottom:3px solid transparent;font-family:inherit;white-space:nowrap;min-width:0}
 #tabs .t:hover{color:#d4a04a}
 #tabs .t.on{color:#e8c87a;border-bottom-color:#e8c87a;background:rgba(232,200,122,0.04)}
 
@@ -49,51 +51,58 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
 .g-res .r .v{font-weight:700;font-size:13px;color:#e8ddd0}.g-res .r.glow{border-color:#5a3a1a;background:rgba(30,18,8,0.9)}
 .g-res .r .ps{font-size:9px;color:#4a6a3a}.g-res .r.locked{opacity:0.2}
 
-#gather-zone,.czone{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:12px;cursor:pointer;min-height:60px;position:relative}
+#gather-zone,.czone{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px;cursor:pointer;min-height:50px;position:relative}
 #gather-zone:active,.czone:active{background:rgba(255,255,255,0.01)}
-#gather-zone .big-icon,.czone .big-icon{font-size:48px;margin-bottom:2px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5))}
-#gather-zone .hint,.czone .hint{font-size:18px;font-weight:700;color:#e8c87a;text-shadow:0 1px 4px rgba(0,0,0,0.4)}
-#gather-zone .sub,.czone .sub{font-size:13px;color:#8a6a4a;margin-top:2px}
+#gather-zone .big-icon,.czone .big-icon{font-size:44px;margin-bottom:2px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5))}
+#gather-zone .hint,.czone .hint{font-size:17px;font-weight:700;color:#e8c87a;text-shadow:0 1px 4px rgba(0,0,0,0.4)}
+#gather-zone .sub,.czone .sub{font-size:12px;color:#8a6a4a;margin-top:2px}
 
 .feed{position:absolute;font-weight:700;pointer-events:none;animation:feedUp 0.8s ease forwards;z-index:20;text-align:center;line-height:1}
-.feed .l1{display:block;font-size:18px;margin-bottom:2px}.feed .l2{display:block;font-size:13px}
+.feed .l1{display:block;font-size:17px;margin-bottom:2px}.feed .l2{display:block;font-size:12px}
 @keyframes feedUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-50px) scale(1.08)}}
 
-.g-upgs{padding:4px 6px;flex-shrink:0;border-top:1px solid #1a0e08;max-height:35%;overflow-y:auto}
-.g-upgs .uh{font-size:10px;text-transform:uppercase;color:#4a3a2a;margin:3px 0 2px;display:block;letter-spacing:0.5px}
-.g-upgs .u{display:flex;justify-content:space-between;align-items:center;padding:4px 5px;margin-bottom:2px;background:rgba(0,0,0,0.2);border-radius:3px;font-size:11px}
-.g-upgs .u .d{flex:1;min-width:0}.g-upgs .u .d .nm{font-weight:600;font-size:11px}.g-upgs .u .d .dc{font-size:9px;color:#6a5a4a}
-.g-upgs .u .co{font-size:10px;color:#ffd700;margin:0 3px;white-space:nowrap}
-.g-upgs .u button{font-size:9px;padding:3px 6px;font-family:inherit;background:linear-gradient(135deg,#3a2010,#5a3018);color:#e8ddd0;border:1px solid #6a3820;border-radius:3px;cursor:pointer;white-space:nowrap}
-.g-upgs .u button:disabled{opacity:0.3;cursor:not-allowed}
+/* ── UPGRADES (shared tap & auto sections) ── */
+.g-upgs,.c-upgs,.a-upgs{padding:3px 6px;flex-shrink:0;overflow-y:auto;max-height:30%}
+.g-upgs{border-top:1px solid #1a0e08}
+.c-upgs{border-top:1px solid #1a0e08;margin-top:2px}
+.a-upgs{border-top:1px solid #2a2010;background:rgba(10,8,6,0.3)}
+.g-upgs .uh,.c-upgs .uh,.a-upgs .uh{font-size:9px;text-transform:uppercase;letter-spacing:0.5px;margin:3px 0 2px;display:block}
+.g-upgs .uh,.c-upgs .uh{color:#4a3a2a}
+.a-upgs .uh{color:#5a6a3a;font-weight:700;text-shadow:0 0 6px rgba(80,180,50,0.08)}
+.g-upgs .u,.c-upgs .u,.a-upgs .u{display:flex;justify-content:space-between;align-items:center;padding:3px 5px;margin-bottom:1px;background:rgba(0,0,0,0.2);border-radius:3px;font-size:11px}
+.a-upgs .u{border-left:2px solid #5a8a3a;background:rgba(20,40,10,0.2)}
+.g-upgs .u .d,.c-upgs .u .d,.a-upgs .u .d{flex:1;min-width:0}
+.g-upgs .u .d .nm,.c-upgs .u .d .nm,.a-upgs .u .d .nm{font-weight:600;font-size:11px}
+.g-upgs .u .d .dc,.c-upgs .u .d .dc,.a-upgs .u .d .dc{font-size:9px;color:#6a5a4a}
+.g-upgs .u .co,.c-upgs .u .co,.a-upgs .u .co{font-size:10px;color:#ffd700;margin:0 3px;white-space:nowrap}
+.g-upgs .u button,.c-upgs .u button,.a-upgs .u button{font-size:9px;padding:3px 6px;font-family:inherit;background:linear-gradient(135deg,#3a2010,#5a3018);color:#e8ddd0;border:1px solid #6a3820;border-radius:3px;cursor:pointer;white-space:nowrap}
+.a-upgs .u button{background:linear-gradient(135deg,#1a3a10,#2a5a18);border-color:#3a6a28}
+.g-upgs .u button:disabled,.c-upgs .u button:disabled,.a-upgs .u button:disabled{opacity:0.3;cursor:not-allowed}
 
 /* ── CRAFT ── */
-.c-recipes{padding:4px 6px;flex-shrink:0}
+.c-recipes{padding:3px 6px;flex-shrink:0}
 .c-recipes .ch{font-size:10px;text-transform:uppercase;color:#4a3a2a;margin:2px 0;display:block}
 .c-recipes .cr{display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
 .c-recipes .cr .ci{background:rgba(15,10,6,0.6);border:1px solid #1a0e08;border-radius:4px;padding:4px 3px;text-align:center;cursor:pointer;transition:all 0.1s;font-size:11px}
 .c-recipes .cr .ci:hover{border-color:#3a2a1a}.c-recipes .cr .ci.on{border-color:#e8c87a;background:rgba(232,200,122,0.04)}
 .c-recipes .cr .ci .cn{font-size:9px;color:#6a5a4a}.c-recipes .cr .ci.locked{opacity:0.2;cursor:default}
 
-.cbar{width:80%;max-width:260px;height:10px;background:#0a0604;border-radius:5px;overflow:hidden;margin:4px auto;border:1px solid #2a180e;position:relative}
+.cbar{width:80%;max-width:240px;height:10px;background:#0a0604;border-radius:5px;overflow:hidden;margin:3px auto;border:1px solid #2a180e;position:relative}
 .cbar .cf{height:100%;background:linear-gradient(90deg,#c46a3a,#e8a050);border-radius:4px;transition:width 0.05s;position:absolute;left:0;top:0}
 
 /* ── BUILD ── */
 #build-pane canvas{display:block;width:100%;height:100%}
-
-.bhud{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,rgba(10,6,4,0.97) 0%,rgba(10,6,4,0.85) 80%,transparent 100%);padding:8px 10px 10px;z-index:5;gap:4px;display:flex;flex-direction:column}
-.bhud .sn{font-size:13px;font-weight:700;color:#e8c87a;text-shadow:0 1px 3px rgba(0,0,0,0.5)}
+.bhud{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,rgba(10,6,4,0.97) 0%,rgba(10,6,4,0.85) 80%,transparent 100%);padding:6px 8px 8px;z-index:5;gap:3px;display:flex;flex-direction:column}
+.bhud .sn{font-size:12px;font-weight:700;color:#e8c87a;text-shadow:0 1px 3px rgba(0,0,0,0.5)}
 .bhud .pt{font-size:11px;color:#8a7a6a;display:flex;gap:10px}
 .bhud .pt span{color:#e8ddd0}
 .bhud .stab{height:5px;background:#0a0604;border-radius:3px;overflow:hidden;border:1px solid #1a0e08}
 .bhud .stab .sf{height:100%;border-radius:2px;transition:width 0.3s;position:relative}
-.bhud .ah{font-size:12px;color:#c0a070}
-
-.row{display:flex;gap:2px;flex-wrap:wrap}.row .dot{width:6px;height:6px;border-radius:1px;background:#1a0e08;border:1px solid #2a180e}
+.bhud .ah{font-size:11px;color:#c0a070}
+.row{display:flex;gap:2px;flex-wrap:wrap}.row .dot{width:5px;height:5px;border-radius:1px;background:#1a0e08;border:1px solid #2a180e}
 .row .dot.done{background:#c46a3a;border-color:#e8a050}.row .dot.crack{background:#cc3030;border-color:#cc5050;animation:pulse 0.3s infinite}
-
 @keyframes pulse{0%,100%{box-shadow:0 0 2px rgba(255,215,0,0.3)}50%{box-shadow:0 0 4px rgba(255,215,0,0.5)}}
-#fb{position:absolute;bottom:52px;right:6px;z-index:6;font-size:13px;padding:6px 14px;background:linear-gradient(135deg,#3a2010,#5a3018);color:#e8c87a;border:1px solid #6a3820;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,0.5)}
+#fb{position:absolute;bottom:48px;right:6px;z-index:6;font-size:12px;padding:5px 12px;background:linear-gradient(135deg,#3a2010,#5a3018);color:#e8c87a;border:1px solid #6a3820;border-radius:5px;cursor:pointer;font-family:inherit;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,0.5)}
 #fb:active{transform:scale(0.95)}
 #tower-tech{position:absolute;top:4px;right:4px;z-index:6}
 #tower-tech button{background:rgba(10,6,4,0.85);border:1px solid #2a180e;border-radius:4px;padding:3px 6px;cursor:pointer;font-size:11px;color:#8a6a4a;font-family:inherit}
@@ -107,21 +116,21 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
 #ttech-panel .tu button{font-size:9px;padding:2px 5px;font-family:inherit;background:linear-gradient(135deg,#3a2010,#5a3018);color:#e8ddd0;border:1px solid #6a3820;border-radius:3px;cursor:pointer;white-space:nowrap}
 #ttech-panel .tu button:disabled{opacity:0.3;cursor:not-allowed}#ttech-panel .tuh{font-size:9px;text-transform:uppercase;color:#4a3a2a;margin:2px 0 2px;border-top:1px solid #1a0e08;padding-top:2px}
 
-.sk-scroll{padding:6px;flex:1;overflow-y:auto}
-.sk{background:rgba(15,10,6,0.6);border:1px solid #1a0e08;border-radius:4px;padding:4px 8px;margin-bottom:4px}
+.sk-scroll{padding:5px;flex:1;overflow-y:auto}
+.sk{background:rgba(15,10,6,0.6);border:1px solid #1a0e08;border-radius:4px;padding:4px 7px;margin-bottom:3px}
 .sk .shdr{display:flex;justify-content:space-between;align-items:center}
-.sk .shdr .sn{font-weight:700;font-size:14px}.sk .shdr .sl{font-size:12px;font-weight:600}
-.sk .sbar{height:5px;background:#0a0604;border-radius:3px;margin:3px 0;overflow:hidden}
-.sk .sbar .sf{height:100%;border-radius:3px;transition:width 0.2s}.sk .sxp{font-size:10px;color:#6a5a4a}
+.sk .shdr .sn{font-weight:700;font-size:13px}.sk .shdr .sl{font-size:11px;font-weight:600}
+.sk .sbar{height:4px;background:#0a0604;border-radius:2px;margin:2px 0;overflow:hidden}
+.sk .sbar .sf{height:100%;border-radius:2px;transition:width 0.2s}.sk .sxp{font-size:10px;color:#6a5a4a}
 
-.ms-sec{margin:6px 0;padding:6px;border-radius:4px;background:rgba(15,10,6,0.4)}
+.ms-sec{margin:5px 0;padding:5px;border-radius:4px;background:rgba(15,10,6,0.4)}
 .ms-sec .msh{font-size:12px;font-weight:700;margin-bottom:2px;display:flex;justify-content:space-between}
-.ms-sec .msh span{font-size:11px;color:#6a5a4a}
+.ms-sec .msh span{font-size:10px;color:#6a5a4a}
 .ms-sec .msg{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:2px}
-.ms-sec .msg .m{background:rgba(10,6,4,0.6);border:1px solid #1a0e08;border-radius:4px;padding:3px 4px;text-align:center;font-size:11px;cursor:pointer;transition:all 0.12s}
+.ms-sec .msg .m{background:rgba(10,6,4,0.6);border:1px solid #1a0e08;border-radius:4px;padding:3px 4px;text-align:center;font-size:10px;cursor:pointer;transition:all 0.12s}
 .ms-sec .msg .m:hover{border-color:#3a2a1a}.ms-sec .msg .m.unlocked{border-color:#3a5a3a;background:rgba(10,20,10,0.4)}
 .ms-sec .msg .m.next{border-color:#ffd700;box-shadow:0 0 4px rgba(255,215,0,0.1)}
-.ms-sec .msg .m .ml{font-size:13px;font-weight:800;color:#e8c87a}.ms-sec .msg .m .md{font-size:9px;color:#6a5a4a;line-height:1.2}
+.ms-sec .msg .m .ml{font-size:12px;font-weight:800;color:#e8c87a}.ms-sec .msg .m .md{font-size:9px;color:#6a5a4a;line-height:1.2}
 .ms-sec .msg .m .mb{font-size:9px;color:#4a7a4a}
 
 .su{background:rgba(15,10,6,0.5);border-radius:4px;padding:4px;margin-top:4px}
@@ -132,16 +141,16 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
 .su .u button{font-size:9px;padding:3px 6px;font-family:inherit;background:linear-gradient(135deg,#3a2010,#5a3018);color:#e8ddd0;border:1px solid #6a3820;border-radius:3px;cursor:pointer;white-space:nowrap}
 .su .u button:disabled{opacity:0.3;cursor:not-allowed}
 
-.t-scroll{padding:6px;flex:1;overflow-y:auto}.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:4px}
-.parapet{border:1px solid #1a0e08;border-radius:5px;padding:5px;background:rgba(15,10,6,0.6)}
+.t-scroll{padding:5px;flex:1;overflow-y:auto}.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:3px}
+.parapet{border:1px solid #1a0e08;border-radius:5px;padding:4px;background:rgba(15,10,6,0.6)}
 .parapet .phdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
-.parapet .phdr .pn{font-size:13px;font-weight:700}.parapet .phdr .pl{font-size:10px;font-weight:600}
-.parapet .pdesc{font-size:10px;color:#6a5a4a;margin-bottom:2px}.parapet .pbar{height:3px;background:#0a0604;border-radius:2px;overflow:hidden;margin-bottom:2px}
+.parapet .phdr .pn{font-size:12px;font-weight:700}.parapet .phdr .pl{font-size:10px;font-weight:600}
+.parapet .pdesc{font-size:9px;color:#6a5a4a;margin-bottom:2px}.parapet .pbar{height:3px;background:#0a0604;border-radius:2px;overflow:hidden;margin-bottom:2px}
 .parapet .pbar .pf{height:100%;background:linear-gradient(90deg,#e8c87a,#ffd700);border-radius:2px;transition:width 0.2s}
 .parapet .peff{font-size:9px;color:#8a7a6a;margin-bottom:2px}
-.parapet button{width:100%;font-size:10px;padding:4px;font-family:inherit;background:linear-gradient(135deg,#3a2010,#5a3018);color:#e8ddd0;border:1px solid #6a3820;border-radius:3px;cursor:pointer}
+.parapet button{width:100%;font-size:10px;padding:3px;font-family:inherit;background:linear-gradient(135deg,#3a2010,#5a3018);color:#e8ddd0;border:1px solid #6a3820;border-radius:3px;cursor:pointer}
 .parapet button:disabled{opacity:0.3;cursor:not-allowed}
-#notif{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:100;background:rgba(10,6,4,0.95);border:1px solid #ffd700;border-radius:6px;padding:6px 14px;color:#e8c87a;font-weight:600;font-size:12px;text-align:center;max-width:260px;opacity:0;transition:opacity 0.12s;pointer-events:none;box-shadow:0 3px 12px rgba(0,0,0,0.6)}
+#notif{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:100;background:rgba(10,6,4,0.95);border:1px solid #ffd700;border-radius:6px;padding:5px 12px;color:#e8c87a;font-weight:600;font-size:12px;text-align:center;max-width:250px;opacity:0;transition:opacity 0.12s;pointer-events:none;box-shadow:0 3px 12px rgba(0,0,0,0.6)}
 #notif.sh{opacity:1}.prtcl{position:fixed;pointer-events:none;font-size:10px;animation:prtclFade 0.4s ease forwards;z-index:50}
 @keyframes prtclFade{0%{opacity:1;transform:translateY(0) scale(0.5)}100%{opacity:0;transform:translateY(-30px) scale(1.2)}}
 @media(min-width:768px){#game{width:480px;height:800px;border-radius:12px;border:1px solid #2a180e;box-shadow:0 8px 40px rgba(0,0,0,0.8)}}
@@ -159,10 +168,14 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
       </div>
     </div>
     <div id="xp-strip">
-      <div class="xpr"><span class="xlb" style="color:#d06040">⛏️</span><span class="xn">Gather</span><div class="xbarw"><div class="xf" id="xpf-g" style="width:0%;background:#d06040"></div><div class="xfo" id="xfo-g" style="background:#d06040"></div></div><span class="xlv" id="xlv-g" style="color:#d06040">1</span></div>
-      <div class="xpr"><span class="xlb" style="color:#50b050">🔨</span><span class="xn">Craft</span><div class="xbarw"><div class="xf" id="xpf-c" style="width:0%;background:#50b050"></div><div class="xfo" id="xfo-c" style="background:#50b050"></div></div><span class="xlv" id="xlv-c" style="color:#50b050">1</span></div>
-      <div class="xpr"><span class="xlb" style="color:#5090d0">🧱</span><span class="xn">Build</span><div class="xbarw"><div class="xf" id="xpf-b" style="width:0%;background:#5090d0"></div><div class="xfo" id="xfo-b" style="background:#5090d0"></div></div><span class="xlv" id="xlv-b" style="color:#5090d0">1</span></div>
-      <div class="xpr" style="opacity:0.5;height:10px"><span class="xlb" style="color:#e0d0c0">⚡</span><span class="xn">General</span><div class="xbarw" style="height:3px"><div class="xf" id="xpf-x" style="width:0%;background:#e0d0c0"></div><div class="xfo" id="xfo-x" style="background:#e0d0c0"></div></div><span class="xlv" id="xlv-x" style="color:#e0d0c0">1</span></div>
+      <div id="xp-general">
+        <div class="xpr"><span class="xlb" style="color:#e0d0c0">⚡</span><span class="xn">General</span><div class="xbarw"><div class="xf" id="xpf-x" style="width:0%;background:#e0d0c0"></div><div class="xfo" id="xfo-x" style="background:#e0d0c0"></div></div><span class="xlv" id="xlv-x" style="color:#e0d0c0">1</span></div>
+      </div>
+      <div id="xp-skills">
+        <div class="xpr" id="xp-g"><span class="xlb" style="color:#d06040">⛏️</span><span class="xn">Gather</span><div class="xbarw"><div class="xf" id="xpf-g" style="width:0%;background:#d06040"></div><div class="xfo" id="xfo-g" style="background:#d06040"></div></div><span class="xlv" id="xlv-g" style="color:#d06040">1</span></div>
+        <div class="xpr" id="xp-c"><span class="xlb" style="color:#50b050">🔨</span><span class="xn">Craft</span><div class="xbarw"><div class="xf" id="xpf-c" style="width:0%;background:#50b050"></div><div class="xfo" id="xfo-c" style="background:#50b050"></div></div><span class="xlv" id="xlv-c" style="color:#50b050">1</span></div>
+        <div class="xpr" id="xp-b"><span class="xlb" style="color:#5090d0">🧱</span><span class="xn">Build</span><div class="xbarw"><div class="xf" id="xpf-b" style="width:0%;background:#5090d0"></div><div class="xfo" id="xfo-b" style="background:#5090d0"></div></div><span class="xlv" id="xlv-b" style="color:#5090d0">1</span></div>
+      </div>
     </div>
   </div>
   <div id="tabs">
@@ -181,6 +194,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
         <div class="sub" id="g-sub">+1 per tap</div>
       </div>
       <div class="g-upgs" id="g-upgs"></div>
+      <div class="a-upgs" id="g-auto-upgs"></div>
     </div>
     <div class="pane" id="craft-pane">
       <div class="c-recipes" id="c-recipes" style="margin-top:2px"></div>
@@ -191,6 +205,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
         <div class="cbar" id="c-bar" style="display:none"><div class="cf" id="c-fill" style="width:0%"></div></div>
       </div>
       <div class="c-upgs" id="c-upgs"></div>
+      <div class="a-upgs" id="c-auto-upgs"></div>
     </div>
     <div class="pane" id="build-pane">
       <canvas id="bc"></canvas>
@@ -255,7 +270,8 @@ const GOLD_COL='#ffd700',RES_COL='#c46a3a',GXP_COL='#e0d0c0',
 
 const S = {res:{},mat:{},upg:{},tech:{},tower:{rows:[],colCount:3,collapses:0,_coll:false},stat:{gold:0,bricks:0,totalClicks:0,taps:0},
   cp:{},sk:{gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}},
-  ms:{gathering:0,crafting:0,building:0,general:0},tal:{},tick:0,_selCraft:null};
+  ms:{gathering:0,crafting:0,building:0,general:0},tal:{},tick:0,_selCraft:null,
+  auto:{gather:0,craft:0,build:0}};
 
 const UPG_G = [
   {id:'g1',n:'Clay Fingers',d:'+1 gather per tap',c:20,m:2.5,L:10,sk:'gather',v:1},
@@ -274,6 +290,17 @@ const UPG_R = [
   {id:'r4',n:'Crane',d:'+30% resource gain',c:3000,m:4,L:15,sk:'gather',v:0.3},
   {id:'r5',n:'Steam Engine',d:'+50% resource gain',c:12000,m:4.5,L:15,sk:'gather',v:0.5},
   {id:'r6',n:'Magic Loom',d:'+100% resource gain',c:50000,m:5,L:15,sk:'gather',v:1},
+];
+const UPG_A = [
+  {id:'ag1',n:'Auto-Scoop',d:'Auto-gather every 2s',c:80,m:2.8,L:10,sk:'gather'},
+  {id:'ag2',n:'Auto-Windmill',d:'Auto-gather every 1s',c:500,m:3.2,L:10,sk:'gather'},
+  {id:'ag3',n:'Auto-Earth Mover',d:'Auto-gather every 0.5s',c:3000,m:3.8,L:10,sk:'gather'},
+  {id:'ac1',n:'Auto-Stir',d:'Auto-craft every 3s',c:120,m:2.8,L:10,sk:'craft'},
+  {id:'ac2',n:'Auto-Press',d:'Auto-craft every 1.5s',c:800,m:3.2,L:10,sk:'craft'},
+  {id:'ac3',n:'Auto-Factory',d:'Auto-craft every 0.75s',c:5000,m:3.8,L:10,sk:'craft'},
+  {id:'ab1',n:'Auto-Trowel',d:'Auto-place bricks every 3s',c:200,m:2.8,L:10,sk:'build'},
+  {id:'ab2',n:'Auto-Crane',d:'Auto-place bricks every 1.5s',c:1200,m:3.2,L:10,sk:'build'},
+  {id:'ab3',n:'Auto-Gigalith',d:'Auto-place bricks every 0.75s',c:8000,m:3.8,L:10,sk:'build'},
 ];
 const UPG_S = [
   {id:'sg1',n:'Gatherer Focus',d:'×2 gather rate',c:100,m:2.5,L:10,sk:'gathering',rL:0},
@@ -335,38 +362,53 @@ function tL(id){return S.tal[id]||0}
 function msG(id){return S.ms[id]||0}
 function skLv(id){return S.sk[id]?.lv||1}
 function xpN(lv){return Math.floor(50*lv*(1+lv*0.12))}
+function aL(id){return S.auto[id]||0}
 
 function rC(id){const s=S.sk[id];let l=1,x=s.xp;while(x>=xpN(l)){x-=xpN(l);l++}s.lv=l}
 
-// ─── XP OVERLAY ANIMATION ─────────────────────────────────────────────
-// When XP gained in one skill, all 3 skill bars show that skill's fill
-// for 1.2s, then fade back to individual fills. General bar is NOT overlaid.
+// ─── XP OVERLAY & BARS ───────────────────────────────────────────────
 
-let xpOverlayTimer=null;
 const SKILL_IDS=['gathering','crafting','building'];
 const SKILL_COLS={'gathering':GAT_COL,'crafting':CRA_COL,'building':BLD_COL,'general':GXP_COL};
 const XP_FO=['xfo-g','xfo-c','xfo-b'];
 const XP_XF=['xpf-g','xpf-c','xpf-b'];
+const XP_IDS=['xp-g','xp-c','xp-b'];
+let xpOverlayTimer=null;
+let currentBoostedSkill=null;
 
 function triggerXpOverlay(skill){
   if(!skill||skill==='general')return;
   const s=S.sk[skill];if(!s)return;
   const nx=xpN(s.lv);const pct=Math.min(100,Math.floor((s.xp||0)/nx*100));
   const col=SKILL_COLS[skill]||GXP_COL;
+
   // Show overlay on all 3 skill bars
   for(let i=0;i<3;i++){
     const fo=document.getElementById(XP_FO[i]);
     if(fo){fo.style.width=pct+'%';fo.style.background=col;fo.classList.add('sh')}
   }
-  // Recede after 1.2s
+
+  // Grow the boosted bar, shrink others
+  currentBoostedSkill=skill;
+  for(let i=0;i<3;i++){
+    const el=document.getElementById(XP_IDS[i]);
+    if(el)el.style.flex=(SKILL_IDS[i]===skill?'4':'1');
+  }
+
   clearTimeout(xpOverlayTimer);
   xpOverlayTimer=setTimeout(()=>{
-    // Animate recede: first fade opacity, then set proper widths behind
+    // Fade overlay
     for(let i=0;i<3;i++){
       const fo=document.getElementById(XP_FO[i]);
       if(fo)fo.classList.remove('sh');
     }
-    // After the fade completes, restore bars to their actual levels
+    // Restore equal flex
+    for(let i=0;i<3;i++){
+      const el=document.getElementById(XP_IDS[i]);
+      if(el)el.style.flex='1';
+    }
+    currentBoostedSkill=null;
+    // After fade, restore actual levels
     setTimeout(()=>updateXPBars(),500);
   },1200);
 }
@@ -379,11 +421,19 @@ function updateXPBars(){
     const f=document.getElementById(XP_XF[i]);
     if(f){f.style.width=pct+'%';f.style.background=col}
   });
-  // Also update general bar
-  const gs=S.sk.general;
-  const gnx=xpN(gs.lv);const gpct=Math.min(100,Math.floor((gs.xp||0)/gnx*100));
-  const gf=document.getElementById('xpf-x');
-  if(gf){gf.style.width=gpct+'%';}
+  // General bar
+  const gs=S.sk.general;if(gs){
+    const gnx=xpN(gs.lv);const gpct=Math.min(100,Math.floor((gs.xp||0)/gnx*100));
+    const gf=document.getElementById('xpf-x');
+    if(gf)gf.style.width=gpct+'%';
+    const gl=document.getElementById('xlv-x');
+    if(gl)gl.textContent=gs.lv;
+  }
+  // Update skill levels in XP strip
+  SKILL_IDS.forEach((id,i)=>{
+    const el=document.getElementById('xlv-'+id.charAt(0));
+    if(el)el.textContent=S.sk[id].lv;
+  });
 }
 
 // ─── EARNING ──────────────────────────────────────────────────────────
@@ -392,18 +442,11 @@ function earnX(sk,base){
   let m=1;
   if(msG('general')>=2)m*=2;
   if(msG('general')>=8)m*=4;
-  if(uL('sg1')>0||uL('sc1')>0||uL('sb1')>0){
-    if(sk==='gathering'&&uL('sg1')>0)m*=uL('sg1')*2;
-    else if(sk==='crafting'&&uL('sc1')>0)m*=uL('sc1')*2;
-    else if(sk==='building'&&uL('sb1')>0)m*=uL('sb1')*2;
-  }
   if(tL('d1')>0)m*=1+tL('d1')*0.15;
   const x=Math.floor(base*m);
   if(sk==='general'){S.sk.general.xp+=x;rC('general')}
   else{S.sk[sk].xp+=x;rC(sk);S.sk.general.xp+=Math.floor(x*0.5);rC('general')}
-  // Update XP bars immediately (individual fills)
   updateXPBars();
-  // Trigger overlay animation
   setTimeout(()=>triggerXpOverlay(sk),50);
 }
 
@@ -417,46 +460,33 @@ function gather(id){
   if(msG('gathering')>=1)g=Math.max(1,Math.floor(g*3));
   if(msG('gathering')>=5)g=Math.max(1,Math.floor(g*10));
   if(msG('gathering')>=9)g=Math.max(1,Math.floor(g*25));
-  // Resource % upgrades
   UPG_R.forEach(u=>{const l=uL(u.id);if(l>0)m+=u.v*l});
-  // Talent: resource efficiency
   if(tL('t3')>0)m+=tL('t3')*0.08;
   const amount=Math.max(1,Math.floor(base*(1+m)));
   S.res[id]=(S.res[id]||0)+amount;
-  // Gold from gather
   const gAmt=Math.max(1,Math.floor(g*(1+uL('g1')*0.5+uL('g2')*1+uL('g3')*2+uL('g4')*4)));
   S.stat.gold=(S.stat.gold||0)+gAmt;
   S.stat.totalClicks=(S.stat.totalClicks||0)+1;
-  // XP
   earnX('gathering',1);
-  // Show floating feedback
   showFeed(GAT_COL,RES_COL,GOLD_COL,'+'+amount+'R','+'+gAmt+'🪙','+1⛏️XP','+'+(Math.floor(1*0.5))+'⚡XP');
   updateUI();
-}
-
-function autoTick(){
-  // Passive resource generation
-  if(S.stat.totalClicks>0){
-    RES_ALL.forEach(r=>{
-      if(r.unlock<=skLv('gathering')){
-        const b=Math.max(0.01,0.1*(1+uL('r1')*0.1+uL('r2')*0.15+uL('r3')*0.2+uL('r4')*0.3+uL('r5')*0.5+uL('r6')*1));
-        S.res[r.id]=(S.res[r.id]||0)+b;
-      }
-    });
-  }
 }
 
 // ─── CRAFT ────────────────────────────────────────────────────────────
 
 function autoCraft(){
-  const avail=unlockedMat().filter(m=>{const r=m.r;for(const[k,v]of Object.entries(r))if((S.res[k]||0)<v)return false;return true});
-  if(!avail.length)return null;
+  const goodMats=unlockedMat().filter(m=>m.id!=='mortar');
+  const avail=goodMats.filter(m=>{const r=m.r;for(const[k,v]of Object.entries(r))if((S.res[k]||0)<v)return false;return true});
+  if(!avail.length){
+    // Try mortar if no other craft possible
+    const mort=MAT_ALL.find(m=>m.id==='mortar');
+    if(mort){const r=mort.r;for(const[k,v]of Object.entries(r))if((S.res[k]||0)<v)return null;return mort}
+    return null
+  }
   const sel=S._selCraft?avail.find(m=>m.id===S._selCraft):null;
   if(sel)return sel;
-  // Pick the best available
-  const idx=MAT_ALL.indexOf(avail[avail.length-1]);
-  if(idx>=0){S._selCraft=MAT_ALL[idx].id;return MAT_ALL[idx]}
-  S._selCraft=avail[0].id;return avail[0]
+  const best=avail.reduce((a,b)=>MAT_ALL.indexOf(a)>MAT_ALL.indexOf(b)?a:b);
+  S._selCraft=best.id;return best
 }
 
 function craft(mat){
@@ -467,7 +497,6 @@ function craft(mat){
   if(msG('crafting')>=1)b=Math.max(1,Math.floor(b*3));
   if(msG('crafting')>=5)b=Math.max(1,Math.floor(b*10));
   if(msG('crafting')>=9)b=Math.max(1,Math.floor(b*25));
-  // Talent: resource efficiency
   let save=0;if(tL('t3')>0)save=Math.min(0.5,tL('t3')*0.08);
   for(const[k,v]of Object.entries(r)){S.res[k]-=v;if(save>0&&Math.random()<save)S.res[k]+=1}
   let amount=b;
@@ -489,19 +518,17 @@ function getBaseW(){let w=3;[null,'bw1','bw2','bw3','bw4','bw5'].forEach(t=>{if(
 function getReinf(){let b=0;['rf1','rf2','rf3','rf4','rf5'].forEach(id=>{if(S.tech[id])b+=TECH.find(t=>t.id===id).val});
   b*=1+tL('f1')*0.1;
   if(msG('gathering')>=4||msG('crafting')>=4||msG('building')>=4||msG('general')>=4)b+=0.2;
-  if(msG('gathering')>=8||msG('crafting')>=8||msG('building')>=8||msG('general')>=8)b+=0.3;
-  return b}
+  if(msG('gathering')>=8||msG('crafting')>=8||msG('building')>=8||msG('general')>=8)b+=0.3;return b}
 function getFound(){let m=1;['fd1','fd2','fd3'].forEach(id=>{if(S.tech[id])m+=TECH.find(t=>t.id===id).val});return m}
 function getMatStr(){const m=MAT_ALL.find(x=>x.id===getMatId());return m?m.str:1.0}
 function getStab(){const h=S.tower.rows.length;if(h===0)return{s:100,p:100,m:1};
   const bw=getBaseW(),ri=getReinf(),fd=getFound(),ms=getMatStr();
-  const s=h/(bw*5+25+ri*30+fd*10);const mms=ms*(1+ri);
   const maxSafe=bw*5+25+ri*30+fd*10;if(maxSafe<=0)return{s:0,p:0,m:1};
   const p=Math.max(0,Math.min(100,100-((h/maxSafe)*100)));
   const hp=Math.max(0.1,1-p/100);
   const c=hp*hp*1.2;let cc=false;
   if(Math.random()<c/300)cc=true;
-  return{s:p,p:p,m:mms}}
+  return{s:p,p:p,m:ms*(1+ri)}}
 function getMatId(){const l=skLv('crafting');if(l>=18)return'megalith';if(l>=12)return'glazedBrick';if(l>=8)return'reinfBrick';if(l>=6)return'stoneBlock';if(l>=3)return'firedBrick';return'mudBrick'}
 function bT(){return 4-Math.min(3,skLv('building')*0.1)}
 function mT(){return 5-Math.min(4,skLv('building')*0.1)}
@@ -521,43 +548,26 @@ function tapBuild(){
   const bw=getBaseW();
   let rows=S.tower.rows;if(!rows.length)rows.push({bricks:[]});
   let row=rows[rows.length-1];
-  // Check if current row is full
   if(row.bricks.length>=bw){
-    // Check stability — could collapse
     const st=getStab();
     if(st.p<=0||(st.p<5&&Math.random()<0.05)){
-      // COLLAPSE!
       S.tower._coll=true;notif('💥 TOWER COLLAPSED!');
       S.stat.gold=(S.stat.gold||0)+Math.floor(Math.max(10,rows.length*5));
       updateUI();return
     }
     rows.push({bricks:[]});row=rows[rows.length-1];slotIdx=0;buildPhase=0;rowPhase=0;mPhase=0
   }
-  // Need enough bricks for the row
   S.mat[mat]=(S.mat[mat]||0)-1;S.mat.mortar=(S.mat.mortar||0)-1;
   S.stat.taps=(S.stat.taps||0)+1;
   S.stat.totalClicks=(S.stat.totalClicks||0)+1;
   S.stat.gold=(S.stat.gold||0)+Math.floor(Math.random()*3+1);
-  
   const rowFill=row.bricks.length;
-  // Speed from skills/upgrades
-  let spd=1;if(msG('building')>=1)spd=Math.max(1,Math.floor(spd*3));
-  if(msG('building')>=5)spd=Math.max(1,Math.floor(spd*10));
-  if(msG('building')>=9)spd=Math.max(1,Math.floor(spd*25));
-  if(tL('t1')>0)spd+=tL('t1')*0.15;
-  if(uL('sb1')>0)spd=Math.max(1,Math.floor(spd*(1+uL('sb1')*0.2)));
-  
-  // Create placing brick
   const brick={st:'p',pr:0};
   row.bricks.push(brick);
   slotIdx=row.bricks.length-1;
-  
   earnX('building',2);
   showFeed(BLD_COL,RES_COL,GOLD_COL,'+1🧱','+'+(Math.floor(Math.random()*3+1))+'🪙','+2🧱XP','+'+(Math.floor(2*0.5))+'⚡XP');
-  
-  // Auto-advance the brick to placed
   row.bricks[slotIdx].st='d';
-  
   updateUI();
 }
 
@@ -566,10 +576,12 @@ function initTowerIfNeeded(){if(!S.tower.rows||!S.tower.rows.length)initTower()}
 // ─── UPGRADES & TECH ─────────────────────────────────────────────────
 
 function buyUpg(id){
-  const allU=[...UPG_G,...UPG_R,...UPG_S];const u=allU.find(x=>x.id===id);if(!u)return;
+  const allU=[...UPG_G,...UPG_R,...UPG_S,...UPG_A];const u=allU.find(x=>x.id===id);if(!u)return;
   const l=uL(u.id);if(l>=u.L)return;
   const c=Math.floor(u.c*Math.pow(u.m,l));if((S.stat.gold||0)<c)return;
   S.stat.gold-=c;S.upg[id]=(S.upg[id]||0)+1;
+  // Auto upgrades also update S.auto for tick logic
+  if(UPG_A.find(x=>x.id===id)){S.auto[u.sk]=(S.auto[u.sk]||0)+1}
   notif('🔧 '+u.n+' Lv.'+(l+1));updateUI()
 }
 
@@ -580,17 +592,14 @@ function buyTech(id){
   S.stat.gold-=t.cost;S.tech[id]=t.val;
   notif('⬆️ '+t.n);updateUI()
 }
-
 function buyMs(skill,i){
   if(msG(skill)>i)return;
   const track=MS[skill];
   if(i>=track.length)return;
   if(skLv(skill)<track[i].lv)return;
   S.ms[skill]=i+1;
-  notif('🏆 '+track[i].n+'!');
-  updateUI()
+  notif('🏆 '+track[i].n+'!');updateUI()
 }
-
 function buyTalent(id){
   const t=TALENTS.find(x=>x.id===id);if(!t)return;
   const l=tL(t.id);if(l>=t.L)return;
@@ -610,10 +619,8 @@ function showFeed(col1,col2,col3,t1,t2,t3,t4){
   const f=document.createElement('div');f.className='feed';
   f.innerHTML='<span class="l1"><span style="color:'+col2+'">'+t1+'</span> <span style="color:'+col3+'">'+t2+'</span></span><span class="l2"><span style="color:'+col1+'">'+t3+'</span> <span style="color:'+GXP_COL+'">'+t4+'</span></span>';
   const r=zone.getBoundingClientRect();
-  f.style.left=(10+Math.random()*(r.width-60))+'px';
-  f.style.top=(30+Math.random()*(r.height*0.3))+'px';
-  zone.appendChild(f);
-  setTimeout(()=>f.remove(),800)
+  f.style.left=(10+Math.random()*(r.width-60))+'px';f.style.top=(30+Math.random()*(r.height*0.3))+'px';
+  zone.appendChild(f);setTimeout(()=>f.remove(),800)
 }
 
 function notif(msg){const n=document.getElementById('notif');n.textContent=msg;n.classList.add('sh');clearTimeout(n._to);n._to=setTimeout(()=>n.classList.remove('sh'),1500)}
@@ -684,7 +691,7 @@ function updateUI(){
   // Resource grid
   const resHtml=unlockedRes().map(r=>{
     const amt=Math.floor(S.res[r.id]||0);
-    const isActive=!gF()||gF().id===r.id;
+    const isActive=gF()&&gF().id===r.id;
     return '<div class="r'+(isActive?' glow':'')+'"><span class="i">'+r.i+'</span><span class="n">'+r.n+'</span><span class="v">'+amt+'</span></div>'
   }).join('');
   document.getElementById('g-res').innerHTML=resHtml;
@@ -699,9 +706,9 @@ function updateUI(){
     document.getElementById('g-sub').textContent='+'+eff+'R +'+(perTap)+'🪙 per tap';
   }
 
-  // Gather upgrades
+  // Gather TAP upgrades
   document.getElementById('g-upgs').innerHTML=
-    '<div class="uh">💰 Gold Upgrades</div>'+
+    '<div class="uh">💰 Tap Upgrades</div>'+
     UPG_G.filter(u=>u.sk==='gather').map(u=>{
       const l=uL(u.id),mx=l>=u.L,c=Math.floor(u.c*Math.pow(u.m,l));const ok=(S.stat.gold||0)>=c&&!mx;
       return '<div class="u"><div class="d"><div class="nm">'+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">🪙'+c+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
@@ -710,6 +717,16 @@ function updateUI(){
     UPG_R.map(u=>{
       const l=uL(u.id),mx=l>=u.L,c=Math.floor(u.c*Math.pow(u.m,l));const ok=(S.stat.gold||0)>=c&&!mx;
       return '<div class="u"><div class="d"><div class="nm">'+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">🪙'+c+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
+    }).join('');
+
+  // Gather AUTO upgrades
+  const gatherAuto=UPG_A.filter(u=>u.sk==='gather');
+  const hasGatherAuto=gatherAuto.some(u=>uL(u.id)>0);
+  document.getElementById('g-auto-upgs').innerHTML=
+    '<div class="uh">⚙️ Automation</div>'+
+    gatherAuto.map(u=>{
+      const l=uL(u.id),mx=l>=u.L,c=Math.floor(u.c*Math.pow(u.m,l));const ok=(S.stat.gold||0)>=c&&!mx;
+      return '<div class="u"><div class="d"><div class="nm">🤖 '+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">🪙'+c+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
     }).join('');
 
   // Craft pane
@@ -731,20 +748,61 @@ function updateUI(){
   }
   document.getElementById('c-bar').style.display=S._selCraft&&unlockedMat().find(m=>m.id===S._selCraft)?'block':'none';
 
-  // Craft upgrades
+  // Craft TAP upgrades
   document.getElementById('c-upgs').innerHTML=
-    '<div class="uh">💰 Gold Upgrades</div>'+
+    '<div class="uh">💰 Tap Upgrades</div>'+
     UPG_G.filter(u=>u.sk==='craft').map(u=>{
       const l=uL(u.id),mx=l>=u.L,c=Math.floor(u.c*Math.pow(u.m,l));const ok=(S.stat.gold||0)>=c&&!mx;
       return '<div class="u"><div class="d"><div class="nm">'+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">🪙'+c+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
+    }).join('');
+
+  // Craft AUTO upgrades
+  const craftAuto=UPG_A.filter(u=>u.sk==='craft');
+  document.getElementById('c-auto-upgs').innerHTML=
+    '<div class="uh">⚙️ Automation</div>'+
+    craftAuto.map(u=>{
+      const l=uL(u.id),mx=l>=u.L,c=Math.floor(u.c*Math.pow(u.m,l));const ok=(S.stat.gold||0)>=c&&!mx;
+      return '<div class="u"><div class="d"><div class="nm">🤖 '+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">🪙'+c+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
     }).join('');
 
   updateHUD();
   updateSkillsUI();
 }
 
+function getAutoInterval(id){
+  const levels=[0,3,1.5,0.75,0.4,0.2];
+  const l=Math.min(aL(id),levels.length-1);
+  return (levels[l]||0.5)*1000;
+}
+
+function runAuto(){
+  // Auto-gather
+  if(aL('gather')>0){
+    const gi=getAutoInterval('gather');
+    if(S.tick%(gi/100)<1){
+      const gr=gF();if(gr)gather(gr.id);
+    }
+  }
+  // Auto-craft
+  if(aL('craft')>0){
+    const ci=getAutoInterval('craft');
+    if(S.tick%(ci/100)<1){
+      const s=autoCraft();if(s)craft(s);
+    }
+  }
+  // Auto-build
+  if(aL('build')>0){
+    const bi=getAutoInterval('build');
+    if(S.tick%(bi/100)<1){
+      const mat=getMatId();
+      if(mat&&(S.mat[mat]||0)>0&&(S.mat.mortar||0)>0){
+        tapBuild();
+      }
+    }
+  }
+}
+
 function updateSkillsUI(){
-  // Skills list (full details for Skills tab)
   const si={gathering:'⛏️',crafting:'🔨',building:'🧱',general:'⚡'};
   const sc={'gathering':GAT_COL,'crafting':CRA_COL,'building':BLD_COL,'general':GXP_COL};
   document.getElementById('skills-list').innerHTML=Object.entries(S.sk).map(([id,s])=>{
@@ -753,7 +811,6 @@ function updateSkillsUI(){
       '<div class="sbar"><div class="sf" style="width:'+pct+'%;background:'+sc[id]+'"></div></div><div class="sxp">'+(s.xp||0)+'/'+nx+' ('+(nx-(s.xp||0))+' to next)</div></div>'
   }).join('');
 
-  // Milestones
   const msKeys=['gathering','crafting','building','general'];
   const msIcons={'gathering':'⛏️','crafting':'🔨','building':'🧱','general':'⚡'};
   const msCols={'gathering':GAT_COL,'crafting':CRA_COL,'building':BLD_COL,'general':GXP_COL};
@@ -797,7 +854,7 @@ function load(){try{const d=localStorage.getItem('babel_save');if(d){Object.assi
   if(!S.cp)S.cp={};if(!S.tech)S.tech={};if(!S.tal)S.tal={};if(!S.ms)S.ms={gathering:0,crafting:0,building:0,general:0};
   if(!S.sk)S.sk={gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}};
   if(!S.tower)S.tower={rows:[],colCount:3,collapses:0};if(!S.tower.rows)S.tower.rows=[];if(S.tower._coll===undefined)S.tower._coll=false;
-  if(!S._selCraft)S._selCraft=null;return true}}catch(e){}return false}
+  if(!S._selCraft)S._selCraft=null;if(!S.auto)S.auto={gather:0,craft:0,build:0};return true}}catch(e){}return false}
 
 function init(){
   document.querySelectorAll('.t').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.t)));
@@ -809,7 +866,7 @@ function init(){
     if(e.key>='1'&&e.key<='5')switchTab(['','gather','craft','build','skills','talents'][+e.key])});
   if(!load())initTower();
   window.addEventListener('resize',()=>rC2());rC2();updateUI();
-  setInterval(()=>{autoTick();S.tick++;if(S.tick%5===0)updateUI()},100);
+  setInterval(()=>{autoTick();runAuto();S.tick++;if(S.tick%5===0)updateUI()},100);
   setInterval(save,5000);
   (function lp(){draw();requestAnimationFrame(lp)})();
   console.log('🗼 Babel loaded!');
