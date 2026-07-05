@@ -7,10 +7,7 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd0;display:flex;justify-content:center;align-items:center;min-height:100vh;user-select:none;overflow:hidden;touch-action:manipulation}
-
 #game{width:100vw;height:100vh;max-width:100vw;max-height:100vh;display:flex;flex-direction:column;background:linear-gradient(135deg,#120a06,#0d0704);overflow:hidden;position:relative}
-
-/* ── TOP BAR ── */
 #bar{padding:3px 8px;background:linear-gradient(180deg,#1a0e08,#0d0704);border-bottom:1px solid #2a180e;flex-shrink:0;z-index:10}
 #bar-top{display:flex;justify-content:space-between;align-items:center;gap:4px}
 #bar-top h1{font-size:11px;font-weight:800;color:#e8c87a;letter-spacing:1px;white-space:nowrap;text-shadow:0 1px 4px rgba(0,0,0,0.5)}
@@ -19,167 +16,119 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
 #bar-top .st b{color:#e8ddd0}
 #bar-top .st .gold{color:#ffd700}
 #bar-top .st .hgt{color:#70b0d0}
-
-/* ── PERSISTENT XP BARS ── */
 #xp-strip{display:flex;gap:2px;padding:2px 6px;flex-shrink:0;background:rgba(0,0,0,0.2);border-bottom:1px solid #1a0e08}
 .xpb{flex:1;display:flex;align-items:center;gap:3px;padding:1px 4px;background:rgba(0,0,0,0.3);border-radius:4px;height:16px;overflow:hidden}
-.xpb .xlb{font-size:6px;font-weight:700;white-space:nowrap;width:20px;text-align:right;flex-shrink:0}
+.xpb .xlb{font-size:6px;font-weight:700;white-space:nowrap;width:18px;text-align:right;flex-shrink:0}
 .xpb .xbar{flex:1;height:4px;background:#0a0604;border-radius:2px;overflow:hidden;min-width:10px}
 .xpb .xbar .xf{height:100%;border-radius:2px;transition:width 0.2s}
-.xpb .xlv{font-size:6px;font-weight:700;white-space:nowrap;width:16px;text-align:left;flex-shrink:0}
-
-/* ── TABS ── */
+.xpb .xlv{font-size:6px;font-weight:700;white-space:nowrap;width:14px;text-align:left;flex-shrink:0}
 #tabs{display:flex;background:#0a0604;border-bottom:1px solid #2a180e;flex-shrink:0;z-index:10;overflow-x:auto}
 #tabs .t{flex:0 1 auto;padding:5px 7px;background:none;color:#5a3a2a;border:none;cursor:pointer;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;transition:all 0.12s;border-bottom:2px solid transparent;font-family:inherit;white-space:nowrap}
 #tabs .t:hover{color:#d4a04a}
 #tabs .t.on{color:#e8c87a;border-bottom-color:#e8c87a;background:rgba(232,200,122,0.04)}
-
-/* ── CONTENT ── */
 #content{flex:1;position:relative;min-height:0;overflow:hidden}
 .pane{position:absolute;inset:0;display:none;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;background:radial-gradient(ellipse at 50% 0%, #150c08 0%, #0a0604 100%)}
 .pane.on{display:flex}
 .pane::-webkit-scrollbar{width:3px}
 .pane::-webkit-scrollbar-track{background:#0a0604}
 .pane::-webkit-scrollbar-thumb{background:#2a180e;border-radius:2px}
-
-/* ── GATHER ── */
 .g-res{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;padding:3px 5px;flex-shrink:0}
 .g-res .r{background:rgba(15,10,6,0.8);border:1px solid #1a0e08;border-radius:4px;padding:2px 4px;display:flex;justify-content:space-between;align-items:center;font-size:8px;transition:all 0.2s}
-.g-res .r .i{font-size:10px}
-.g-res .r .n{flex:1;font-size:7px;color:#8a6a4a;margin-left:2px}
+.g-res .r .i{font-size:10px}.g-res .r .n{flex:1;font-size:7px;color:#8a6a4a;margin-left:2px}
 .g-res .r .v{font-weight:700;font-size:10px;color:#e8ddd0}
 .g-res .r.glow{border-color:#5a3a1a;background:rgba(30,18,8,0.9)}
 .g-res .r .ps{font-size:6px;color:#4a6a3a}
 .g-res .r.locked{opacity:0.25}
-
 #gather-zone{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px;cursor:pointer;min-height:50px;position:relative}
 #gather-zone:active{background:rgba(255,255,255,0.01)}
 #gather-zone .big-icon{font-size:40px;margin-bottom:2px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5))}
 #gather-zone:active .big-icon{transform:scale(0.95)}
 #gather-zone .hint{font-size:13px;font-weight:700;color:#e8c87a;text-shadow:0 1px 6px rgba(0,0,0,0.4)}
 #gather-zone .sub{font-size:9px;color:#8a6a4a;margin-top:1px}
-
-/* Floating feedback */
 .feed{position:absolute;font-weight:700;pointer-events:none;animation:feedUp 0.9s ease forwards;z-index:20;text-align:center;line-height:1}
-.feed .l1{display:block;font-size:15px;margin-bottom:2px}
-.feed .l2{display:block;font-size:11px}
-@keyframes feedUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-60px) scale(1.1)}}
-
+.feed .l1{display:block;font-size:14px;margin-bottom:2px}
+.feed .l2{display:block;font-size:10px}
+@keyframes feedUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-55px) scale(1.08)}}
 .g-upgs{padding:3px 5px;flex-shrink:0;border-top:1px solid #1a0e08;max-height:30%;overflow-y:auto}
 .g-upgs .uh{font-size:7px;text-transform:uppercase;color:#4a3a2a;margin:2px 0 1px;letter-spacing:0.5px}
 .g-upgs .u{display:flex;justify-content:space-between;align-items:center;background:rgba(15,10,6,0.6);border:1px solid #1a0e08;border-radius:3px;padding:2px 4px;margin-bottom:1px;font-size:8px}
-.g-upgs .u .d{flex:1;min-width:0}
-.g-upgs .u .d .nm{font-weight:600;font-size:8px}
-.g-upgs .u .d .dc{font-size:6px;color:#6a5a4a}
-.g-upgs .u .co{font-size:7px;font-weight:600;margin:0 2px;white-space:nowrap}
+.g-upgs .u .d{flex:1;min-width:0}.g-upgs .u .d .nm{font-weight:600;font-size:8px}
+.g-upgs .u .d .dc{font-size:6px;color:#6a5a4a}.g-upgs .u .co{font-size:7px;font-weight:600;margin:0 2px;white-space:nowrap}
 .g-upgs .u button{font-size:6px;padding:1px 5px;font-family:inherit;background:linear-gradient(135deg,#3a2010,#5a3018);color:#e8ddd0;border:1px solid #6a3820;border-radius:3px;cursor:pointer;white-space:nowrap}
 .g-upgs .u button:disabled{opacity:0.3;cursor:not-allowed}
-
-/* ── CRAFT ── */
 .c-recipes{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:2px;padding:3px 5px;flex-shrink:0}
 .c-recipes .rc{background:rgba(15,10,6,0.8);border:1px solid #1a0e08;border-radius:4px;padding:3px 5px;cursor:pointer;display:flex;align-items:center;gap:3px;font-size:8px;transition:all 0.15s}
-.c-recipes .rc:hover{border-color:#3a2010}
-.c-recipes .rc.on{border-color:#e8c87a;background:rgba(30,18,8,0.9)}
-.c-recipes .rc.auto{border-color:#ffd700;box-shadow:0 0 6px rgba(255,215,0,0.1)}
-.c-recipes .rc.locked{opacity:0.2;cursor:not-allowed}
-.c-recipes .rc .ri{font-size:13px}
-.c-recipes .rc .rn{flex:1;font-size:8px;font-weight:600}
-.c-recipes .rc .rn .rr{font-size:6px;color:#6a5a4a;font-weight:400}
-.c-recipes .rc .ck{font-size:6px;color:#4a6a3a;padding:1px 3px;border-radius:2px;background:rgba(90,138,90,0.08);white-space:nowrap}
-
+.c-recipes .rc:hover{border-color:#3a2010}.c-recipes .rc.on{border-color:#e8c87a;background:rgba(30,18,8,0.9)}
+.c-recipes .rc.auto{border-color:#ffd700;box-shadow:0 0 6px rgba(255,215,0,0.1)}.c-recipes .rc.locked{opacity:0.2;cursor:not-allowed}
+.c-recipes .rc .ri{font-size:13px}.c-recipes .rc .rn{flex:1;font-size:8px;font-weight:600}
+.c-recipes .rc .rn .rr{font-size:6px;color:#6a5a4a;font-weight:400}.c-recipes .rc .ck{font-size:6px;color:#4a6a3a;padding:1px 3px;border-radius:2px;background:rgba(90,138,90,0.08);white-space:nowrap}
 #craft-zone{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px;cursor:pointer;min-height:40px;position:relative}
-#craft-zone:active{background:rgba(255,255,255,0.01)}
-#craft-zone .big-icon{font-size:28px;margin-bottom:2px}
-#craft-zone .hint{font-size:12px;font-weight:700;color:#e8c87a}
-#craft-zone .sub{font-size:8px;color:#8a6a4a}
+#craft-zone:active{background:rgba(255,255,255,0.01)}#craft-zone .big-icon{font-size:28px;margin-bottom:2px}
+#craft-zone .hint{font-size:12px;font-weight:700;color:#e8c87a}#craft-zone .sub{font-size:8px;color:#8a6a4a}
 #craft-zone .cbar{width:120px;max-width:40vw;height:3px;background:#0a0604;border-radius:2px;margin-top:4px;overflow:hidden}
 #craft-zone .cbar .cf{height:100%;background:linear-gradient(90deg,#ffd700,#e8c87a);border-radius:2px;transition:width 0.1s}
 .c-upgs{padding:3px 5px;flex-shrink:0;border-top:1px solid #1a0e08;max-height:20%;overflow-y:auto}
-
-/* ── BUILD ── */
-#build-pane{padding:0;position:relative;background:#080504}
-#build-pane canvas{display:block;width:100%;height:100%}
+#build-pane{padding:0;position:relative;background:#080504}#build-pane canvas{display:block;width:100%;height:100%}
 .bhud{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(6,3,2,0.95));padding:5px 8px;pointer-events:none;z-index:5}
-.bhud>*{pointer-events:auto}
-.bhud .sn{font-size:10px;font-weight:700;color:#e8c87a}
-.bhud .pt{font-size:7px;color:#8a6a4a}
+.bhud>*{pointer-events:auto}.bhud .sn{font-size:10px;font-weight:700;color:#e8c87a}.bhud .pt{font-size:7px;color:#8a6a4a}
 .bhud .stab{height:3px;border-radius:2px;margin:1px 0;overflow:hidden;background:#0a0604}
 .bhud .stab .sf{height:100%;border-radius:2px;transition:width 0.3s,background 0.3s}
 .bhud .ah{font-size:9px;color:#e8ddd0;background:rgba(0,0,0,0.7);padding:1px 6px;border-radius:3px;display:inline-block;margin-top:1px;border:1px solid rgba(232,200,122,0.1)}
 .bhud .ah .tc{display:inline-block;width:14px;height:14px;line-height:14px;text-align:center;background:#e8c87a;color:#0a0604;border-radius:50%;font-weight:700;font-size:7px;margin:0 1px;vertical-align:middle}
 .bhud .row{display:flex;gap:1px;margin-top:1px;flex-wrap:wrap;max-height:10px;overflow:hidden}
 .bhud .row .dot{width:4px;height:4px;border-radius:1px;background:#1a0e08;border:1px solid #2a180e;flex-shrink:0}
-.bhud .row .dot.done{background:#c46a3a;border-color:#8a5020}
-.bhud .row .dot.cur{background:#ffd700;border-color:#ffd700;animation:pulse 1s infinite}
+.bhud .row .dot.done{background:#c46a3a;border-color:#8a5020}.bhud .row .dot.cur{background:#ffd700;border-color:#ffd700;animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 3px rgba(255,215,0,0.3)}50%{box-shadow:0 0 6px rgba(255,215,0,0.5)}}
-
-/* Floating build button */
 #fb{position:absolute;bottom:50px;right:6px;z-index:6;font-size:9px;padding:4px 10px;background:linear-gradient(135deg,#3a2010,#5a3018);color:#e8c87a;border:1px solid #6a3820;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,0.5)}
-#fb:active{transform:scale(0.95)}
-
-#tower-tech{position:absolute;top:4px;right:4px;z-index:6}
+#fb:active{transform:scale(0.95)}#tower-tech{position:absolute;top:4px;right:4px;z-index:6}
 #tower-tech button{background:rgba(10,6,4,0.85);border:1px solid #2a180e;border-radius:3px;padding:1px 5px;cursor:pointer;font-size:7px;color:#8a6a4a;font-family:inherit}
 #tower-tech button:hover{color:#e8c87a;border-color:#e8c87a}
 #ttech-panel{position:absolute;top:20px;right:4px;z-index:6;width:170px;background:rgba(10,6,4,0.96);border:1px solid #2a180e;border-radius:4px;padding:4px;display:none;backdrop-filter:blur(4px);max-height:65%;overflow-y:auto}
-#ttech-panel.sh{display:block}
-#ttech-panel .tu{display:flex;justify-content:space-between;align-items:center;padding:2px 4px;margin-bottom:1px;border-radius:2px;font-size:8px}
-#ttech-panel .tu:hover{background:rgba(255,255,255,0.02)}
-#ttech-panel .tu .td{flex:1;min-width:0}
-#ttech-panel .tu .td .tnm{font-weight:600;font-size:8px}
-#ttech-panel .tu .td .tdc{font-size:6px;color:#6a5a4a}
+#ttech-panel.sh{display:block}#ttech-panel .tu{display:flex;justify-content:space-between;align-items:center;padding:2px 4px;margin-bottom:1px;border-radius:2px;font-size:8px}
+#ttech-panel .tu:hover{background:rgba(255,255,255,0.02)}#ttech-panel .tu .td{flex:1;min-width:0}
+#ttech-panel .tu .td .tnm{font-weight:600;font-size:8px}#ttech-panel .tu .td .tdc{font-size:6px;color:#6a5a4a}
 #ttech-panel .tu .tco{font-size:7px;color:#ffd700;margin:0 2px;white-space:nowrap}
 #ttech-panel .tu button{font-size:6px;padding:1px 4px;font-family:inherit;background:linear-gradient(135deg,#3a2010,#5a3018);color:#e8ddd0;border:1px solid #6a3820;border-radius:2px;cursor:pointer;white-space:nowrap}
-#ttech-panel .tu button:disabled{opacity:0.3;cursor:not-allowed}
-#ttech-panel .tuh{font-size:6px;text-transform:uppercase;color:#4a3a2a;margin:2px 0 1px;border-top:1px solid #1a0e08;padding-top:2px}
-
-/* ── SKILLS ── */
+#ttech-panel .tu button:disabled{opacity:0.3;cursor:not-allowed}#ttech-panel .tuh{font-size:6px;text-transform:uppercase;color:#4a3a2a;margin:2px 0 1px;border-top:1px solid #1a0e08;padding-top:2px}
 .sk-scroll{padding:4px;flex:1;overflow-y:auto}
 .sk{background:rgba(15,10,6,0.6);border:1px solid #1a0e08;border-radius:4px;padding:3px 6px;margin-bottom:2px}
-.sk .shdr{display:flex;justify-content:space-between;align-items:center}
-.sk .shdr .sn{font-weight:700;font-size:9px}
-.sk .shdr .sl{font-size:8px;font-weight:600}
+.sk .shdr{display:flex;justify-content:space-between;align-items:center}.sk .shdr .sn{font-weight:700;font-size:9px}.sk .shdr .sl{font-size:8px;font-weight:600}
 .sk .sbar{height:3px;background:#0a0604;border-radius:2px;margin:2px 0;overflow:hidden}
-.sk .sbar .sf{height:100%;border-radius:2px;transition:width 0.2s}
-.sk .sxp{font-size:6px;color:#6a5a4a}
+.sk .sbar .sf{height:100%;border-radius:2px;transition:width 0.2s}.sk .sxp{font-size:6px;color:#6a5a4a}
 
-.ms{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin:3px 0}
-.m{background:rgba(15,10,6,0.6);border:1px solid #1a0e08;border-radius:4px;padding:2px 4px;text-align:center;font-size:8px}
-.m.unlocked{border-color:#3a5a3a;background:rgba(10,20,10,0.5)}
-.m.next{border-color:#ffd700;box-shadow:0 0 4px rgba(255,215,0,0.1)}
-.m .ml{font-size:11px;font-weight:800;color:#e8c87a}
-.m .md{font-size:6px;color:#6a5a4a}
-.m .mb{font-size:6px;color:#4a7a4a}
-.m.locked{opacity:0.2}
+/* 4 milestone sections */
+.ms-sec{margin:4px 0;padding:4px;border-radius:4px;background:rgba(15,10,6,0.4)}
+.ms-sec .msh{font-size:8px;font-weight:700;margin-bottom:2px;display:flex;justify-content:space-between}
+.ms-sec .msh span{font-size:7px;color:#6a5a4a}
+.ms-sec .msg{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:2px}
+.ms-sec .msg .m{background:rgba(10,6,4,0.6);border:1px solid #1a0e08;border-radius:3px;padding:2px 3px;text-align:center;font-size:7px;cursor:pointer;transition:all 0.15s}
+.ms-sec .msg .m:hover{border-color:#3a2a1a}
+.ms-sec .msg .m.unlocked{border-color:#3a5a3a;background:rgba(10,20,10,0.4)}
+.ms-sec .msg .m.next{border-color:#ffd700;box-shadow:0 0 4px rgba(255,215,0,0.1)}
+.ms-sec .msg .m.done{opacity:0.5}
+.ms-sec .msg .m .ml{font-size:9px;font-weight:800;color:#e8c87a}
+.ms-sec .msg .m .md{font-size:5px;color:#6a5a4a;line-height:1.2}
+.ms-sec .msg .m .mb{font-size:5px;color:#4a7a4a}
 
 .su{background:rgba(15,10,6,0.5);border-radius:4px;padding:3px;margin-top:3px}
 .su h{font-size:7px;text-transform:uppercase;color:#4a3a2a;margin:2px 0 1px;display:block}
 .su .u{display:flex;justify-content:space-between;align-items:center;padding:2px 4px;margin-bottom:1px;font-size:8px;background:rgba(0,0,0,0.2);border-radius:2px}
-.su .u .d{flex:1;min-width:0}
-.su .u .d .nm{font-weight:600;font-size:8px}
-.su .u .d .dc{font-size:6px;color:#6a5a4a}
+.su .u .d{flex:1;min-width:0}.su .u .d .nm{font-weight:600;font-size:8px}.su .u .d .dc{font-size:6px;color:#6a5a4a}
 .su .u .co{font-size:7px;color:#ffd700;margin:0 2px;white-space:nowrap}
 .su .u button{font-size:6px;padding:1px 4px;font-family:inherit;background:linear-gradient(135deg,#3a2010,#5a3018);color:#e8ddd0;border:1px solid #6a3820;border-radius:2px;cursor:pointer;white-space:nowrap}
 .su .u button:disabled{opacity:0.3;cursor:not-allowed}
-
-/* ── TALENTS ── */
-.t-scroll{padding:4px;flex:1;overflow-y:auto}
-.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:3px}
+.t-scroll{padding:4px;flex:1;overflow-y:auto}.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:3px}
 .parapet{border:1px solid #1a0e08;border-radius:5px;padding:4px;background:rgba(15,10,6,0.6)}
 .parapet .phdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:1px}
-.parapet .phdr .pn{font-size:9px;font-weight:700}
-.parapet .phdr .pl{font-size:7px;font-weight:600}
-.parapet .pdesc{font-size:6px;color:#6a5a4a;margin-bottom:2px}
-.parapet .pbar{height:2px;background:#0a0604;border-radius:1px;overflow:hidden;margin-bottom:2px}
+.parapet .phdr .pn{font-size:9px;font-weight:700}.parapet .phdr .pl{font-size:7px;font-weight:600}
+.parapet .pdesc{font-size:6px;color:#6a5a4a;margin-bottom:2px}.parapet .pbar{height:2px;background:#0a0604;border-radius:1px;overflow:hidden;margin-bottom:2px}
 .parapet .pbar .pf{height:100%;background:linear-gradient(90deg,#e8c87a,#ffd700);border-radius:1px;transition:width 0.2s}
 .parapet .peff{font-size:6px;color:#8a7a6a;margin-bottom:2px}
 .parapet button{width:100%;font-size:7px;padding:2px;font-family:inherit;background:linear-gradient(135deg,#3a2010,#5a3018);color:#e8ddd0;border:1px solid #6a3820;border-radius:3px;cursor:pointer}
 .parapet button:disabled{opacity:0.3;cursor:not-allowed}
-
 #notif{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:100;background:rgba(10,6,4,0.95);border:1px solid #ffd700;border-radius:6px;padding:4px 12px;color:#e8c87a;font-weight:600;font-size:9px;text-align:center;max-width:260px;opacity:0;transition:opacity 0.15s;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,0.6)}
-#notif.sh{opacity:1}
-.prtcl{position:fixed;pointer-events:none;font-size:10px;animation:prtclFade 0.5s ease forwards;z-index:50}
+#notif.sh{opacity:1}.prtcl{position:fixed;pointer-events:none;font-size:10px;animation:prtclFade 0.5s ease forwards;z-index:50}
 @keyframes prtclFade{0%{opacity:1;transform:translateY(0) scale(0.5)}100%{opacity:0;transform:translateY(-35px) scale(1.2)}}
-
 @media(min-width:768px){#game{width:780px;height:660px;border-radius:10px;border:1px solid #2a180e;box-shadow:0 8px 40px rgba(0,0,0,0.8)}}
 </style>
 </head>
@@ -209,7 +158,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
     <button class="t" data-t="talents">🏰 Talents</button>
   </div>
   <div id="content">
-    <!-- GATHER -->
     <div class="pane on" id="gather-pane">
       <div class="g-res" id="g-res"></div>
       <div id="gather-zone">
@@ -219,7 +167,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
       </div>
       <div class="g-upgs" id="g-upgs"></div>
     </div>
-    <!-- CRAFT -->
     <div class="pane" id="craft-pane">
       <div class="c-recipes" id="c-recipes" style="margin-top:3px"></div>
       <div id="craft-zone">
@@ -230,7 +177,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
       </div>
       <div class="c-upgs" id="c-upgs"></div>
     </div>
-    <!-- BUILD -->
     <div class="pane" id="build-pane">
       <canvas id="bc"></canvas>
       <button id="fb" onclick="G.tapBuild()">🧱 Place</button>
@@ -244,7 +190,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
         <div class="row" id="bhud-row"></div>
       </div>
     </div>
-    <!-- SKILLS -->
     <div class="pane" id="skills-pane">
       <div class="sk-scroll">
         <div id="skills-list"></div>
@@ -252,7 +197,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
         <div id="skill-upgs-area" class="su"></div>
       </div>
     </div>
-    <!-- TALENTS -->
     <div class="pane" id="talents-pane">
       <div class="t-scroll">
         <div class="tg" id="talents-grid"></div>
@@ -264,7 +208,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
 
 <script>
 // ═══════════════════════════════════════════════════════════════════════
-//  BABEL — Skill-unlocked progression, rich tap feedback, polished UI
+//  BABEL — 4 separate milestone tracks per skill
 // ═══════════════════════════════════════════════════════════════════════
 
 ;(() => {
@@ -273,16 +217,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
 // ─── DATA ──────────────────────────────────────────────────────────────
 
 const RES_ALL = [
-  {id:'mud',n:'Mud',i:'🟤',y:1,unlock:0},
-  {id:'water',n:'Water',i:'💧',y:1,unlock:0},
-  {id:'straw',n:'Straw',i:'🌾',y:1,unlock:0},
-  {id:'gravel',n:'Gravel',i:'🪨',y:1,unlock:2},
-  {id:'sand',n:'Sand',i:'🏖️',y:1,unlock:3},
-  {id:'clay',n:'Clay',i:'🧱',y:1,unlock:4},
-  {id:'lime',n:'Lime',i:'🪨',y:1,unlock:5},
-  {id:'stone',n:'Stone',i:'⛰️',y:1,unlock:7},
+  {id:'mud',n:'Mud',i:'🟤',y:1,unlock:0},{id:'water',n:'Water',i:'💧',y:1,unlock:0},
+  {id:'straw',n:'Straw',i:'🌾',y:1,unlock:0},{id:'gravel',n:'Gravel',i:'🪨',y:1,unlock:2},
+  {id:'sand',n:'Sand',i:'🏖️',y:1,unlock:3},{id:'clay',n:'Clay',i:'🧱',y:1,unlock:4},
+  {id:'lime',n:'Lime',i:'🪨',y:1,unlock:5},{id:'stone',n:'Stone',i:'⛰️',y:1,unlock:7},
 ];
-
 const MAT_ALL = [
   {id:'mortar',n:'Mortar',i:'🧴',t:3,r:{sand:2,water:1,lime:1},d:'Mix',unlock:0,str:0},
   {id:'mudBrick',n:'Mud Brick',i:'🧱',t:4,r:{mud:3,straw:1},d:'Mud→Dry',unlock:0,str:1.0},
@@ -292,19 +231,12 @@ const MAT_ALL = [
   {id:'glazedBrick',n:'Glazed Brick',i:'✨',t:6,r:{firedBrick:1,sand:2,water:1},d:'Glaze',unlock:12,str:0.3},
   {id:'megalith',n:'Megalith',i:'🏛️',t:8,r:{stoneBlock:2,reinfBrick:1},d:'Mega',unlock:18,str:0.2},
 ];
-
 const BC = {
-  mudBrick:{s:'#c46a3a',m:'#a0522d',e:'#8b3a1a'},
-  firedBrick:{s:'#d45030',m:'#b83820',e:'#8a2010'},
-  stoneBlock:{s:'#8a8a8a',m:'#6a6a6a',e:'#4a4a4a'},
-  reinfBrick:{s:'#6a7a8a',m:'#4a5a6a',e:'#2a3a4a'},
-  glazedBrick:{s:'#7a8a6a',m:'#5a6a4a',e:'#3a4a2a'},
-  megalith:{s:'#5a4a3a',m:'#3a2a1a',e:'#2a1a0a'},
-  mortar:{s:'#b8a080',m:'#988060',e:'#786040'},
-  glazedMortar:{s:'#8a9a7a',m:'#6a7a5a',e:'#4a5a3a'},
+  mudBrick:{s:'#c46a3a',m:'#a0522d',e:'#8b3a1a'},firedBrick:{s:'#d45030',m:'#b83820',e:'#8a2010'},
+  stoneBlock:{s:'#8a8a8a',m:'#6a6a6a',e:'#4a4a4a'},reinfBrick:{s:'#6a7a8a',m:'#4a5a6a',e:'#2a3a4a'},
+  glazedBrick:{s:'#7a8a6a',m:'#5a6a4a',e:'#3a4a2a'},megalith:{s:'#5a4a3a',m:'#3a2a1a',e:'#2a1a0a'},
+  mortar:{s:'#b8a080',m:'#988060',e:'#786040'},glazedMortar:{s:'#8a9a7a',m:'#6a7a5a',e:'#4a5a3a'},
 };
-
-// Tower tech
 const TECH = [
   {id:'bw1',n:'Wider Base',d:'3→5 width',ty:'width',val:5,cost:100,req:null,i:'⬛'},
   {id:'bw2',n:'Broad Base',d:'5→7 width',ty:'width',val:7,cost:500,req:{firedBrick:10},i:'⬛'},
@@ -320,59 +252,69 @@ const TECH = [
   {id:'fd2',n:'Deep Foundation',d:'×2 stab',ty:'found',val:1.0,cost:1500,req:{stoneBlock:12},i:'🏗️'},
   {id:'fd3',n:'Bedrock Anchor',d:'×3 stab',ty:'found',val:2.0,cost:10000,req:{megalith:12},i:'🏗️'},
 ];
-
-// Gold upgrades
 const UPG_G = [
-  {id:'gg1',n:'Strong Hands',d:'2x gather',t:'gather',b:10,m:2.5,L:5},
-  {id:'gg2',n:'Copper Tools',d:'+1 gather',t:'gather',b:25,m:2.2,L:5},
+  {id:'gg1',n:'Strong Hands',d:'2x gather',t:'gather',b:10,m:2.5,L:5},{id:'gg2',n:'Copper Tools',d:'+1 gather',t:'gather',b:25,m:2.2,L:5},
   {id:'gg3',n:'Iron Tools',d:'+2 gather',t:'gather',b:100,m:2.0,L:4,req:{firedBrick:8}},
-  {id:'gg4',n:'Mud Golem',d:'Auto mud 1/s',t:'gather',b:50,m:2.0,L:3},
-  {id:'gg5',n:'Sand Wisp',d:'Auto sand 0.5/s',t:'gather',b:75,m:2.0,L:3},
+  {id:'gg4',n:'Mud Golem',d:'Auto mud 1/s',t:'gather',b:50,m:2.0,L:3},{id:'gg5',n:'Sand Wisp',d:'Auto sand 0.5/s',t:'gather',b:75,m:2.0,L:3},
   {id:'gg6',n:'Clay Sprite',d:'Auto clay 1/s',t:'gather',b:100,m:2.0,L:3,req:{firedBrick:4}},
   {id:'gg7',n:'Quarry Golem',d:'Auto stone 0.3/s',t:'gather',b:200,m:2.0,L:3,req:{stoneBlock:4}},
-  {id:'gc1',n:'Efficient Craft',d:'-1 tap',t:'craft',b:30,m:3.0,L:3},
-  {id:'gc2',n:'Batch Produce',d:'Craft 2x',t:'craft',b:80,m:3.0,L:3},
+  {id:'gc1',n:'Efficient Craft',d:'-1 tap',t:'craft',b:30,m:3.0,L:3},{id:'gc2',n:'Batch Produce',d:'Craft 2x',t:'craft',b:80,m:3.0,L:3},
 ];
-
-// Resource upgrades
 const UPG_R = [
-  {id:'rm1',n:'Mud Mastery',d:'+20% mud',cost:{mud:200},L:5,cm:1.5},
-  {id:'rm2',n:'Sand Mastery',d:'+20% sand',cost:{sand:200},L:5,cm:1.5},
-  {id:'rm3',n:'Clay Mastery',d:'+20% clay',cost:{clay:200},L:5,cm:1.5},
-  {id:'rm4',n:'Stone Mastery',d:'+20% stone',cost:{stone:200},L:5,cm:1.5},
-  {id:'rm5',n:'Deep Digging',d:'+50% earth',cost:{mud:500,gravel:300},L:3,cm:1.8},
-  {id:'rc1',n:'Efficient Mortar',d:'-1 mortar cost',cost:{mortar:50},L:3,cm:2.0},
+  {id:'rm1',n:'Mud Mastery',d:'+20% mud',cost:{mud:200},L:5,cm:1.5},{id:'rm2',n:'Sand Mastery',d:'+20% sand',cost:{sand:200},L:5,cm:1.5},
+  {id:'rm3',n:'Clay Mastery',d:'+20% clay',cost:{clay:200},L:5,cm:1.5},{id:'rm4',n:'Stone Mastery',d:'+20% stone',cost:{stone:200},L:5,cm:1.5},
+  {id:'rm5',n:'Deep Digging',d:'+50% earth',cost:{mud:500,gravel:300},L:3,cm:1.8},{id:'rc1',n:'Efficient Mortar',d:'-1 mortar cost',cost:{mortar:50},L:3,cm:2.0},
 ];
-
-// Skill upgrades
 const UPG_S = [
-  {id:'sg1',n:'Expert Gatherer',d:'+100% gather',sk:'gathering',c:200,rL:5,L:3,m:1.8},
-  {id:'sg2',n:'Prospector',d:'2x gold',sk:'gathering',c:500,rL:10,L:3,m:1.8},
-  {id:'sc1',n:'Efficient Artisan',d:'Craft -2 taps',sk:'crafting',c:200,rL:5,L:3,m:1.8},
-  {id:'sc2',n:'Master Craftsman',d:'Craft 3x',sk:'crafting',c:500,rL:10,L:3,m:1.8},
-  {id:'sb1',n:'Quick Builder',d:'Build -2 taps',sk:'building',c:200,rL:5,L:3,m:1.8},
-  {id:'sb2',n:'Master Architect',d:'+3 b/action',sk:'building',c:500,rL:10,L:3,m:1.8},
-  {id:'sx1',n:'Speed Demon',d:'All 2x',sk:'general',c:300,rL:5,L:3,m:1.8},
-  {id:'sx2',n:'Gold Mastery',d:'2x gold',sk:'general',c:800,rL:10,L:3,m:1.8},
+  {id:'sg1',n:'Expert Gatherer',d:'+100% gather',sk:'gathering',c:200,rL:5,L:3,m:1.8},{id:'sg2',n:'Prospector',d:'2x gold',sk:'gathering',c:500,rL:10,L:3,m:1.8},
+  {id:'sc1',n:'Efficient Artisan',d:'Craft -2 taps',sk:'crafting',c:200,rL:5,L:3,m:1.8},{id:'sc2',n:'Master Craftsman',d:'Craft 3x',sk:'crafting',c:500,rL:10,L:3,m:1.8},
+  {id:'sb1',n:'Quick Builder',d:'Build -2 taps',sk:'building',c:200,rL:5,L:3,m:1.8},{id:'sb2',n:'Master Architect',d:'+3 b/act',sk:'building',c:500,rL:10,L:3,m:1.8},
+  {id:'sx1',n:'Speed Demon',d:'All 2x',sk:'general',c:300,rL:5,L:3,m:1.8},{id:'sx2',n:'Gold Mastery',d:'2x gold',sk:'general',c:800,rL:10,L:3,m:1.8},
   {id:'sx3',n:'Enlightenment',d:'3x XP',sk:'general',c:2000,rL:25,L:3,m:1.8},
 ];
 
-// Milestones checked against TOTAL skill levels
-const MILESTONES = [
-  {lv:5,n:'Apprentice',d:'+1 all yield',b:{allY:1}},
-  {lv:10,n:'Builder',d:'Gold x2',b:{gM:2}},
-  {lv:25,n:'Engineer',d:'XP x2',b:{xM:2}},
-  {lv:50,n:'Architect',d:'Stab+20%',b:{tS:0.2}},
-  {lv:75,n:'Foreman',d:'-3 taps',b:{tD:3}},
-  {lv:100,n:'Master B.',d:'Yield x2',b:{allY:2}},
-  {lv:125,n:'Sage',d:'Gold x3',b:{gM:3}},
-  {lv:150,n:'Tower Lord',d:'Stab+30%',b:{tS:0.3}},
-  {lv:200,n:'Monarch',d:'XP x4',b:{xM:4}},
-  {lv:250,n:'King',d:'Gather x3',b:{gth:3}},
-  {lv:300,n:'Emperor',d:'Gold x5',b:{gM:5}},
-  {lv:400,n:'Demigod',d:'All x10',b:{aM:10}},
-  {lv:500,n:'Ascended',d:'All x20',b:{aM:20}},
-];
+// ─── 4 SEPARATE MILESTONE TRACKS ──────────────────────────────────────
+// Each track: milestones[skill] = array of {lv, n, d, bonus}
+// Only show next 2 unclaimed
+
+const MS = {
+  gathering: [
+    {lv:5,n:'Prospector',d:'+1 yield',b:{allY:1}},{lv:10,n:'Digger',d:'Gold x2',b:{gM:2}},
+    {lv:25,n:'Excavator',d:'XP x2',b:{xM:2}},{lv:50,n:'Miner',d:'Stab+20%',b:{tS:0.2}},
+    {lv:75,n:'Tunnel King',d:'-3 taps',b:{tD:3}},{lv:100,n:'Earth Master',d:'Yield x2',b:{allY:2}},
+    {lv:125,n:'Gem Seeker',d:'Gold x3',b:{gM:3}},{lv:150,n:'Crystal Lord',d:'Stab+30%',b:{tS:0.3}},
+    {lv:200,n:'Mountain King',d:'XP x4',b:{xM:4}},{lv:250,n:'Titan Miner',d:'Gather x3',b:{gth:3}},
+    {lv:300,n:'Core Driller',d:'Gold x5',b:{gM:5}},{lv:400,n:'World Shaper',d:'All x10',b:{aM:10}},
+    {lv:500,n:'Elemental',d:'All x20',b:{aM:20}},
+  ],
+  crafting: [
+    {lv:5,n:'Artisan',d:'-1 craft tap',b:{cD:1}},{lv:10,n:'Smith',d:'Craft 2x',b:{cB:2}},
+    {lv:25,n:'Inventor',d:'XP x2',b:{xM:2}},{lv:50,n:'Master Smith',d:'Stab+20%',b:{tS:0.2}},
+    {lv:75,n:'Forge Lord',d:'-2 craft taps',b:{cD:2}},{lv:100,n:'Alchemist',d:'Yield x2',b:{allY:2}},
+    {lv:125,n:'Sage Artificer',d:'Gold x3',b:{gM:3}},{lv:150,n:'Demiurge',d:'Stab+30%',b:{tS:0.3}},
+    {lv:200,n:'Arcane Smith',d:'XP x4',b:{xM:4}},{lv:250,n:'Mythril Forger',d:'Craft 4x',b:{cB:4}},
+    {lv:300,n:'Primordial',d:'Gold x5',b:{gM:5}},{lv:400,n:'Godforged',d:'All x10',b:{aM:10}},
+    {lv:500,n:'Infinite Craft',d:'All x20',b:{aM:20}},
+  ],
+  building: [
+    {lv:5,n:'Constructor',d:'-1 build tap',b:{bD:1}},{lv:10,n:'Engineer',d:'+1 br/act',b:{bB:1}},
+    {lv:25,n:'Foreman',d:'XP x2',b:{xM:2}},{lv:50,n:'Site Master',d:'Stab+20%',b:{tS:0.2}},
+    {lv:75,n:'Chief Eng.',d:'-2 build taps',b:{bD:2}},{lv:100,n:'Builder King',d:'Yield x2',b:{allY:2}},
+    {lv:125,n:'Tower Mage',d:'Gold x3',b:{gM:3}},{lv:150,n:'Sky Breaker',d:'Stab+30%',b:{tS:0.3}},
+    {lv:200,n:'Cloud Walker',d:'XP x4',b:{xM:4}},{lv:250,n:'Star Builder',d:'+3 br/act',b:{bB:3}},
+    {lv:300,n:'Void Mason',d:'Gold x5',b:{gM:5}},{lv:400,n:'Cosmic Arch.',d:'All x10',b:{aM:10}},
+    {lv:500,n:'Infinity Tower',d:'All x20',b:{aM:20}},
+  ],
+  general: [
+    {lv:5,n:'Awakened',d:'All +1',b:{allY:1}},{lv:10,n:'Enlightened',d:'Gold x2',b:{gM:2}},
+    {lv:25,n:'Transcendent',d:'XP x2',b:{xM:2}},{lv:50,n:'Ascended',d:'Stab+20%',b:{tS:0.2}},
+    {lv:75,n:'Ethereal',d:'-2 all taps',b:{tD:2}},{lv:100,n:'Celestial',d:'Yield x2',b:{allY:2}},
+    {lv:125,n:'Divine',d:'Gold x3',b:{gM:3}},{lv:150,n:'Mythic',d:'Stab+30%',b:{tS:0.3}},
+    {lv:200,n:'Legendary',d:'XP x4',b:{xM:4}},{lv:250,n:'Immortal',d:'All +3',b:{allY:3}},
+    {lv:300,n:'Cosmic',d:'Gold x5',b:{gM:5}},{lv:400,n:'Omnipotent',d:'All x10',b:{aM:10}},
+    {lv:500,n:'Babel God',d:'All x20',b:{aM:20}},
+  ],
+};
 
 const TALENTS = [
   {id:'s1',n:'Scaffolding',i:'🏗️',d:'Faster build',L:10,cb:100,cm:1.8,rS:'building',rL:3,rS2:2,ef:l=>({bS:l*0.15})},
@@ -385,57 +327,46 @@ const TALENTS = [
 // ─── STATE ────────────────────────────────────────────────────────────
 
 let S = {
-  res:Object.fromEntries(RES_ALL.map(r=>[r.id,0])),
-  mat:Object.fromEntries(MAT_ALL.map(m=>[m.id,0])),
-  upg:{},tech:{},
-  tower:{rows:[],colCount:0,collapses:0},
-  stat:{gold:0,bricks:0},
-  cp:{},
-  sk:{gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}},
-  tal:{},tick:0,gF:0,_ms:0,_coll:false,_selCraft:null,
+  res:Object.fromEntries(RES_ALL.map(r=>[r.id,0])),mat:Object.fromEntries(MAT_ALL.map(m=>[m.id,0])),
+  upg:{},tech:{},tower:{rows:[],colCount:0,collapses:0},stat:{gold:0,bricks:0},
+  cp:{},sk:{gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}},
+  // 4 milestone progress counters
+  ms:{gathering:0,crafting:0,building:0,general:0},
+  tal:{},tick:0,gF:0,_coll:false,_selCraft:null,
 };
 
 // ─── HELPERS ──────────────────────────────────────────────────────────
 
 function uL(id){return S.upg[id]||0}
 function tL(id){return S.tal[id]||0}
-function ms(){return S._ms||0}
-function totalSkillLv(){let t=0;for(const k of Object.keys(S.sk))t+=(S.sk[k].lv||1);return t}
+function msG(id){return S.ms[id]||0} // milestones claimed for a skill
 function skLv(id){return S.sk[id]?.lv||1}
-
 function xpN(lv){return Math.floor(50*lv*(1+lv*0.12))}
+
 function earnX(sk,base){
-  let m=1;if(ms()>=25)m*=2;if(ms()>=200)m*=4;if(uL('sx3')>0)m*=3;m*=1+tL('d1')*0.1;
+  let m=1;if(msG('general')>=2)m*=2;if(msG('general')>=8)m*=4;if(uL('sx3')>0)m*=3;m*=1+tL('d1')*0.1;
   const x=Math.floor(base*m);
   if(sk==='general'){S.sk.general.xp+=x;rC('general')}
   else{S.sk[sk].xp+=x;rC(sk);S.sk.general.xp+=Math.floor(x*0.5);rC('general')}
 }
 function rC(id){const s=S.sk[id];let l=1,x=s.xp;while(x>=xpN(l)){x-=xpN(l);l++}s.lv=l}
 
-// ─── UNLOCK SYSTEM ────────────────────────────────────────────────────
-
 function unlockedRes(){const l=skLv('gathering');return RES_ALL.filter(r=>r.unlock<=l)}
 function unlockedMat(){const l=skLv('crafting');return MAT_ALL.filter(m=>m.unlock<=l)}
 
 function getBaseW(){let w=3;[null,'bw1','bw2','bw3','bw4','bw5'].forEach(t=>{if(t&&S.tech[t])w=S.tech[t]});return w}
 function getReinf(){let b=0;['rf1','rf2','rf3','rf4','rf5'].forEach(id=>{if(S.tech[id])b+=TECH.find(t=>t.id===id).val});
-  b*=1+tL('f1')*0.1;if(ms()>=50)b+=0.2;if(ms()>=150)b+=0.3;return b}
+  b*=1+tL('f1')*0.1;if(msG('gathering')>=4||msG('crafting')>=4||msG('building')>=4||msG('general')>=4)b+=0.2; // Lv.50 milestones
+  if(msG('gathering')>=8||msG('crafting')>=8||msG('building')>=8||msG('general')>=8)b+=0.3; // Lv.150
+  return b}
 function getFound(){let m=1;['fd1','fd2','fd3'].forEach(id=>{if(S.tech[id])m+=TECH.find(t=>t.id===id).val});return m}
-function getMatId(){
-  const ms=[null,'mt1','mt2','mt3','mt4'];let mat='mudBrick';
-  // Material tech upgrades don't exist in list anymore, so derive from crafting level
-  const l=skLv('crafting');
-  if(l>=18)mat='megalith';else if(l>=12)mat='glazedBrick';else if(l>=8)mat='reinfBrick';else if(l>=6)mat='stoneBlock';else if(l>=3)mat='firedBrick';
-  return mat;
-}
+function getMatId(){const l=skLv('crafting');if(l>=18)return'megalith';if(l>=12)return'glazedBrick';if(l>=8)return'reinfBrick';if(l>=6)return'stoneBlock';if(l>=3)return'firedBrick';return'mudBrick'}
 function getMatStr(){const m=MAT_ALL.find(x=>x.id===getMatId());return m?m.str:1.0}
 
-function getStab(){
-  const h=S.tower.rows.length;if(h===0)return{s:100,p:100,m:1};
+function getStab(){const h=S.tower.rows.length;if(h===0)return{s:100,p:100,m:1};
   const bw=getBaseW(),ri=getReinf(),fd=getFound(),ms=getMatStr();
   const max=Math.floor(bw*(1+ri)*fd/ms);const p=Math.max(0,100-(h/max*100));
-  return{s:p,p:Math.floor(p),m:max,h:h};
-}
+  return{s:p,p:Math.floor(p),m:max,h:h}}
 
 function initTower(){S.tower.rows=[];S.tower.colCount=getBaseW();S.tower._coll=false}
 function collapseT(){
@@ -452,32 +383,39 @@ function collapseT(){
 function gY(id){
   const r=RES_ALL.find(x=>x.id===id);if(!r)return 1;
   let y=r.y;y*=Math.pow(2,uL('g1')+uL('gg1'));y+=uL('g2')+uL('gg2');y+=(uL('g3')+uL('gg3'))*2;
-  y*=1+uL('rm1')*0.2+(id==='sand'?uL('rm2')*0.2:0)+(id==='clay'?uL('rm3')*0.2:0)+(id==='stone'?uL('rm4')*0.2:0)+(id==='water'?uL('rm2')*0:0);
+  y*=1+uL('rm1')*0.2+(id==='sand'?uL('rm2')*0.2:0)+(id==='clay'?uL('rm3')*0.2:0)+(id==='stone'?uL('rm4')*0.2:0);
   if(['mud','gravel','sand','clay','stone'].includes(id))y*=1+uL('rm5')*0.5;
   y*=1+skLv('gathering')*0.1;y*=1+tL('q1')*0.2;
-  if(ms()>=5)y+=1;if(ms()>=50)y+=1;if(ms()>=100)y+=1;if(ms()>=250)y*=3;if(uL('sg1')>0)y*=2;
+  if(msG('gathering')>=1||msG('general')>=1)y+=1;if(msG('general')>=9||msG('gathering')>=9)y*=3;
+  if(msG('gathering')>=6||msG('general')>=6)y+=1;if(uL('sg1')>0)y*=2;
   return Math.max(1,Math.floor(y));
 }
-function gM(){let m=1;if(uL('sg2')>0)m*=2;if(uL('sx2')>0)m*=2;if(ms()>=10)m*=2;if(ms()>=125)m*=3;if(ms()>=300)m*=5;m*=1+tL('d1')*0.1;return m}
-function aM(){let m=1;if(ms()>=400)m*=10;if(ms()>=500)m*=20;m*=1+tL('f1')*0.05;if(uL('sx1')>0)m*=2;return m}
-function bT(){return Math.max(1,4-(ms()>=75?3:0)-uL('sb1')*2)}
-function mT(){return Math.max(1,5-(ms()>=75?3:0)-uL('sb1')*2)}
-function bB(){return 1+uL('sb2')*3}
-function cT(id){const m=MAT_ALL.find(x=>x.id===id);return m?Math.max(1,m.t-uL('c1')-uL('gc1')-(ms()>=75?3:0)):3}
-function cB(){return 1+uL('c2')+uL('gc2')}
+function gM(){
+  let m=1;if(uL('sg2')>0)m*=2;if(uL('sx2')>0)m*=2;
+  if(msG('gathering')>=2||msG('crafting')>=2||msG('building')>=2||msG('general')>=2)m*=2;
+  if(msG('gathering')>=7||msG('crafting')>=7||msG('building')>=7||msG('general')>=7)m*=3;
+  if(msG('gathering')>=11||msG('crafting')>=11||msG('building')>=11||msG('general')>=11)m*=5;
+  m*=1+tL('d1')*0.1;return m;
+}
+function aM(){let m=1;if(msG('gathering')>=12||msG('crafting')>=12||msG('building')>=12||msG('general')>=12)m*=10;if(msG('gathering')>=13||msG('crafting')>=13||msG('building')>=13||msG('general')>=13)m*=20;
+  m*=1+tL('f1')*0.05;if(uL('sx1')>0)m*=2;return m}
+
+function bT(){let t=4;if(msG('building')>=1||msG('general')>=5)t-=1;if(msG('building')>=5||msG('general')>=5)t-=2;if(uL('sb1')>0)t-=2;return Math.max(1,t)}
+function mT(){let t=5;if(msG('building')>=1||msG('general')>=5)t-=1;if(msG('building')>=5||msG('general')>=5)t-=2;if(uL('sb1')>0)t-=2;return Math.max(1,t)}
+function bB(){return 1+uL('sb2')*3+(msG('building')>=2?1:0)+(msG('building')>=10?3:0)}
+function cT(id){const m=MAT_ALL.find(x=>x.id===id);if(!m)return 3;let t=m.t;if(msG('crafting')>=1)t-=1;if(msG('crafting')>=5)t-=2;if(uL('c1')+uL('gc1')>0)t-=uL('c1')+uL('gc1');return Math.max(1,t)}
+function cB(){return 1+uL('c2')+uL('gc2')+(msG('crafting')>=2?1:0)+(msG('crafting')>=10?3:0)}
+
 function autoR(id){let r=0;const map={g4:'mud',g5:'sand',g6:'clay',g7:'stone'};
   for(const[u,res]of Object.entries(map))if(id===res)r+=uL(u)*(u==='g5'?0.5:u==='g7'?0.3:1);
   r+=uL('gg4')*(id==='mud'?1:0)+uL('gg5')*(id==='sand'?0.5:0)+uL('gg6')*(id==='clay'?1:0)+uL('gg7')*(id==='stone'?0.3:0);return r}
-function gF(){const u=unlockedRes();if(u.length===0)return RES_ALL[0];return u[S.gF%u.length]}
+function gF(){const u=unlockedRes();if(!u.length)return RES_ALL[0];return u[S.gF%u.length]}
 
 function autoCraft(){
   const lu=unlockedMat();if(!lu.length)return null;
-  const matId=getMatId();const mo='mortar';
-  const hB=S.mat[matId]||0,hM=S.mat[mo]||0,need=Math.max(5,getBaseW()*2);
-  if(lu.find(m=>m.id===matId)&&hB<need)return matId;
-  if(lu.find(m=>m.id===mo)&&hM<need)return mo;
-  if(S._selCraft&&lu.find(m=>m.id===S._selCraft))return S._selCraft;
-  return lu[0].id;
+  const matId=getMatId();const mo='mortar';const hB=S.mat[matId]||0,hM=S.mat[mo]||0,need=Math.max(5,getBaseW()*2);
+  if(lu.find(m=>m.id===matId)&&hB<need)return matId;if(lu.find(m=>m.id===mo)&&hM<need)return mo;
+  if(S._selCraft&&lu.find(m=>m.id===S._selCraft))return S._selCraft;return lu[0].id;
 }
 
 // ─── BUILD ────────────────────────────────────────────────────────────
@@ -495,8 +433,7 @@ function tapBuild(){
   if(brick.st==='e'){const b=bB();if((S.mat[matId]||0)<b){notify('Need '+matId+'!');return}
     S.mat[matId]-=b;brick.st='p';brick.pr=0}
   if(brick.st==='p'){brick.pr=(brick.pr||0)+1;S.stat.bricks++;S.stat.gold+=1*gM()*aM();earnX('building',1);
-    if(brick.pr>=bT()){brick.st='m';brick.mp=0;sparkle('🧱')}
-    feedBuild();updateHUD();updateUIs();return}
+    if(brick.pr>=bT()){brick.st='m';brick.mp=0;sparkle('🧱')}feedBuild();updateHUD();updateUIs();return}
   if(brick.st==='m'){if((S.mat.mortar||0)<1){notify('Need mortar!');return}
     brick.mp=(brick.mp||0)+1;S.stat.gold+=1*gM()*aM();earnX('building',1);
     if(brick.mp>=mT()){S.mat.mortar--;brick.st='d';const s=getStab();if(s.p<=0){collapseT();return}
@@ -510,8 +447,7 @@ function gather(id){
   const y=Math.floor(gY(id)*aM());const gold=Math.floor(1*gM()*aM());
   S.res[id]=(S.res[id]||0)+y;S.stat.gold+=gold;
   const u=unlockedRes();S.gF=(S.gF+1)%u.length;
-  feedGather(y,gold);earnX('gathering',1);
-  updateUI()
+  feedGather(y,gold);earnX('gathering',1);updateUI()
 }
 
 // ─── CRAFT ────────────────────────────────────────────────────────────
@@ -519,27 +455,22 @@ function gather(id){
 function craft(id){
   const mat=MAT_ALL.find(x=>x.id===id);if(!mat)return;
   const taps=cT(id);if(!S.cp[id])S.cp[id]={t:0,a:false};const p=S.cp[id];
-  if(!p.a){
-    for(const[rid,q]of Object.entries(mat.r)){const src=S.res[rid]!==undefined?S.res:S.mat;if((src[rid]||0)<q*1){notify('Need '+q+'x '+rid);return}}
-    for(const[rid,q]of Object.entries(mat.r)){if(S.res[rid]!==undefined)S.res[rid]-=q;else S.mat[rid]-=q}
-    p.a=true;p.t=0}
+  if(!p.a){for(const[rid,q]of Object.entries(mat.r)){const src=S.res[rid]!==undefined?S.res:S.mat;if((src[rid]||0)<q*1){notify('Need '+q+'x '+rid);return}}
+    for(const[rid,q]of Object.entries(mat.r)){if(S.res[rid]!==undefined)S.res[rid]-=q;else S.mat[rid]-=q}p.a=true;p.t=0}
   p.t++;const gold=Math.floor(1*gM()*aM());S.stat.gold+=gold;earnX('crafting',1);
   feedCraft(gold);sparkle('🔨');
   if(p.t>=taps){const b=cB();S.mat[id]=(S.mat[id]||0)+b;p.a=false;p.t=0;notify('+'+b+' '+mat.n)}
   updateUI()
 }
 
-// ─── FEEDBACK PARTICLES ──────────────────────────────────────────────
+// ─── FEEDBACK ─────────────────────────────────────────────────────────
 
 function feedGather(y,gold){
   const zone=document.getElementById('gather-zone');if(!zone)return;
   const el=document.createElement('div');el.className='feed';
-  const skCol={gathering:'#d06040',crafting:'#50b050',building:'#5090d0',general:'#e0d0c0'};
-  const sx=skLv('gathering');const nxp=xpN(sx);const pct=Math.floor((S.sk.gathering.xp||0)/nxp*100);
   el.innerHTML='<span class="l1"><span style="color:#c46a3a">+'+y+'R</span> <span style="color:#ffd700">+'+gold+'🪙</span></span>'+
-    '<span class="l2"><span style="color:'+skCol.gathering+'">+1⛏️XP</span> <span style="color:#e0d0c0">+0.5⚡XP</span></span>';
+    '<span class="l2"><span style="color:#d06040">+1⛏️XP</span> <span style="color:#e0d0c0">+0.5⚡XP</span></span>';
   el.style.left=(20+Math.random()*60)+'%';el.style.top=(20+Math.random()*40)+'%';
-  el.style.animationDuration=(0.7+Math.random()*0.3)+'s';
   zone.appendChild(el);setTimeout(()=>el.remove(),1000);
 }
 function feedCraft(gold){
@@ -551,15 +482,12 @@ function feedCraft(gold){
   zone.appendChild(el);setTimeout(()=>el.remove(),1000);
 }
 function feedBuild(){
-  const el=document.createElement('div');el.className='feed';
-  const gold=Math.floor(1*gM()*aM());
+  const gold=Math.floor(1*gM()*aM());const el=document.createElement('div');el.className='feed';
   el.innerHTML='<span class="l1"><span style="color:#ffd700">+'+gold+'🪙</span></span>'+
     '<span class="l2"><span style="color:#5090d0">+1🧱XP</span> <span style="color:#e0d0c0">+0.5⚡XP</span></span>';
-  el.style.left=(40+Math.random()*20)+'%';el.style.top=(30+Math.random()*30)+'%';el.style.fontSize='10px';
+  el.style.left=(40+Math.random()*20)+'%';el.style.top=(30+Math.random()*30)+'%';
   document.getElementById('build-pane').appendChild(el);setTimeout(()=>el.remove(),900);
 }
-
-// ─── AUTO ──────────────────────────────────────────────────────────────
 
 function autoTick(){for(const r of unlockedRes()){const rt=autoR(r.id);if(rt>0)S.res[r.id]=(S.res[r.id]||0)+rt/10}}
 
@@ -582,11 +510,17 @@ function buyUpg(id){
   if(u.cost&&typeof u.cost==='object')for(const[rid,q]of Object.entries(u.cost)){S.res[rid]-=q*Math.pow(u.cm||1,l)}
   S.upg[id]=l+1;notify('⬆️ '+u.n+' Lv.'+(l+1)+'!');updateUI()
 }
-function buyMs(idx){
-  const m=MILESTONES[idx];if(!m||idx<=(ms()-1))return;
-  if(totalSkillLv()<m.lv){notify('Need total Lv.'+m.lv);return}
-  S._ms=(S._ms||0)+1;notify('🏅 '+m.n+'!');updateUI()
+
+// ─── 4 MILESTONE BUY ──────────────────────────────────────────────────
+
+function buyMs(skill,idx){
+  const track=MS[skill];if(!track||!track[idx])return;
+  const claimed=msG(skill);if(idx!==claimed)return; // must buy in order
+  if(skLv(skill)<track[idx].lv){notify('Need '+skill+' Lv.'+track[idx].lv);return}
+  S.ms[skill]=(S.ms[skill]||0)+1;
+  notify('🏅 '+skill+': '+track[idx].n+'!');updateUI()
 }
+
 function buyTalent(id){
   const t=TALENTS.find(x=>x.id===id);if(!t)return;
   const l=tL(id);if(l>=t.L)return;
@@ -616,42 +550,32 @@ function draw(){
   cx.fillStyle=g;cx.fillRect(0,0,w,h);
   if(S.tower.rows.length>10){cx.fillStyle='rgba(255,255,240,0.06)';for(let i=0;i<30;i++){const x=(i*131+47)%w,y=(i*89+11)%(h*0.2);cx.beginPath();cx.arc(x,y,0.4,0,Math.PI*2);cx.fill()}}
   cx.fillStyle='#0a0604';cx.fillRect(0,h-28,w,28);cx.fillStyle='#1a0e08';cx.fillRect(0,h-28,w,1.5);
-
   const rows=S.tower.rows,bw=getBaseW();
   if(!rows.length){cx.fillStyle='rgba(255,255,255,0.04)';cx.font='12px sans-serif';cx.textAlign='center';cx.fillText('Tap to start building!',w/2,h/2-15);return}
   const maxDrawH=h-32,totalSlots=Math.max(rows.length,5);
   const bH=Math.min(10,Math.max(3,(maxDrawH/totalSlots)*0.55)),gap=1,mH=Math.max(0.8,bH*0.2),rowH=bH+mH;
-  const bW=Math.min(26,Math.max(6,(w-20)/(bw+0.5)));
-  const wallW=bw*bW+(bw-1)*gap,ox=(w-wallW)/2;
+  const bW=Math.min(26,Math.max(6,(w-20)/(bw+0.5)));const wallW=bw*bW+(bw-1)*gap,ox=(w-wallW)/2;
   const cols=BC[getMatId()]||BC.mudBrick,mCols=BC.mortar;
   const startRow=Math.max(0,rows.length-Math.floor(maxDrawH/rowH));
-
   for(let ri=startRow;ri<rows.length;ri++){
-    const row=rows[ri],y=h-30-(rows.length-ri)*rowH;
-    if(y<-rowH||y>h)continue;
-    for(let b=0;b<bw;b++){
-      const bx=ox+b*(bW+gap);if(bx+bW<0||bx>w)continue;
+    const row=rows[ri],y=h-30-(rows.length-ri)*rowH;if(y<-rowH||y>h)continue;
+    for(let b=0;b<bw;b++){const bx=ox+b*(bW+gap);if(bx+bW<0||bx>w)continue;
       const brick=row.bricks[b]||{st:'e'};const st=getStab();
-      if(brick.st==='d'){
-        const g2=cx.createLinearGradient(bx,y,bx,y+bH);g2.addColorStop(0,cols.s);g2.addColorStop(0.5,cols.m);g2.addColorStop(1,cols.e);
+      if(brick.st==='d'){const g2=cx.createLinearGradient(bx,y,bx,y+bH);g2.addColorStop(0,cols.s);g2.addColorStop(0.5,cols.m);g2.addColorStop(1,cols.e);
         cx.fillStyle=g2;cx.fillRect(bx,y,bW,bH);cx.strokeStyle='rgba(0,0,0,0.15)';cx.lineWidth=0.2;cx.strokeRect(bx,y,bW,bH);
         if(st.p<15&&(b+ri)%3===0){cx.strokeStyle='rgba(200,50,50,'+(0.15+(15-st.p)/15*0.4)+')';cx.lineWidth=0.3;
           cx.beginPath();cx.moveTo(bx+1,y+1);cx.lineTo(bx+bW-1,y+bH-1);cx.moveTo(bx+bW-1,y+1);cx.lineTo(bx+1,y+bH-1);cx.stroke()}
-      }else if(brick.st==='p'){
-        const f=Math.min(1,(brick.pr||0)/bT());cx.globalAlpha=0.08;cx.fillStyle='rgba(255,255,255,0.06)';cx.fillRect(bx,y,bW,bH);cx.globalAlpha=1;
+      }else if(brick.st==='p'){const f=Math.min(1,(brick.pr||0)/bT());
+        cx.globalAlpha=0.08;cx.fillStyle='rgba(255,255,255,0.06)';cx.fillRect(bx,y,bW,bH);cx.globalAlpha=1;
         const sl=y-(1-f)*12;cx.shadowColor='rgba(232,200,122,0.08)';cx.shadowBlur=3;
         const g2=cx.createLinearGradient(bx,sl,bx,sl+bH);g2.addColorStop(0,cols.s);g2.addColorStop(0.5,cols.m);g2.addColorStop(1,cols.e);
         cx.fillStyle=g2;cx.fillRect(bx,sl,bW,bH);cx.shadowBlur=0
-      }else if(brick.st==='m'){
-        const g2=cx.createLinearGradient(bx,y,bx,y+bH);g2.addColorStop(0,cols.s);g2.addColorStop(0.5,cols.m);g2.addColorStop(1,cols.e);
+      }else if(brick.st==='m'){const g2=cx.createLinearGradient(bx,y,bx,y+bH);g2.addColorStop(0,cols.s);g2.addColorStop(0.5,cols.m);g2.addColorStop(1,cols.e);
         cx.fillStyle=g2;cx.fillRect(bx,y,bW,bH);cx.strokeStyle='rgba(0,0,0,0.15)';cx.lineWidth=0.2;cx.strokeRect(bx,y,bW,bH);
         const mf=Math.min(1,(brick.mp||0)/mT());cx.fillStyle='rgba(180,160,130,'+(0.1+0.25*mf)+')';cx.fillRect(bx,y-mH,bW,mH)
-      }else{cx.strokeStyle='rgba(255,255,255,0.02)';cx.lineWidth=0.2;cx.strokeRect(bx,y,bW,bH)}
-    }
-    if(ri<rows.length-1){cx.fillStyle=mCols.m;cx.fillRect(ox,y+bH,wallW,mH)}
-  }
+      }else{cx.strokeStyle='rgba(255,255,255,0.02)';cx.lineWidth=0.2;cx.strokeRect(bx,y,bW,bH)}}
+    if(ri<rows.length-1){cx.fillStyle=mCols.m;cx.fillRect(ox,y+bH,wallW,mH)}}
   cx.fillStyle='#2a1508';cx.fillRect(ox-4,h-30,wallW+8,2.5);
-  // Sway
   const s=getStab();if(s.p<20){const sw=(20-s.p)*0.2*Math.sin(Date.now()/400);cx.save();cx.translate(sw,0);
     cx.fillStyle='rgba(200,100,50,0.05)';cx.fillRect(ox-3,h-30-wallW*0.15,wallW+6,28);cx.restore()}
 }
@@ -679,7 +603,6 @@ function updateUIs(){
   document.getElementById('st-gold').textContent=Math.floor(S.stat.gold||0);
   document.getElementById('st-bricks').textContent=S.stat.bricks;
   document.getElementById('st-hgt').textContent=S.tower.rows.length;
-  // XP bars
   ['gathering','crafting','building','general'].forEach((id,i)=>{
     const s=S.sk[id];const nx=xpN(s.lv);const pct=Math.min(100,Math.floor((s.xp||0)/nx*100));
     document.getElementById(['xpf-g','xpf-c','xpf-b','xpf-x'][i]).style.width=pct+'%';
@@ -689,16 +612,13 @@ function updateUIs(){
 
 function updateUI(){
   updateUIs();
-
-  // GATHER
   const uR=unlockedRes();
   document.getElementById('g-res').innerHTML=RES_ALL.map(r=>{const v=Math.floor(S.res[r.id]||0);const au=autoR(r.id);const lk=!uR.find(x=>x.id===r.id);
-    return '<div class="r'+(lk?' locked':au>0?' glow':'')+'"><span class="i">'+r.i+'</span><span class="n">'+(lk?'🔒 Locked':r.n)+'</span><span class="v">'+(lk?'?':v)+'</span>'+(au>0?'<span class="ps">⚡'+(au).toFixed(1)+'</span>':'')+'</div>'}).join('');
+    return '<div class="r'+(lk?' locked':au>0?' glow':'')+'"><span class="i">'+r.i+'</span><span class="n">'+(lk?'🔒 Lv.'+r.unlock:r.n)+'</span><span class="v">'+(lk?'?':v)+'</span>'+(au>0?'<span class="ps">⚡'+(au).toFixed(1)+'</span>':'')+'</div>'}).join('');
   const f=gF();document.getElementById('g-icon').textContent=f.i;
   document.getElementById('g-hint').textContent='Tap to gather '+f.n;
-  document.getElementById('g-sub').textContent='+'+gY(f.id)+' 🪙'+Math.floor(gM()*aM())+' ⛏️XP';
+  document.getElementById('g-sub').textContent='+'+gY(f.id)+' 🪙'+Math.floor(gM()*aM());
 
-  // Gather upgrades
   document.getElementById('g-upgs').innerHTML=(()=>{
     let h='<div class="uh">🪙 Gold</div>';
     h+=UPG_G.filter(u=>u.t==='gather').map(u=>{const l=uL(u.id),mx=l>=u.L,c=Math.floor(u.b*Math.pow(u.m,l));const ok=(S.stat.gold||0)>=c&&!mx,rm=!u.req||Object.entries(u.req).every(([m,q])=>(S.mat[m]||0)>=q);
@@ -711,10 +631,9 @@ function updateUI(){
     return h;
   })();
 
-  // CRAFT
   const uM=unlockedMat();const as=autoCraft();if(!S._selCraft||!uM.find(m=>m.id===S._selCraft))S._selCraft=as;
   document.getElementById('c-recipes').innerHTML=MAT_ALL.map(m=>{const lk=!uM.find(x=>x.id===m.id);const on=m.id===S._selCraft,ia=m.id===as&&!lk;
-    const rcp=Object.entries(m.r).map(([r,q])=>q+'x '+r).join(' + ');
+    const rcp=Object.entries(m.r).map(([r,q])=>q+'x '+r).join(' +');
     return '<div class="rc'+(on?' on':'')+(ia?' auto':'')+(lk?' locked':'')+'" onclick="'+(lk?'':'G.selCraft(\''+m.id+'\')')+'">'+
       '<span class="ri">'+m.i+'</span><span class="rn">'+m.n+'<div class="rr">'+(lk?'🔒 Lv.'+m.unlock:(ia?'⭐ ':'')+rcp)+'</div></span>'+
       (!lk?'<span class="ck">'+(cB()>1?'x'+cB()+' ':'')+cT(m.id)+'t</span>':'')+'</div>'}).join('');
@@ -724,9 +643,8 @@ function updateUI(){
       document.getElementById('c-hint').textContent='🔄 '+cm.n;document.getElementById('c-sub').textContent=p.t+'/'+cT(S._selCraft);
       document.getElementById('c-bar').style.display='block';document.getElementById('c-fill').style.width=pct+'%'}
     else{document.getElementById('c-hint').textContent='Tap to craft '+cm.n;document.getElementById('c-sub').textContent=(cB()>1?'x'+cB()+' ':'')+cT(S._selCraft)+' taps';
-      document.getElementById('c-bar').style.display='none'}}else{document.getElementById('c-hint').textContent='🔒 Unlock recipes by leveling Crafting';document.getElementById('c-sub').textContent='Level up to unlock more';document.getElementById('c-bar').style.display='none'}
+      document.getElementById('c-bar').style.display='none'}}else{document.getElementById('c-hint').textContent='🔒 Unlock recipes via Crafting level';document.getElementById('c-sub').textContent='';document.getElementById('c-bar').style.display='none'}
 
-  // Craft upgrades
   document.getElementById('c-upgs').innerHTML=(()=>{
     let h='<div class="uh">🪙 Gold</div>';
     h+=UPG_G.filter(u=>u.t==='craft').map(u=>{const l=uL(u.id),mx=l>=u.L,c=Math.floor(u.b*Math.pow(u.m,l));const ok=(S.stat.gold||0)>=c&&!mx;
@@ -739,7 +657,6 @@ function updateUI(){
     return h;
   })();
 
-  // TOWER TECH
   document.getElementById('ttech-panel').innerHTML=(()=>{
     const cats=[{h:'⬛ Width',ids:['bw1','bw2','bw3','bw4','bw5']},{h:'🧴 Reinf',ids:['rf1','rf2','rf3','rf4','rf5']},{h:'🏗️ Found',ids:['fd1','fd2','fd3']}];
     return cats.map(c=>'<div class="tuh">'+c.h+'</div>'+c.ids.map(id=>{const t=TECH.find(x=>x.id===id);if(!t)return'';const o=S.tech[id];
@@ -747,22 +664,35 @@ function updateUI(){
       return '<div class="tu"><div class="td"><div class="tnm">'+(o?'✅ ':'')+t.i+' '+t.n+'</div><div class="tdc">'+t.d+'</div></div><span class="tco">🪙'+t.cost+'</span><button onclick="G.buyTech(\''+id+'\')"'+(ok&&rm?'':'disabled')+'>'+(o?'OWNED':'Buy')+'</button></div>'}).join('')).join('');
   })();
 
-  // SKILLS
+  // ── SKILLS TAB ──
   const si={gathering:'⛏️',crafting:'🔨',building:'🧱',general:'⚡'};
   const sc={'gathering':'#d06040','crafting':'#50b050','building':'#5090d0','general':'#e0d0c0'};
-  document.getElementById('skills-list').innerHTML=Object.entries(S.sk).map(([id,s])=>{
+  document.getElementById('skills-list').innerHTML=Object.entries(S.sk).map(([id,s]) => {
     const nx=xpN(s.lv);const pct=Math.min(100,Math.floor((s.xp||0)/nx*100));
     return '<div class="sk"><div class="shdr"><span class="sn" style="color:'+sc[id]+'">'+(si[id]||'')+' '+id.charAt(0).toUpperCase()+id.slice(1)+'</span><span class="sl" style="color:'+sc[id]+'">Lv.'+s.lv+'</span></div>'+
-      '<div class="sbar"><div class="sf" style="width:'+pct+'%;background:'+sc[id]+'"></div></div><div class="sxp">'+(s.xp||0)+'/'+nx+' XP — '+(nx-(s.xp||0))+' to next</div></div>'}).join('');
+      '<div class="sbar"><div class="sf" style="width:'+pct+'%;background:'+sc[id]+'"></div></div><div class="sxp">'+(s.xp||0)+'/'+nx+' XP ('+(nx-(s.xp||0))+' to next)</div></div>'
+  }).join('');
 
-  // MILESTONES (use total skill levels)
-  const bm=ms();const tLv=totalSkillLv();
-  document.getElementById('milestones-area').innerHTML='<div class="ms">'+MILESTONES.map((m,i)=>{
-    const un=i<bm;const isN=i===bm;const isN2=i===bm+1;
-    if(i>bm+1&&!un)return'';
-    return '<div class="m'+(un?' unlocked':'')+(isN||isN2?' next':'')+'" '+(isN&&tLv>=m.lv?'onclick="G.buyMs('+i+')" style="cursor:pointer"':'')+'>'+
-      '<div class="ml">'+(un?'✅':'🔒')+' Lv.'+m.lv+'</div><div class="md">'+(un?m.n+' — '+m.d:isN?'Need total Lv.'+m.lv+' → '+m.n:'Lv.'+m.lv+' req')+'</div>'+
-      (isN&&tLv>=m.lv?'<div class="mb" style="color:#ffd700">👆 Claim</div>':un?'<div class="mb">✅</div>':'')+'</div>'}).join('')+'</div>';
+  // ── 4 MILESTONE SECTIONS ──
+  const msKeys=['gathering','crafting','building','general'];
+  const msIcons={'gathering':'⛏️','crafting':'🔨','building':'🧱','general':'⚡'};
+  const msCols={'gathering':'#d06040','crafting':'#50b050','building':'#5090d0','general':'#e0d0c0'};
+  document.getElementById('milestones-area').innerHTML=msKeys.map(skill=>{
+    const track=MS[skill];const claimed=msG(skill);
+    let html='<div class="ms-sec"><div class="msh"><span style="color:'+msCols[skill]+'">'+msIcons[skill]+' '+skill.charAt(0).toUpperCase()+skill.slice(1)+' Milestones</span><span>Lv.'+skLv(skill)+' · Claimed: '+claimed+'/'+track.length+'</span></div><div class="msg">';
+    track.forEach((m,i)=>{
+      const un=i<claimed;const isN=i===claimed;const isN2=i===claimed+1;
+      if(i>claimed+1&&!un)return; // only show next 2
+      const canClaim=isN&&skLv(skill)>=m.lv;
+      html+='<div class="m'+(un?' unlocked':'')+(isN||isN2?' next':'')+(i<claimed-2?' done':'')+'" '+
+        (canClaim?'onclick="G.buyMs(\''+skill+'\','+i+')" style="cursor:pointer"':'')+'>'+
+        '<div class="ml">'+(un?'✅':'🔒')+' Lv.'+m.lv+'</div>'+
+        '<div class="md">'+(un?m.n+': '+m.d:isN?(canClaim?'👆 Claim':'Lv.'+m.lv+' req'):'')+'</div>'+
+        (un?'<div class="mb">✅</div>':'')+'</div>';
+    });
+    html+='</div></div>';
+    return html;
+  }).join('');
 
   // Skill upgrades
   const ss=[{n:'⛏️ Gathering',u:UPG_S.filter(x=>x.sk==='gathering'),sk:'gathering'},{n:'🔨 Crafting',u:UPG_S.filter(x=>x.sk==='crafting'),sk:'crafting'},
@@ -796,8 +726,9 @@ function switchTab(t){document.querySelectorAll('.t').forEach(b=>b.classList.rem
 
 function save(){try{localStorage.setItem('babel_save',JSON.stringify(S))}catch(e){}}
 function load(){try{const d=localStorage.getItem('babel_save');if(d){Object.assign(S,JSON.parse(d));
-  if(!S.cp)S.cp={};if(!S.tech)S.tech={};if(!S.tal)S.tal={};if(!S.sk)S.sk={gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}};
-  if(!S.tower)S.tower={rows:[],colCount:3,collapses:0};if(!S.tower.rows)S.tower.rows=[];if(S._ms===undefined)S._ms=0;if(S.tower._coll===undefined)S.tower._coll=false;
+  if(!S.cp)S.cp={};if(!S.tech)S.tech={};if(!S.tal)S.tal={};if(!S.ms)S.ms={gathering:0,crafting:0,building:0,general:0};
+  if(!S.sk)S.sk={gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}};
+  if(!S.tower)S.tower={rows:[],colCount:3,collapses:0};if(!S.tower.rows)S.tower.rows=[];if(S.tower._coll===undefined)S.tower._coll=false;
   if(!S._selCraft)S._selCraft=null;return true}}catch(e){}return false}
 
 // ─── INIT ─────────────────────────────────────────────────────────────
@@ -822,7 +753,7 @@ function init(){
 window.G={
   init,gather,craft,tapBuild,buyUpg,buyTech,
   selCraft(id){S._selCraft=id;updateUI()},
-  buyMs(i){buyMs(i)},buyTalent,
+  buyMs(s,i){buyMs(s,i)},buyTalent,
   toggleTech(){document.getElementById('ttech-panel').classList.toggle('sh')},
 };
 })();
