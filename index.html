@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Babel — Tower of Babel</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#1a0f0a;color:#f5e6d3;display:flex;justify-content:center;align-items:center;min-height:100vh;user-select:none;overflow:hidden;touch-action:manipulation}
+#game{width:100vw;height:100vh;max-width:100vw;max-height:100vh;display:flex;flex-direction:column;background:#1a0f08;overflow:hidden;position:relative}
+#bar{display:flex;justify-content:space-between;align-items:center;padding:3px 8px;background:linear-gradient(135deg,#2a1508,#0f0a05);border-bottom:2px solid #4a2812;flex-shrink:0;gap:3px;z-index:10}
+#bar h1{font-size:12px;font-weight:800;color:#e8c87a;letter-spacing:1px;white-space:nowrap}
+#bar h1 span{color:#d4a04a}
+#bar .st{display:flex;gap:4px;font-size:9px;color:#8a6a4a;flex-wrap:wrap;align-items:center}
+#bar .st b{color:#f5e6d3}
+#bar .st .gold{color:#ffd700}
+#bar .st .xl{color:#60a060;font-weight:700}
+#tabs{display:flex;background:#0f0a05;border-bottom:2px solid #4a2812;flex-shrink:0;z-index:10;overflow-x:auto}
+#tabs .t{flex:0 1 auto;padding:5px 8px;background:none;color:#6a4a3a;border:none;cursor:pointer;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;transition:all 0.1s;border-bottom:3px solid transparent;font-family:inherit;white-space:nowrap}
+#tabs .t:hover{color:#e8c87a}
+#tabs .t.on{color:#e8c87a;border-bottom-color:#e8c87a;background:rgba(232,200,122,0.05)}
+#content{flex:1;position:relative;min-height:0;overflow:hidden}
+.pane{position:absolute;inset:0;display:none;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.pane.on{display:flex}
+.pane::-webkit-scrollbar{width:3px}
+.pane::-webkit-scrollbar-track{background:#0f0a05}
+.pane::-webkit-scrollbar-thumb{background:#4a2812;border-radius:2px}
+
+/* --- GATHER --- */
+#gather-pane{background:linear-gradient(180deg,#1a0f08,#0f0a05)}
+.gs{display:flex;gap:4px;padding:2px 6px;flex-shrink:0;flex-wrap:wrap}
+.gs .gl{font-size:8px;color:#60a060;background:rgba(0,0,0,0.3);padding:1px 5px;border-radius:3px;white-space:nowrap}
+.g-res{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:2px;padding:3px 6px;flex-shrink:0}
+.g-res .r{background:#0f0a05;border:1px solid #2a1508;border-radius:3px;padding:2px 4px;display:flex;justify-content:space-between;align-items:center;font-size:9px}
+.g-res .r .i{font-size:10px}
+.g-res .r .n{flex:1;font-size:7px;color:#a08060;margin-left:2px}
+.g-res .r .v{font-weight:700;font-size:11px;color:#f5e6d3}
+.g-res .r.glow{border-color:#a08030}
+.g-res .r .ps{font-size:6px;color:#4a804a}
+#gather-zone{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px;cursor:pointer;min-height:60px}
+#gather-zone:active{background:rgba(255,255,255,0.02)}
+#gather-zone .big-icon{font-size:36px;margin-bottom:3px}
+#gather-zone:active .big-icon{transform:scale(0.92)}
+#gather-zone .hint{font-size:13px;font-weight:700;color:#e8c87a}
+#gather-zone .sub{font-size:9px;color:#a08060}
+#gather-zone .yield{font-size:24px;font-weight:800;color:#ffd700;opacity:0;position:absolute;transition:all 0.2s;pointer-events:none}
+#gather-zone .yield.pop{opacity:1;transform:translateY(-20px)}
+#gather-zone .change{position:absolute;font-weight:800;color:#ffd700;pointer-events:none;font-size:16px;animation:floatUp 0.5s ease forwards}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-35px) scale(1.2)}}
+.g-upgs{padding:3px 6px;flex-shrink:0;border-top:1px solid #2a1508;max-height:35%;overflow-y:auto}
+.g-upgs .uh{font-size:7px;text-transform:uppercase;color:#4a3a2a;margin:3px 0 1px}
+.g-upgs .u{display:flex;justify-content:space-between;align-items:center;background:#0f0a05;border:1px solid #2a1508;border-radius:3px;padding:2px 4px;margin-bottom:1px;font-size:9px}
+.g-upgs .u .d{flex:1;min-width:0}
+.g-upgs .u .d .nm{font-weight:600;font-size:9px}
+.g-upgs .u .d .dc{font-size:7px;color:#6a5a4a}
+.g-upgs .u .co{font-size:8px;font-weight:600;margin:0 2px;white-space:nowrap}
+.g-upgs .u button{font-size:7px;padding:1px 5px;font-family:inherit;background:linear-gradient(135deg,#4a2a12,#6a3a1a);color:#f5e6d3;border:1px solid #7a4020;border-radius:3px;cursor:pointer;white-space:nowrap}
+.g-upgs .u button:disabled{opacity:0.4;cursor:not-allowed}
+
+/* --- CRAFT --- */
+#craft-pane{background:linear-gradient(180deg,#150c06,#0a0505)}
+.c-recipes{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:2px;padding:3px 6px;flex-shrink:0}
+.c-recipes .rc{background:#0f0a05;border:2px solid #2a1508;border-radius:4px;padding:3px 5px;cursor:pointer;display:flex;align-items:center;gap:3px;font-size:9px}
+.c-recipes .rc:hover{border-color:#4a2a12}
+.c-recipes .rc.on{border-color:#e8c87a;background:#1a0f08}
+.c-recipes .rc.auto{border-color:#ffd700;box-shadow:0 0 3px rgba(255,215,0,0.15)}
+.c-recipes .rc .ri{font-size:14px}
+.c-recipes .rc .rn{flex:1;font-size:9px;font-weight:600}
+.c-recipes .rc .rn .rr{font-size:7px;color:#6a5a4a;font-weight:400}
+.c-recipes .rc .ck{font-size:7px;color:#4a804a;padding:1px 3px;border-radius:2px;background:rgba(90,138,90,0.1);white-space:nowrap}
+#craft-zone{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px;cursor:pointer;min-height:50px}
+#craft-zone:active{background:rgba(255,255,255,0.02)}
+#craft-zone .big-icon{font-size:32px;margin-bottom:3px}
+#craft-zone .hint{font-size:12px;font-weight:700;color:#e8c87a}
+#craft-zone .sub{font-size:9px;color:#a08060}
+#craft-zone .cbar{width:130px;max-width:45vw;height:3px;background:#0a0505;border-radius:2px;margin-top:4px;overflow:hidden}
+#craft-zone .cbar .cf{height:100%;background:linear-gradient(90deg,#ffd700,#e8c87a);border-radius:2px;transition:width 0.1s}
+.c-upgs{padding:3px 6px;flex-shrink:0;border-top:1px solid #2a1508;max-height:25%;overflow-y:auto}
+
+/* --- BUILD (TOWER) --- */
+#build-pane{background:#0a0505;padding:0;position:relative}
+#build-pane canvas{display:block;width:100%;height:100%}
+.bhud{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.93));padding:6px 10px;pointer-events:none;z-index:5}
+.bhud>*{pointer-events:auto}
+.bhud .sn{font-size:11px;font-weight:700;color:#e8c87a}
+.bhud .pt{font-size:8px;color:#a08060}
+.bhud .stab{height:4px;border-radius:2px;margin:2px 0;overflow:hidden;background:#1a0f08}
+.bhud .stab .sf{height:100%;border-radius:2px;transition:width 0.3s,background 0.3s}
+.bhud .ah{font-size:10px;color:#f5e6d3;background:rgba(0,0,0,0.7);padding:2px 7px;border-radius:4px;display:inline-block;margin-top:1px;border:1px solid rgba(232,200,122,0.12)}
+.bhud .ah .tc{display:inline-block;width:16px;height:16px;line-height:16px;text-align:center;background:#e8c87a;color:#2c1810;border-radius:50%;font-weight:700;font-size:8px;margin:0 1px;vertical-align:middle}
+.bhud .row{display:flex;gap:1px;margin-top:2px;flex-wrap:wrap;max-height:14px;overflow:hidden}
+.bhud .row .dot{width:5px;height:5px;border-radius:1px;background:#2a1508;border:1px solid #4a2812;flex-shrink:0}
+.bhud .row .dot.done{background:#c46a3a;border-color:#905028}
+.bhud .row .dot.cur{background:#ffd700;border-color:#ffd700;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 3px rgba(255,215,0,0.3)}50%{box-shadow:0 0 6px rgba(255,215,0,0.5)}}
+.bhud .row .dot.crack{background:#8a2020;border-color:#cc0000;animation:crackle 0.3s infinite}
+@keyframes crackle{0%,100%{opacity:1}50%{opacity:0.5}}
+.bhud .row .dot.fail{background:#400;border-color:#800;animation:failPulse 0.2s infinite}
+@keyframes failPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.3;transform:scale(0.8)}}
+
+#tower-upgs{position:absolute;top:4px;right:4px;z-index:6}
+#tower-upgs button{background:rgba(15,10,5,0.85);border:1px solid #4a2812;border-radius:4px;padding:2px 6px;cursor:pointer;font-size:8px;color:#a08060;font-family:inherit}
+#tower-upgs button:hover{color:#e8c87a;border-color:#e8c87a}
+#tupg-panel{position:absolute;top:24px;right:4px;z-index:6;width:180px;background:rgba(15,10,5,0.96);border:1px solid #4a2812;border-radius:5px;padding:5px;display:none;backdrop-filter:blur(4px);max-height:70%;overflow-y:auto}
+#tupg-panel.sh{display:block}
+#tupg-panel .tu{display:flex;justify-content:space-between;align-items:center;padding:2px 4px;margin-bottom:1px;border-radius:3px;font-size:9px}
+#tupg-panel .tu:hover{background:rgba(255,255,255,0.03)}
+#tupg-panel .tu .td{flex:1;min-width:0}
+#tupg-panel .tu .td .tnm{font-weight:600;font-size:9px}
+#tupg-panel .tu .td .tdc{font-size:7px;color:#6a5a4a}
+#tupg-panel .tu .tco{font-size:8px;color:#ffd700;margin:0 2px;white-space:nowrap}
+#tupg-panel .tu button{font-size:7px;padding:1px 4px;font-family:inherit;background:linear-gradient(135deg,#4a2a12,#6a3a1a);color:#f5e6d3;border:1px solid #7a4020;border-radius:3px;cursor:pointer;white-space:nowrap}
+#tupg-panel .tu button:disabled{opacity:0.4;cursor:not-allowed}
+#tupg-panel .tuh{font-size:7px;text-transform:uppercase;color:#4a3a2a;margin:3px 0 1px;border-top:1px solid #2a1508;padding-top:3px}
+
+/* --- SKILLS --- */
+#skills-pane{background:linear-gradient(180deg,#0f0a08,#080505)}
+.sk-scroll{padding:5px;flex:1;overflow-y:auto}
+.sk-scroll::-webkit-scrollbar{width:3px}
+.sk-scroll::-webkit-scrollbar-track{background:#0f0a05}
+.sk-scroll::-webkit-scrollbar-thumb{background:#4a2812}
+.sk{background:#0f0a05;border:1px solid #2a1508;border-radius:4px;padding:3px 6px;margin-bottom:3px}
+.sk .shdr{display:flex;justify-content:space-between;align-items:center}
+.sk .shdr .sn{font-weight:700;font-size:10px}
+.sk .shdr .sl{color:#60a060;font-size:9px;font-weight:600}
+.sk .sbar{height:3px;background:#050303;border-radius:2px;margin:2px 0;overflow:hidden}
+.sk .sbar .sf{height:100%;background:linear-gradient(90deg,#60a060,#308030);border-radius:2px;transition:width 0.2s}
+.sk .sxp{font-size:7px;color:#6a5a4a}
+
+.ms{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:2px;margin:4px 0}
+.m{background:#0f0a05;border:2px solid #2a1508;border-radius:4px;padding:3px 5px;text-align:center;font-size:9px}
+.m.unlocked{border-color:#60a060;background:#080f08}
+.m.next{border-color:#ffd700;box-shadow:0 0 3px rgba(255,215,0,0.15)}
+.m.locked{opacity:0.3}
+.m .ml{font-size:13px;font-weight:800;color:#e8c87a}
+.m .md{font-size:7px;color:#6a5a4a}
+.m .mb{font-size:7px;color:#4a804a}
+
+.su{background:#0f0a05;border-radius:4px;padding:4px;margin-top:4px}
+.su h{font-size:8px;text-transform:uppercase;color:#4a3a2a;letter-spacing:0.3px;margin:3px 0 1px;display:block}
+.su .u{display:flex;justify-content:space-between;align-items:center;padding:2px 4px;margin-bottom:1px;font-size:9px;background:rgba(0,0,0,0.2);border-radius:3px}
+.su .u .d{flex:1;min-width:0}
+.su .u .d .nm{font-weight:600;font-size:9px}
+.su .u .d .dc{font-size:7px;color:#6a5a4a}
+.su .u .co{font-size:8px;color:#ffd700;margin:0 2px;white-space:nowrap}
+.su .u button{font-size:7px;padding:1px 5px;font-family:inherit;background:linear-gradient(135deg,#4a2a12,#6a3a1a);color:#f5e6d3;border:1px solid #7a4020;border-radius:3px;cursor:pointer;white-space:nowrap}
+.su .u button:disabled{opacity:0.4;cursor:not-allowed}
+
+/* --- TALENTS --- */
+#talents-pane{background:linear-gradient(180deg,#0a0f08,#050805)}
+.t-scroll{padding:5px;flex:1;overflow-y:auto}
+.t-scroll::-webkit-scrollbar{width:3px}
+.t-scroll::-webkit-scrollbar-track{background:#0f0a05}
+.t-scroll::-webkit-scrollbar-thumb{background:#4a2812}
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:3px}
+.parapet{border:2px solid #2a1508;border-radius:5px;padding:4px;background:#0f0a05}
+.parapet .phdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
+.parapet .phdr .pn{font-size:9px;font-weight:700}
+.parapet .phdr .pl{font-size:8px;color:#60a060;font-weight:600}
+.parapet .pdesc{font-size:7px;color:#6a5a4a;margin-bottom:2px}
+.parapet .pbar{height:2px;background:#050303;border-radius:1px;overflow:hidden;margin-bottom:2px}
+.parapet .pbar .pf{height:100%;background:linear-gradient(90deg,#e8c87a,#ffd700);border-radius:1px;transition:width 0.2s}
+.parapet .peff{font-size:7px;color:#a08060;margin-bottom:2px}
+.parapet button{width:100%;font-size:8px;padding:2px;font-family:inherit;background:linear-gradient(135deg,#4a2a12,#6a3a1a);color:#f5e6d3;border:1px solid #7a4020;border-radius:3px;cursor:pointer}
+.parapet button:disabled{opacity:0.4;cursor:not-allowed}
+
+#notif{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:100;background:#0f0a05;border:2px solid #ffd700;border-radius:6px;padding:4px 12px;color:#f5e6d3;font-weight:600;font-size:10px;text-align:center;max-width:280px;opacity:0;transition:opacity 0.15s;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,0.6)}
+#notif.sh{opacity:1}
+.prtcl{position:fixed;pointer-events:none;font-size:12px;animation:prtclFade 0.5s ease forwards;z-index:50}
+@keyframes prtclFade{0%{opacity:1;transform:translateY(0) scale(0.5)}100%{opacity:0;transform:translateY(-40px) scale(1.2)}}
+.crumble{position:fixed;pointer-events:none;font-size:10px;animation:crumbleFall 1s ease forwards;z-index:50}
+@keyframes crumbleFall{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(100px) rotate(720deg)}}
+@media(min-width:768px){#game{width:800px;height:680px;border-radius:10px;border:2px solid #4a2812;box-shadow:0 8px 40px rgba(0,0,0,0.7)}}
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="bar">
+    <h1>🗼 <span>BABEL</span></h1>
+    <div class="st">
+      <span class="gold">🪙<b id="st-gold">0</b></span>
+      <span>🧱<b id="st-bricks">0</b></span>
+      <span class="xl">⚡<b id="st-lvl">1</b></span>
+      <span>🗼<b id="st-hgt">0</b>r</span>
+    </div>
+  </div>
+  <div id="tabs">
+    <button class="t on" data-t="gather">🪨 Gather</button>
+    <button class="t" data-t="craft">🔨 Craft</button>
+    <button class="t" data-t="build">🗼 Build</button>
+    <button class="t" data-t="skills">⚡ Skills</button>
+    <button class="t" data-t="talents">🏰 Talents</button>
+  </div>
+  <div id="content">
+    <!-- GATHER -->
+    <div class="pane on" id="gather-pane">
+      <div class="gs"><span class="gl" id="g-skill">Gathering Lv.1</span></div>
+      <div class="g-res" id="g-res"></div>
+      <div id="gather-zone">
+        <div class="big-icon" id="g-icon">🟤</div>
+        <div class="hint" id="g-hint">Tap to gather Mud</div>
+        <div class="sub" id="g-sub">+1 per tap</div>
+        <div class="yield" id="g-yield"></div>
+      </div>
+      <div class="g-upgs" id="g-upgs"></div>
+    </div>
+    <!-- CRAFT -->
+    <div class="pane" id="craft-pane">
+      <div class="gs"><span class="gl" id="c-skill">Crafting Lv.1</span></div>
+      <div class="c-recipes" id="c-recipes" style="margin-top:3px"></div>
+      <div id="craft-zone">
+        <div class="big-icon" id="c-icon">🧱</div>
+        <div class="hint" id="c-hint">Tap to craft</div>
+        <div class="sub" id="c-sub">Select a recipe</div>
+        <div class="cbar" id="c-bar" style="display:none"><div class="cf" id="c-fill" style="width:0%"></div></div>
+      </div>
+      <div class="c-upgs" id="c-upgs"></div>
+    </div>
+    <!-- BUILD -->
+    <div class="pane" id="build-pane">
+      <canvas id="bc"></canvas>
+      <div id="tower-upgs"><button onclick="G.toggleUpg()">⬆️ Tech</button></div>
+      <div id="tupg-panel"></div>
+      <div class="bhud">
+        <div class="sn" id="bhud-name">🗼 Tower of Babel</div>
+        <div class="pt" id="bhud-progress">Height 0 · Width 3</div>
+        <div class="stab" id="stab-bar"><div class="sf" id="stab-fill" style="width:100%;background:#40a040"></div></div>
+        <div class="ah" id="bhud-action">👉 Tap to place brick <span class="tc">0/4</span></div>
+        <div class="row" id="bhud-row"></div>
+      </div>
+    </div>
+    <!-- SKILLS -->
+    <div class="pane" id="skills-pane">
+      <div class="sk-scroll">
+        <div id="skills-list"></div>
+        <div id="milestones-area"></div>
+        <div id="skill-upgs-area" class="su"></div>
+      </div>
+    </div>
+    <!-- TALENTS -->
+    <div class="pane" id="talents-pane">
+      <div class="t-scroll">
+        <div class="tg" id="talents-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="notif"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+//  BABEL — Tower of Babel
+//  Build a tower as tall as you can. It gets unstable. It falls.
+//  Wider base, reinforcements, and skill make you build taller.
+// ═══════════════════════════════════════════════════════════════════════
+
+;(() => {
+'use strict';
+
+// ─── DATA ──────────────────────────────────────────────────────────────
+
+const RES = [
+  {id:'mud',n:'Mud',i:'🟤',y:1},{id:'gravel',n:'Gravel',i:'🪨',y:1},
+  {id:'sand',n:'Sand',i:'🏖️',y:1},{id:'clay',n:'Clay',i:'🧱',y:1},
+  {id:'water',n:'Water',i:'💧',y:1},{id:'straw',n:'Straw',i:'🌾',y:1},
+  {id:'lime',n:'Lime',i:'🪨',y:1},{id:'stone',n:'Stone',i:'⛰️',y:1},
+];
+
+const MAT = [
+  {id:'mortar',n:'Mortar',i:'🧴',t:3,r:{sand:2,water:1,lime:1},d:'Mix'},
+  {id:'mudBrick',n:'Mud Brick',i:'🧱',t:4,r:{mud:3,straw:1},d:'Mud→Dry',str:1.0},
+  {id:'firedBrick',n:'Fired Brick',i:'🔥',t:4,r:{clay:2,sand:1,water:1},d:'Fire',str:0.8},
+  {id:'stoneBlock',n:'Stone Block',i:'🗿',t:5,r:{stone:3},d:'Quarry',str:0.6},
+  {id:'reinfBrick',n:'Reinf.Brick',i:'⚔️',t:5,r:{firedBrick:1,stone:1,lime:1},d:'Reinforce',str:0.4},
+  {id:'glazedBrick',n:'Glazed Brick',i:'✨',t:6,r:{firedBrick:1,sand:2,water:1},d:'Glaze',str:0.3},
+  {id:'megalith',n:'Megalith',i:'🏛️',t:8,r:{stoneBlock:2,reinfBrick:1},d:'Mega',str:0.2},
+];
+
+// Brick colors
+const BC = {
+  mudBrick:{s:'#c46a3a',m:'#a0522d',e:'#8b3a1a'},
+  firedBrick:{s:'#d45030',m:'#b83820',e:'#8a2010'},
+  stoneBlock:{s:'#8a8a8a',m:'#6a6a6a',e:'#4a4a4a'},
+  reinfBrick:{s:'#6a7a8a',m:'#4a5a6a',e:'#2a3a4a'},
+  glazedBrick:{s:'#7a8a6a',m:'#5a6a4a',e:'#3a4a2a'},
+  megalith:{s:'#5a4a3a',m:'#3a2a1a',e:'#2a1a0a'},
+  mortar:{s:'#b8a080',m:'#988060',e:'#786040'},
+  glazedMortar:{s:'#8a9a7a',m:'#6a7a5a',e:'#4a5a3a'},
+};
+
+// Tower tech tree
+const TECH = [
+  // Base width upgrades
+  {id:'bw1',n:'Wider Base',d:'Width 3→5',tab:'tower',cost:100,ty:'width',val:5,req:null,icon:'⬛'},
+  {id:'bw2',n:'Broad Base',d:'Width 5→7',tab:'tower',cost:500,ty:'width',val:7,req:{firedBrick:15},icon:'⬛'},
+  {id:'bw3',n:'Grand Base',d:'Width 7→10',tab:'tower',cost:2000,ty:'width',val:10,req:{stoneBlock:20},icon:'⬛'},
+  {id:'bw4',n:'Massive Base',d:'Width 10→14',tab:'tower',cost:8000,ty:'width',val:14,req:{megalith:10},icon:'⬛'},
+  {id:'bw5',n:'Titan Base',d:'Width 14→20',tab:'tower',cost:30000,ty:'width',val:20,req:{megalith:30},icon:'⬛'},
+  // Reinforcements
+  {id:'rf1',n:'Mud Plaster',d:'Stability +20%',tab:'tower',cost:50,ty:'reinf',val:0.2,req:null,icon:'🧴'},
+  {id:'rf2',n:'Wood Braces',d:'Stability +30%',tab:'tower',cost:300,ty:'reinf',val:0.3,req:{firedBrick:10},icon:'🪵'},
+  {id:'rf3',n:'Stone Buttress',d:'Stability +40%',tab:'tower',cost:1000,ty:'reinf',val:0.4,req:{stoneBlock:15},icon:'⛰️'},
+  {id:'rf4',n:'Iron Frame',d:'Stability +60%',tab:'tower',cost:5000,ty:'reinf',val:0.6,req:{reinfBrick:15},icon:'⚙️'},
+  {id:'rf5',n:'Steel Skeleton',d:'Stability +80%',tab:'tower',cost:20000,ty:'reinf',val:0.8,req:{megalith:20},icon:'🔩'},
+  // Foundation
+  {id:'fd1',n:'Shallow Found.',d:'Stability ×1.5',tab:'tower',cost:200,ty:'found',val:0.5,req:{mortar:15},icon:'🏗️'},
+  {id:'fd2',n:'Deep Foundation',d:'Stability ×2',tab:'tower',cost:1500,ty:'found',val:1.0,req:{stoneBlock:15},icon:'🏗️'},
+  {id:'fd3',n:'Bedrock Anchor',d:'Stability ×3',tab:'tower',cost:10000,ty:'found',val:2.0,req:{megalith:15},icon:'🏗️'},
+  // Material unlocks (upgrades which brick the tower uses)
+  {id:'mt1',n:'Fired Brick Tech',d:'Stronger bricks',tab:'tower',cost:150,ty:'mat',val:'firedBrick',req:{firedBrick:5},icon:'🔥'},
+  {id:'mt2',n:'Stone Block Tech',d:'Much stronger',tab:'tower',cost:800,ty:'mat',val:'stoneBlock',req:{stoneBlock:10},icon:'🗿'},
+  {id:'mt3',n:'Reinforced Tech',d:'Premium bricks',tab:'tower',cost:3000,ty:'mat',val:'reinfBrick',req:{reinfBrick:10},icon:'⚔️'},
+  {id:'mt4',n:'Megalith Tech',d:'Ultimate bricks',tab:'tower',cost:15000,ty:'mat',val:'megalith',req:{megalith:10},icon:'🏛️'},
+];
+
+// Gold upgrades
+const UPG_GOLD = [
+  {id:'gg1',n:'Strong Hands',d:'2x gather',tab:'gather',b:10,m:2.5,L:5},
+  {id:'gg2',n:'Copper Tools',d:'+1 gather',tab:'gather',b:25,m:2.2,L:5},
+  {id:'gg3',n:'Iron Tools',d:'+2 gather',tab:'gather',b:100,m:2.0,L:4,req:{firedBrick:10}},
+  {id:'gg4',n:'Mud Golem',d:'Auto mud 1/s',tab:'gather',b:50,m:2.0,L:3},
+  {id:'gg5',n:'Sand Wisp',d:'Auto sand 0.5/s',tab:'gather',b:75,m:2.0,L:3},
+  {id:'gg6',n:'Clay Sprite',d:'Auto clay 1/s',tab:'gather',b:100,m:2.0,L:3,req:{firedBrick:5}},
+  {id:'gg7',n:'Quarry Golem',d:'Auto stone 0.3/s',tab:'gather',b:200,m:2.0,L:3,req:{stoneBlock:5}},
+  {id:'gc1',n:'Efficient Craft',d:'-1 tap craft',tab:'craft',b:30,m:3.0,L:3},
+  {id:'gc2',n:'Batch Produce',d:'Craft 2x',tab:'craft',b:80,m:3.0,L:3},
+];
+
+// Resource upgrades (% multipliers)
+const UPG_RES = [
+  {id:'rm1',n:'Mud Mastery',d:'+20% mud',cost:{mud:200},eff:{resMult:{mud:0.2}},L:5,cm:1.5},
+  {id:'rm2',n:'Sand Mastery',d:'+20% sand',cost:{sand:200},eff:{resMult:{sand:0.2}},L:5,cm:1.5},
+  {id:'rm3',n:'Clay Mastery',d:'+20% clay',cost:{clay:200},eff:{resMult:{clay:0.2}},L:5,cm:1.5},
+  {id:'rm4',n:'Stone Mastery',d:'+20% stone',cost:{stone:200},eff:{resMult:{stone:0.2}},L:5,cm:1.5},
+  {id:'rm5',n:'Deep Digging',d:'+50% all earth',cost:{mud:500,gravel:300},eff:{allEarth:0.5},L:3,cm:1.8},
+  {id:'rc1',n:'Efficient Mortar',d:'-1 mortar cost',cost:{mortar:50},eff:{craftDiscount:{mortar:1}},L:3,cm:2.0},
+];
+
+// Skill-specific upgrades
+const UPG_SKILL = [
+  {id:'sg1',n:'Expert Gatherer',d:'+100% gather',sk:'gathering',cost:200,rLv:5,L:3,m:1.8},
+  {id:'sg2',n:'Master Prospector',d:'2x gold',sk:'gathering',cost:500,rLv:10,L:3,m:1.8},
+  {id:'sc1',n:'Efficient Artisan',d:'Craft -2 taps',sk:'crafting',cost:200,rLv:5,L:3,m:1.8},
+  {id:'sc2',n:'Master Craftsman',d:'Craft 3x batch',sk:'crafting',cost:500,rLv:10,L:3,m:1.8},
+  {id:'sb1',n:'Quick Builder',d:'Build -2 taps',sk:'building',cost:200,rLv:5,L:3,m:1.8},
+  {id:'sb2',n:'Master Architect',d:'+3 bricks/action',sk:'building',cost:500,rLv:10,L:3,m:1.8},
+  {id:'sx1',n:'Speed Demon',d:'All 2x',sk:'general',cost:300,rLv:5,L:3,m:1.8},
+  {id:'sx2',n:'Gold Mastery',d:'2x gold',sk:'general',cost:800,rLv:10,L:3,m:1.8},
+  {id:'sx3',n:'Enlightenment',d:'3x all XP',sk:'general',cost:2000,rLv:25,L:3,m:1.8},
+];
+
+// Milestones (unlocked by total taps)
+const MILESTONES = [
+  {lv:5,n:'Apprentice',d:'+1 all yield',bonus:{allYield:1}},
+  {lv:10,n:'Builder',d:'Gold ×2',bonus:{goldMult:2}},
+  {lv:25,n:'Engineer',d:'All XP ×2',bonus:{xpMult:2}},
+  {lv:50,n:'Architect',d:'Tower stability +20%',bonus:{towerStab:0.2}},
+  {lv:75,n:'Foreman',d:'Craft/buld -3 taps',bonus:{tapDiscount:3}},
+  {lv:100,n:'Master Builder',d:'All yields ×2',bonus:{allYield:2}},
+  {lv:125,n:'Sage of Stone',d:'Gold ×3',bonus:{goldMult:3}},
+  {lv:150,n:'Tower Lord',d:'Stability +30%',bonus:{towerStab:0.3}},
+  {lv:200,n:'Monarch of Mud',d:'XP ×4',bonus:{xpMult:4}},
+  {lv:250,n:'King of Clay',d:'Gather ×3',bonus:{gatherMult:3}},
+  {lv:300,n:'Emperor Earth',d:'Gold ×5',bonus:{goldMult:5}},
+  {lv:400,n:'Demigod',d:'All ×10',bonus:{allMult:10}},
+  {lv:500,n:'Babel Ascended',d:'All ×20',bonus:{allMult:20}},
+];
+
+// Talents (parapets)
+const TALENTS = [
+  {id:'scaffold',n:'Scaffolding',i:'🏗️',d:'Faster build',L:10,cb:100,cm:1.8,rSkl:'building',rLv:3,rLvSt:2,eff:l=>({bldSpd:l*0.15})},
+  {id:'kiln',n:'Kiln Mastery',i:'🔥',d:'Faster craft',L:10,cb:100,cm:1.8,rSkl:'crafting',rLv:3,rLvSt:2,eff:l=>({crfSpd:l*0.15})},
+  {id:'quarry',n:'Deep Quarry',i:'⛰️',d:'More gather',L:10,cb:100,cm:1.8,rSkl:'gathering',rLv:3,rLvSt:2,eff:l=>({gthMult:l*0.2})},
+  {id:'design',n:'Sacred Design',i:'📐',d:'Gold & XP',L:10,cb:150,cm:1.8,rSkl:'general',rLv:5,rLvSt:2,eff:l=>({gdMult:l*0.1,xpMult:l*0.1})},
+  {id:'foundation',n:'Deep Found.',i:'🧱',d:'Stability+all',L:10,cb:200,cm:1.8,rSkl:'general',rLv:8,rLvSt:3,eff:l=>({allMult:l*0.05,stabMult:l*0.1})},
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────
+
+let S = {
+  res:Object.fromEntries(RES.map(r=>[r.id,0])),
+  mat:Object.fromEntries(MAT.map(m=>[m.id,0])),
+  upg:{},tech:{},
+  tower:{rows:[],colCount:0,collapses:0},
+  stat:{gold:0,taps:0,bricks:0},
+  cp:{},
+  skills:{gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}},
+  tal:{},tick:0,gFocus:0,_ms:0,_collapsing:false,
+};
+
+// ─── TOWER LOGIC ──────────────────────────────────────────────────────
+
+function getBaseWidth(){
+  const techs=[null,'bw1','bw2','bw3','bw4','bw5'];
+  let w=3;
+  for(const t of techs){if(t&&S.tech[t])w=S.tech[t]}
+  return w;
+}
+function getReinfBonus(){
+  let b=0;
+  for(const id of['rf1','rf2','rf3','rf4','rf5'])if(S.tech[id])b+=TECH.find(t=>t.id===id).val;
+  // Talent multiplier
+  b*=1+tL('foundation')*0.1;
+  // From milestones
+  if(ms()>=50)b+=0.2;if(ms()>=150)b+=0.3;
+  return b;
+}
+function getFoundMult(){
+  let m=1;
+  for(const id of['fd1','fd2','fd3'])if(S.tech[id])m+=TECH.find(t=>t.id===id).val;
+  return m;
+}
+function getMatId(){
+  const ms=[null,'mt1','mt2','mt3','mt4'];
+  let mat='mudBrick';
+  for(const t of ms){if(t&&S.tech[t])mat=S.tech[t]}
+  return mat;
+}
+function getMatStrength(){
+  const mat=MAT.find(m=>m.id===getMatId());
+  return mat?mat.str:1.0;
+}
+function tL(id){return S.tal[id]||0}
+function uL(id){return S.upg[id]||0}
+function uV(id){return uL(id)}
+function ms(){return S._ms||0}
+
+function getStability(){
+  const height=S.tower.rows.length;
+  if(height===0)return{stability:100,stabPct:100,maxSafe:1};
+  const bw=getBaseWidth();
+  const reinf=getReinfBonus();
+  const found=getFoundMult();
+  const matStr=getMatStrength();
+  const maxSafe=Math.floor(bw*(1+reinf)*found/matStr);
+  const stab=Math.max(0,100-(height/maxSafe*100));
+  return{stability:stab,stabPct:Math.floor(stab),maxSafe,height};
+}
+function isUnstable(){const s=getStability();return s.stabPct<20}
+function isCritical(){const s=getStability();return s.stabPct<10}
+function isFailing(){const s=getStability();return s.stabPct<5}
+
+function initTower(){
+  const bw=getBaseWidth();
+  S.tower.rows=[];
+  S.tower.colCount=bw;
+  S.tower._collapsing=false;
+}
+
+function collapseTower(){
+  if(S.tower._collapsing)return;
+  S.tower._collapsing=true;
+  S.tower.collapses=(S.tower.collapses||0)+1;
+  notify('💥 TOWER COLLAPSES!');
+  // Crumbling animation
+  for(let i=0;i<15;i++){setTimeout(()=>{const el=document.createElement('div');el.className='crumble';el.textContent=['🧱','🪨','💥','💨'][Math.floor(Math.random()*4)];
+    el.style.left=(20+Math.random()*60)+'vw';el.style.top=(20+Math.random()*50)+'vh';el.style.fontSize=(10+Math.random()*20)+'px';
+    el.style.animationDuration=(0.5+Math.random()*0.8)+'s';
+    document.body.appendChild(el);setTimeout(()=>el.remove(),1500);},i*80)}
+  // Reset tower after delay
+  setTimeout(()=>{
+    S.tower.rows=[];initTower();S.tower._collapsing=false;
+    // Bonus rubble
+    notify('🏚️ Rebuilding... lessons learned! XP bonus!');
+    earnXP('building',50);earnXP('general',50);
+    updateUI();
+  },1200);
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────
+
+function xpNext(lv){return Math.floor(60*lv*(1+lv*0.1))}
+function earnXP(skill,base){
+  let m=1;if(ms()>=25)m*=2;if(ms()>=200)m*=4;if(uV('sx3')>0)m*=3;
+  m*=1+tL('design')*0.1;
+  const x=Math.floor(base*m);
+  if(skill==='general'){S.skills.general.xp+=x;recalc('general')}
+  else{S.skills[skill].xp+=x;recalc(skill);S.skills.general.xp+=Math.floor(x*0.5);recalc('general')}
+}
+function recalc(id){const s=S.skills[id];let l=1,x=s.xp;while(x>=xpNext(l)){x-=xpNext(l);l++}s.lv=l}
+
+function gYield(id){
+  const r=RES.find(x=>x.id===id);if(!r)return 1;
+  let y=r.y;y*=Math.pow(2,uL('g1')+uL('gg1'));y+=uL('g2')+uL('gg2');y+=(uL('g3')+uL('gg3'))*2;
+  y*=1+uL('rm1')*0.2; // per-level mud mastery etc
+  if(id==='mud'||id==='gravel'||id==='sand'||id==='clay'||id==='stone')y*=1+uL('rm5')*0.5;
+  y*=1+S.skills.gathering.lv*0.1;y*=1+tL('quarry')*0.2;
+  if(ms()>=5)y+=1;if(ms()>=50)y+=1;if(ms()>=100)y+=1;if(ms()>=250)y*=3;
+  if(uV('sg1')>0)y*=2;
+  return Math.max(1,Math.floor(y));
+}
+function goldMultExtra(){
+  let m=1;
+  if(uV('sg2')>0)m*=2;if(uV('sx2')>0)m*=2;
+  if(ms()>=10)m*=2;if(ms()>=125)m*=3;if(ms()>=300)m*=5;
+  m*=1+tL('design')*0.1;
+  return m;
+}
+function allMultExtra(){
+  let m=1;
+  if(ms()>=400)m*=10;if(ms()>=500)m*=20;
+  m*=1+tL('foundation')*0.05;
+  if(uV('sx1')>0)m*=2;
+  return m;
+}
+function bTaps(){return Math.max(1,4-(ms()>=75?3:0)-uV('sb1')*2)}
+function mTaps(){return Math.max(1,5-(ms()>=75?3:0)-uV('sb1')*2)}
+function bBatch(){return 1+uV('sb2')*3}
+function cTaps(id){const m=MAT.find(x=>x.id===id);return m?Math.max(1,m.t-uV('c1')-uV('gc1')-(ms()>=75?3:0)):3}
+function cBatch(){return 1+uV('c2')+uV('gc2')}
+
+function autoRate(id){
+  let r=0;const map={g4:'mud',g5:'sand',g6:'clay',g7:'stone'};
+  for(const[u,res]of Object.entries(map)){if(id===res)r+=uL(u)*(u==='g5'?0.5:u==='g7'?0.3:1)}
+  r+=uL('gg4')*(id==='mud'?1:0)+uL('gg5')*(id==='sand'?0.5:0)+uL('gg6')*(id==='clay'?1:0)+uL('gg7')*(id==='stone'?0.3:0);
+  return r;
+}
+function gatherFocus(){return RES[S.gFocus%RES.length]}
+
+function autoSelectCraft(){
+  const matId=getMatId();const moId='mortar';
+  const haveB=S.mat[matId]||0,haveM=S.mat[moId]||0;
+  const need=Math.max(10,getBaseWidth()*2);
+  if(haveB<need)return matId;
+  if(haveM<need)return moId;
+  if(S._selCraft&&MAT.find(m=>m.id===S._selCraft))return S._selCraft;
+  return matId;
+}
+
+// ─── BUILD ────────────────────────────────────────────────────────────
+
+function tapBuild(){
+  if(S.tower._collapsing)return;
+  const rows=S.tower.rows;const bw=getBaseWidth();
+  if(rows.length===0){initTower();const nr={bricks:[]};for(let i=0;i<bw;i++)nr.bricks.push({st:'e'});S.tower.rows.push(nr)}
+  const ri=S.tower.rows.length-1;let row=S.tower.rows[ri];
+  // Check if row is full
+  const full=row.bricks.every(b=>b.st==='d');
+  if(full){
+    // Check stability before adding new row
+    const s=getStability();
+    if(s.stabPct<=0){collapseTower();return}
+    // Add new row
+    const nr={bricks:[]};for(let i=0;i<bw;i++)nr.bricks.push({st:'e'});
+    S.tower.rows.push(nr);row=nr;
+    // Check stability for new row
+    const ns=getStability();
+    if(ns.stabPct<5&&Math.random()<0.3){notify('⚠️ Tower creaks dangerously!');}
+  }
+  // Find current brick
+  const bricks=row.bricks;let bi=-1;
+  for(let b=0;b<bricks.length;b++){if(bricks[b].st!=='d'){bi=b;break}}
+  if(bi===-1)return;
+  const brick=bricks[bi];
+  const matId=getMatId();
+  
+  if(brick.st==='e'){
+    const batch=bBatch();
+    if((S.mat[matId]||0)<batch){notify('Need '+matId+'!');return}
+    S.mat[matId]-=batch;brick.st='p';brick.pr=0;
+  }
+  if(brick.st==='p'){
+    brick.pr=(brick.pr||0)+1;S.stat.taps++;S.stat.bricks++;S.stat.gold+=1*goldMultExtra()*allMultExtra();earnXP('building',1);
+    if(brick.pr>=bTaps()){
+      brick.st='m';brick.mp=0;
+      sparkle('🧱');
+    }
+    updateHUD();updateUIstats();return
+  }
+  if(brick.st==='m'){
+    if((S.mat.mortar||0)<1){notify('Need mortar!');return}
+    brick.mp=(brick.mp||0)+1;S.stat.taps++;S.stat.bricks++;S.stat.gold+=1*goldMultExtra()*allMultExtra();earnXP('building',1);
+    if(brick.mp>=mTaps()){
+      S.mat.mortar--;brick.st='d';
+      // Check stability after placing
+      const s=getStability();
+      if(s.stabPct<=0){collapseTower();return}
+      const allDone=row.bricks.every(b=>b.st==='d');
+      if(allDone){
+        // Row complete - stability check for next row
+        const ns2=getStability();
+        if(ns2.stabPct<3){notify('💀 Tower is at its limit!');}
+        else if(ns2.stabPct<10){notify('⚠️ Tower is swaying... reinforce!');}
+      }
+    }
+    updateHUD();updateUIstats();return
+  }
+}
+
+// ─── GATHER ────────────────────────────────────────────────────────────
+
+function gather(id){
+  const y=Math.floor(gYield(id)*allMultExtra());
+  S.res[id]=(S.res[id]||0)+y;S.stat.taps++;S.stat.gold+=1*goldMultExtra()*allMultExtra();earnXP('gathering',1);
+  S.gFocus=(S.gFocus+1)%RES.length;
+  updateUI();
+  const yel=document.getElementById('g-yield');
+  if(yel){yel.textContent='+'+y;yel.classList.remove('pop');void yel.offsetWidth;yel.classList.add('pop')}
+  const fl=document.createElement('div');fl.className='change';fl.textContent='+🪙'+Math.floor(goldMultExtra()*allMultExtra());
+  document.getElementById('gather-zone').appendChild(fl);setTimeout(()=>fl.remove(),600);
+}
+
+// ─── CRAFT ────────────────────────────────────────────────────────────
+
+function craft(matId){
+  const mat=MAT.find(x=>x.id===matId);if(!mat)return;
+  const taps=cTaps(matId);
+  if(!S.cp[matId])S.cp[matId]={t:0,a:false};
+  const p=S.cp[matId];
+  if(!p.a){
+    for(const[rid,q]of Object.entries(mat.r)){const src=S.res[rid]!==undefined?S.res:S.mat;if((src[rid]||0)<q*1){notify('Need '+q+'x '+rid);return}}
+    for(const[rid,q]of Object.entries(mat.r)){if(S.res[rid]!==undefined)S.res[rid]-=q;else S.mat[rid]-=q}
+    p.a=true;p.t=0
+  }
+  p.t++;S.stat.taps++;S.stat.gold+=1*goldMultExtra()*allMultExtra();earnXP('crafting',1);
+  sparkle('🔨');
+  if(p.t>=taps){const batch=cBatch();S.mat[matId]=(S.mat[matId]||0)+batch;p.a=false;p.t=0;notify('+'+batch+' '+mat.n)}
+  updateUI()
+}
+
+// ─── AUTO ──────────────────────────────────────────────────────────────
+
+function autoTick(){for(const r of RES){const rt=autoRate(r.id);if(rt>0)S.res[r.id]=(S.res[r.id]||0)+rt/10}}
+
+// ─── UPGRADES ─────────────────────────────────────────────────────────
+
+function buyTech(id){
+  const t=TECH.find(x=>x.id===id);if(!t)return;
+  if(S.tech[id]){notify('Already owned!');return}
+  if(t.req&&typeof t.req==='object'){for(const[m,q]of Object.entries(t.req)){if((S.mat[m]||0)<q){notify('Need '+q+'x '+m);return}}}
+  let cost=t.cost;
+  if((S.stat.gold||0)<cost){notify('Need 🪙'+cost);return}
+  S.stat.gold-=cost;S.tech[id]=t.val;
+  // If it's a width upgrade, rebuild tower
+  if(t.ty==='width'){initTower();notify('📐 Base widened to '+t.val+'!')}
+  else if(t.ty==='mat'){notify('🔧 Now using '+t.val+'!')}
+  else notify('⬆️ '+t.n+'!');
+  updateUI()
+}
+function buyUpg(id){
+  const all=[...UPG_GOLD,...UPG_RES,...UPG_SKILL];
+  const u=all.find(x=>x.id===id);if(!u)return;
+  const l=uL(id);if(l>=u.L)return;
+  if(u.req){for(const[m,q]of Object.entries(u.req)){if((S.mat[m]||0)<q){notify('Need '+q+'x '+m);return}}}
+  if(u.rLv!==undefined){const sk=S.skills[u.sk||'general'];if((sk.lv||0)<u.rLv){notify('Need '+(u.sk||'general')+' Lv.'+u.rLv);return}}
+  if(u.cost&&typeof u.cost==='object'){
+    for(const[rid,q]of Object.entries(u.cost)){const mq=q*Math.pow(u.cm||1,l);if((S.res[rid]||0)<mq){notify('Need '+mq.toFixed(0)+'x '+rid);return}}}
+  if(u.b!==undefined&&!u.cost){let cost=Math.floor(u.b*Math.pow(u.m,l));if((S.stat.gold||0)<cost){notify('Need 🪙'+cost);return};S.stat.gold-=cost}
+  if(u.cost&&typeof u.cost==='object'){for(const[rid,q]of Object.entries(u.cost)){S.res[rid]-=q*Math.pow(u.cm||1,l)}}
+  S.upg[id]=l+1;notify('⬆️ '+u.n+' Lv.'+S.upg[id]+'!');updateUI()
+}
+function buyMs(idx){
+  const m=MILESTONES[idx];if(!m)return;
+  if(S.stat.taps<m.lv){notify('Need '+m.lv+' taps!');return}
+  S._ms=(S._ms||0)+1;notify('🏅 '+m.n+'!');updateUI()
+}
+function buyTalent(id){
+  const t=TALENTS.find(x=>x.id===id);if(!t)return;
+  const l=tL(id);if(l>=t.L)return;
+  const rS=t.rSkl||'general';const rL=t.rLv+t.rLvSt*l;
+  if((S.skills[rS].lv||0)<rL){notify('Need '+rS+' Lv.'+rL);return}
+  const cost=Math.floor(t.cb*Math.pow(t.cm,l));
+  if((S.stat.gold||0)<cost){notify('Need 🪙'+cost);return}
+  S.stat.gold-=cost;S.tal[id]=l+1;notify('🏰 '+t.n+' Lv.'+S.tal[id]+'!');updateUI()
+}
+
+// ─── NOTIFY / SPARKLE ────────────────────────────────────────────────
+
+let nTimer=null;
+function notify(msg){const el=document.getElementById('notif');el.textContent=msg;el.classList.add('sh');clearTimeout(nTimer);nTimer=setTimeout(()=>el.classList.remove('sh'),1600)}
+function sparkle(e='✨'){for(let i=0;i<3;i++){const el=document.createElement('div');el.className='prtcl';el.textContent=e;
+  el.style.left=(30+Math.random()*40)+'vw';el.style.top=(30+Math.random()*40)+'vh';document.body.appendChild(el);setTimeout(()=>el.remove(),600)}}
+
+// ─── CANVAS ───────────────────────────────────────────────────────────
+
+const canvas=document.getElementById('bc'),ctx=canvas.getContext('2d');
+let cW=0,cH=0,rP=false;
+function resizeCanvas(){const p=document.getElementById('build-pane'),r=p.getBoundingClientRect();if(r.width<10||r.height<10){rP=true;return}
+  const d=window.devicePixelRatio||1;canvas.width=r.width*d;canvas.height=r.height*d;cW=r.width;cH=r.height;canvas.style.width=r.width+'px';canvas.style.height=r.height+'px';rP=false}
+
+function draw(){
+  const d=window.devicePixelRatio||1;ctx.setTransform(d,0,0,d,0,0);
+  if(cW<20||cH<20){if(rP||cW<20)resizeCanvas();if(cW<20||cH<20)return}
+  const w=cW,h=cH;
+  const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'#0a0505');g.addColorStop(0.3,'#1a0f08');g.addColorStop(0.7,'#2a1508');g.addColorStop(1,'#1a0f08');
+  ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+  // Stars
+  if(S.tower.rows.length>10){ctx.fillStyle='rgba(255,255,240,0.08)';for(let i=0;i<40;i++){const x=(i*131+47)%w,y=(i*89+11)%(h*0.25);ctx.beginPath();ctx.arc(x,y,0.5,0,Math.PI*2);ctx.fill()}}
+  // Ground
+  ctx.fillStyle='#1a0f08';ctx.fillRect(0,h-35,w,35);ctx.fillStyle='#2a1508';ctx.fillRect(0,h-35,w,2);
+
+  const rows=S.tower.rows;const bw=getBaseWidth();
+  if(rows.length===0){ctx.fillStyle='rgba(255,255,255,0.05)';ctx.font='14px sans-serif';ctx.textAlign='center';ctx.fillText('Tap to start building!',w/2,h/2-20);return}
+
+  const visRows=Math.min(rows.length,Math.floor((h-55)/(8+2)));
+  const startRow=Math.max(0,rows.length-visRows);
+  // Row height: dynamic based on number of visible rows
+  const maxDrawH=h-55;const totalSlots=Math.max(visRows,5);
+  const bH=Math.min(12,Math.max(4,(maxDrawH/totalSlots)*0.6));
+  const gap=1;const mH=Math.max(1,bH*0.25);
+  const bW=Math.min(30,Math.max(8,(w-30)/(bw+0.5)));
+  const rowH=bH+mH;
+  const wallW=bw*bW+(bw-1)*gap;
+  const ox=(w-wallW)/2;
+  
+  const s=getStability();
+  const cols=BC[getMatId()]||BC.mudBrick;
+  const mCols=BC.mortar;
+
+  // Draw ground shadow
+  ctx.fillStyle='rgba(0,0,0,0.2)';ctx.fillRect(ox+2,h-37,wallW,5);
+
+  // Draw rows (bottom-up)
+  for(let ri=startRow;ri<rows.length;ri++){
+    const row=rows[ri];
+    // Calculate y position from bottom - most recent rows at the bottom
+    const rowFromTop=ri-startRow;
+    const y=h-40-(rows.length-ri)*rowH;
+    if(y<-rowH||y>h)continue;
+
+    // Check if this row is near the top (recently placed) - draw more detailed
+    const isRecent=ri>=rows.length-5;
+
+    for(let b=0;b<bw;b++){
+      const bx=ox+b*(bW+gap);
+      if(bx+bW<0||bx>w)continue;
+      const brick=row.bricks[b]||{st:'e'};
+      const st=getStability();
+
+      if(brick.st==='d'){
+        drawBrick(bx,y,bW,bH,cols);
+        // Cracks if unstable
+        if(st.stabPct<15&&(b+ri)%3===0){
+          ctx.strokeStyle='rgba(200,50,50,'+(0.2+(15-st.stabPct)/15*0.5)+')';ctx.lineWidth=0.5;
+          ctx.beginPath();ctx.moveTo(bx+2,y+2);ctx.lineTo(bx+bW-2,y+bH-2);ctx.stroke();
+          ctx.beginPath();ctx.moveTo(bx+bW-2,y+2);ctx.lineTo(bx+2,y+bH-2);ctx.stroke();
+        }
+      }else if(brick.st==='p'){
+        const f=Math.min(1,(brick.pr||0)/bTaps());
+        ctx.globalAlpha=0.1;ctx.fillStyle='rgba(255,255,255,0.08)';ctx.fillRect(bx,y,bW,bH);ctx.globalAlpha=1;
+        const slideY=y-(1-f)*15;
+        ctx.shadowColor='rgba(232,200,122,'+(0.1+0.1*f)+')';ctx.shadowBlur=4;
+        drawBrick(bx,slideY,bW,bH,cols);ctx.shadowBlur=0;
+      }else if(brick.st==='m'){
+        drawBrick(bx,y,bW,bH,cols);
+        const mf=Math.min(1,(brick.mp||0)/mTaps());
+        ctx.fillStyle='rgba(180,160,130,'+(0.15+0.3*mf)+')';
+        ctx.fillRect(bx,y-mH,bW,mH);
+      }else{
+        ctx.strokeStyle='rgba(255,255,255,0.03)';ctx.lineWidth=0.3;ctx.strokeRect(bx,y,bW,bH);
+      }
+    }
+    // Mortar between rows
+    if(ri<rows.length-1){
+      ctx.fillStyle=mCols.m;ctx.fillRect(ox,y+bH,wallW,mH);
+    }
+  }
+
+  // Unbuilt future potential
+  const maxH=getStability().maxSafe;
+  if(rows.length<maxH+5){
+    const nextY=h-40-(rows.length+1)*rowH;
+    if(nextY>5){ctx.strokeStyle='rgba(255,255,255,0.02)';ctx.lineWidth=0.3;ctx.setLineDash([1,3]);
+      for(let b=0;b<bw;b++){const bx=ox+b*(bW+gap);ctx.strokeRect(bx,nextY,bW,bH)}ctx.setLineDash([])}
+  }
+
+  // Tower sway if unstable
+  if(s.stabPct<20){
+    const sway=(20-s.stabPct)*0.3*Math.sin(Date.now()/300);
+    ctx.save();ctx.translate(sway,0);
+    ctx.fillStyle='rgba(200,100,50,0.08)';
+    ctx.fillRect(ox-5,h-40-wallW*0.2-cw,wallW+10,40);
+    ctx.restore();
+  }
+
+  ctx.fillStyle='#3a2010';ctx.fillRect(ox-6,h-38,wallW+12,3);
+}
+
+function drawBrick(x,y,w,h,cols){
+  const g=ctx.createLinearGradient(x,y,x,y+h);
+  g.addColorStop(0,cols.s);g.addColorStop(0.5,cols.m);g.addColorStop(1,cols.e);
+  ctx.fillStyle=g;ctx.fillRect(x,y,w,h);
+  ctx.strokeStyle='rgba(0,0,0,0.2)';ctx.lineWidth=0.3;ctx.strokeRect(x,y,w,h);
+}
+
+// ─── HUD ──────────────────────────────────────────────────────────────
+
+function updateHUD(){
+  const h=S.tower.rows.length;const s=getStability();
+  document.getElementById('bhud-progress').textContent='Height '+h+' · Width '+getBaseWidth()+' · ☁️ '+s.maxSafe+' max';
+  // Stability bar
+  const fill=document.getElementById('stab-fill');
+  const stable=s.stabPct;
+  fill.style.width=Math.max(0,Math.min(100,stable))+'%';
+  fill.style.background=stable>50?'#40a040':stable>20?'#c0a040':stable>5?'#c06030':'#cc2020';
+
+  const rows=S.tower.rows;const bw=getBaseWidth();
+  if(rows.length>0){
+    const row=rows[rows.length-1];
+    const doneC=row.bricks.filter(b=>b.st==='d').length;
+    document.getElementById('bhud-row').innerHTML=row.bricks.map((b,i)=>{
+      if(b.st==='d')return '<span class="dot done"></span>';
+      let extra='';
+      if(s.stabPct<10)extra=' crack';
+      if(s.stabPct<3)extra=' fail';
+      return '<span class="dot'+(b.st==='p'||b.st==='m'?' cur':'')+extra+'"></span>';
+    }).join('');
+  }else document.getElementById('bhud-row').innerHTML='';
+
+  const tap=S.tower.rows.length>0?(S.tower.rows[S.tower.rows.length-1].bricks.find(b=>b.st==='p'||b.st==='m')?0:0):0;
+  let curTap=0,curMax=4;
+  const lastRow=S.tower.rows.length>0?S.tower.rows[S.tower.rows.length-1]:null;
+  if(lastRow){const curB=lastRow.bricks.find(b=>b.st==='p'||b.st==='m');
+    if(curB){curTap=curB.st==='p'?(curB.pr||0):(curB.mp||0);curMax=curB.st==='p'?bTaps():mTaps()}}
+  document.getElementById('bhud-action').innerHTML='👉 '+(S.tower._collapsing?'💥 Collapsing!':(lastRow?'Place brick':'Start building'))+' <span class="tc">'+curTap+'/'+curMax+'</span>';
+}
+
+// ─── UI ───────────────────────────────────────────────────────────────
+
+function updateUIstats(){
+  document.getElementById('st-gold').textContent=Math.floor(S.stat.gold||0);
+  document.getElementById('st-bricks').textContent=S.stat.bricks;
+  document.getElementById('st-lvl').textContent=S.skills.general.lv;
+  document.getElementById('st-hgt').textContent=S.tower.rows.length;
+}
+
+function updateUI(){
+  updateUIstats();
+  // === GATHER ===
+  document.getElementById('g-res').innerHTML=RES.map(r=>{const v=Math.floor(S.res[r.id]||0);const au=autoRate(r.id);
+    return '<div class="r'+(au>0?' glow':'')+'"><span class="i">'+r.i+'</span><span class="n">'+r.n+'</span><span class="v">'+v+'</span>'+(au>0?'<span class="ps">⚡'+(au).toFixed(1)+'</span>':'')+'</div>'}).join('');
+  document.getElementById('g-skill').textContent='Gathering Lv.'+S.skills.gathering.lv;
+  const f=gatherFocus();document.getElementById('g-icon').textContent=f.i;
+  document.getElementById('g-hint').textContent='Tap to gather '+f.n;
+  document.getElementById('g-sub').textContent='+'+gYield(f.id)+' 🪙'+Math.floor(goldMultExtra()*allMultExtra());
+
+  // Gather upgrades
+  document.getElementById('g-upgs').innerHTML=(()=>{
+    let h='<div class="uh">🪙 Gold</div>';
+    h+=UPG_GOLD.filter(u=>u.tab==='gather').map(u=>{const l=uL(u.id),max=l>=u.L,c=Math.floor(u.b*Math.pow(u.m,l));const ok=(S.stat.gold||0)>=c&&!max,rm=!u.req||Object.entries(u.req).every(([m,q])=>(S.mat[m]||0)>=q);
+      return '<div class="u"><div class="d"><div class="nm">'+u.n+(max?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">🪙'+c+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok&&rm?'':'disabled')+'>'+(max?'MAX':'Buy')+'</button></div>'}).join('');
+    h+='<div class="uh">🪨 Resource %</div>';
+    h+=UPG_RES.filter(u=>u.id.startsWith('rm')).map(u=>{const l=uL(u.id),max=l>=u.L;
+      const cs=u.cost?Object.entries(u.cost).map(([r,q])=>{const mq=q*Math.pow(u.cm||1,l);return RES.find(x=>x.id===r)?.i+mq.toFixed(0)}).join(' '):'';
+      const ok=u.cost?Object.entries(u.cost).every(([r,q])=>(S.res[r]||0)>=q*Math.pow(u.cm||1,l)):false;
+      return '<div class="u"><div class="d"><div class="nm">'+u.n+(max?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">'+cs+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok&&!max?'':'disabled')+'>'+(max?'MAX':'Buy')+'</button></div>'}).join('');
+    return h;
+  })();
+
+  // === CRAFT ===
+  document.getElementById('c-skill').textContent='Crafting Lv.'+S.skills.crafting.lv;
+  const as=autoSelectCraft();if(!S._selCraft||!MAT.find(m=>m.id===S._selCraft))S._selCraft=as;
+  document.getElementById('c-recipes').innerHTML=MAT.map(m=>{const on=m.id===S._selCraft,ia=m.id===as;
+    const rcp=Object.entries(m.r).map(([r,q])=>q+'x '+r).join(' + ');
+    return '<div class="rc'+(on?' on':'')+(ia?' auto':'')+'" onclick="G.selCraft(\''+m.id+'\')"><span class="ri">'+m.i+'</span><span class="rn">'+m.n+'<div class="rr">'+(ia?'⭐ ':'')+rcp+'</div></span><span class="ck">'+(cBatch()>1?'x'+cBatch()+' ':'')+cTaps(m.id)+'t</span></div>'}).join('');
+  const cm=MAT.find(m=>m.id===S._selCraft);
+  if(cm){document.getElementById('c-icon').textContent=cm.i;const p=S.cp&&S.cp[S._selCraft];
+    if(p&&p.a){const pct=Math.round(p.t/cTaps(S._selCraft)*100);
+      document.getElementById('c-hint').textContent='🔄 '+cm.n;document.getElementById('c-sub').textContent=p.t+'/'+cTaps(S._selCraft);
+      document.getElementById('c-bar').style.display='block';document.getElementById('c-fill').style.width=pct+'%'}
+    else{document.getElementById('c-hint').textContent='Tap to craft '+cm.n;document.getElementById('c-sub').textContent=(cBatch()>1?'x'+cBatch()+' ':'')+cTaps(S._selCraft)+' taps';
+      document.getElementById('c-bar').style.display='none'}}
+
+  // Craft upgrades
+  document.getElementById('c-upgs').innerHTML=(()=>{
+    let h='<div class="uh">🪙 Gold</div>';
+    h+=UPG_GOLD.filter(u=>u.tab==='craft').map(u=>{const l=uL(u.id),max=l>=u.L,c=Math.floor(u.b*Math.pow(u.m,l));const ok=(S.stat.gold||0)>=c&&!max;
+      return '<div class="u"><div class="d"><div class="nm">'+u.n+(max?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">🪙'+c+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(max?'MAX':'Buy')+'</button></div>'}).join('');
+    h+='<div class="uh">🪨 Resource %</div>';
+    h+=UPG_RES.filter(u=>!u.id.startsWith('rm')).map(u=>{const l=uL(u.id),max=l>=u.L;
+      const cs=u.cost?Object.entries(u.cost).map(([r,q])=>RES.find(x=>x.id===r)?.i+q).join(' '):'';
+      const ok=u.cost?Object.entries(u.cost).every(([r,q])=>(S.res[r]||0)>=q):false;
+      return '<div class="u"><div class="d"><div class="nm">'+u.n+(max?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">'+cs+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok&&!max?'':'disabled')+'>'+(max?'MAX':'Buy')+'</button></div>'}).join('');
+    return h;
+  })();
+
+  // === TOWER TECH ===
+  document.getElementById('tupg-panel').innerHTML=(()=>{
+    const cats=[{h:'⬛ Base Width',ids:['bw1','bw2','bw3','bw4','bw5']},{h:'🧴 Reinforcements',ids:['rf1','rf2','rf3','rf4','rf5']},{h:'🏗️ Foundation',ids:['fd1','fd2','fd3']},{h:'🔥 Materials',ids:['mt1','mt2','mt3','mt4']}];
+    return cats.map(c=>'<div class="tuh">'+c.h+'</div>'+c.ids.map(id=>{
+      const t=TECH.find(x=>x.id===id);if(!t)return'';const owned=S.tech[id];
+      const ok=(S.stat.gold||0)>=t.cost&&!owned;
+      const rm=!t.req||typeof t.req!=='object'||Object.entries(t.req).every(([m,q])=>(S.mat[m]||0)>=q);
+      return '<div class="tu"><div class="td"><div class="tnm">'+(owned?'✅ ':'')+t.i+' '+t.n+'</div><div class="tdc">'+t.d+'</div></div><span class="tco">🪙'+t.cost+'</span><button onclick="G.buyTech(\''+id+'\')"'+(ok&&rm?'':'disabled')+'>'+(owned?'OWNED':'Buy')+'</button></div>'}).join('')).join('');
+  })();
+
+  // === SKILLS ===
+  const si={gathering:'🪨',crafting:'🔨',building:'🧱',general:'⚡'};
+  document.getElementById('skills-list').innerHTML=Object.entries(S.skills).map(([id,s])=>{
+    const nxt=xpNext(s.lv);const pct=Math.min(100,Math.floor((s.xp||0)/nxt*100));
+    return '<div class="sk"><div class="shdr"><span class="sn">'+(si[id]||'')+' '+id.charAt(0).toUpperCase()+id.slice(1)+'</span><span class="sl">Lv.'+s.lv+'</span></div><div class="sbar"><div class="sf" style="width:'+pct+'%"></div></div><div class="sxp">'+(s.xp||0)+'/'+nxt+' XP</div></div>'}).join('');
+  
+  // Milestones
+  const bm=ms();
+  document.getElementById('milestones-area').innerHTML='<div class="ms">'+MILESTONES.map((m,i)=>{
+    const un=i<=bm;const isN=i===bm;const isN2=i===bm+1;
+    if(i>bm+1&&!un)return'';
+    return '<div class="m'+(un?' unlocked':'')+(isN||isN2?' next':'')+'" '+(isN?'onclick="G.buyMs('+i+')" style="cursor:pointer"':'')+'>'+
+      '<div class="ml">'+(un?'✅':'🔒')+' '+m.lv+' taps</div><div class="md">'+(un?m.n+' — '+m.d:isN?'Tap to unlock '+m.n:'Locked')+'</div>'+
+      (un?'<div class="mb">✅ Active</div>':isN?'<div class="mb" style="color:#ffd700">👆 Claim</div>':'')+'</div>'}).join('')+'</div>';
+
+  // Skill upgrades
+  const ss=[{n:'🪨 Gathering',u:UPG_SKILL.filter(x=>x.sk==='gathering'),sk:'gathering'},{n:'🔨 Crafting',u:UPG_SKILL.filter(x=>x.sk==='crafting'),sk:'crafting'},
+    {n:'🧱 Building',u:UPG_SKILL.filter(x=>x.sk==='building'),sk:'building'},{n:'⚡ General',u:UPG_SKILL.filter(x=>x.sk==='general'),sk:'general'}];
+  document.getElementById('skill-upgs-area').innerHTML=ss.map(set=>{
+    let h='<h>'+set.n+' <span style="color:#60a060;font-size:8px">(Lv.'+S.skills[set.sk].lv+')</span></h>';
+    h+=set.u.map(u=>{const l=uL(u.id),max=l>=u.L,c=Math.floor(u.cost*Math.pow(u.m,l));const ok=(S.stat.gold||0)>=c&&!max,hl=(S.skills[set.sk].lv||0)>=u.rLv;
+      return '<div class="u"><div class="d"><div class="nm">'+u.n+(max?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+' (req Lv.'+u.rLv+')</div></div><span class="co">🪙'+c+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok&&hl?'':'disabled')+'>'+(max?'MAX':'Buy')+'</button></div>'}).join('');
+    return h;
+  }).join('');
+
+  // === TALENTS ===
+  document.getElementById('talents-grid').innerHTML=TALENTS.map(t=>{
+    const l=tL(t.id),max=l>=t.L,rs=t.rSkl||'general',rl=t.rLv+t.rLvSt*l,hl=(S.skills[rs].lv||0)>=rl;
+    const c=Math.floor(t.cb*Math.pow(t.cm,l)),ok=(S.stat.gold||0)>=c&&!max;
+    const e=t.eff(l);const es=Object.entries(e).map(([k,v])=>k+': +'+(typeof v==='number'?v*100:v)+'%').join(', ');
+    return '<div class="parapet" style="border-color:'+(max?'#60a060':hl?'#4a2a12':'#1a0f08')+'"><div class="phdr"><span class="pn">'+t.i+' '+t.n+'</span><span class="pl">'+(max?'MAX':'Lv.'+l+'/'+t.L)+'</span></div>'+
+      '<div class="pdesc">'+t.d+' · req '+rs+' Lv.'+rl+'</div><div class="pbar"><div class="pf" style="width:'+(l/t.L*100)+'%"></div></div><div class="peff">'+es+'</div>'+
+      '<button onclick="G.buyTalent(\''+t.id+'\')"'+(ok&&hl?'':'disabled')+'>🪙'+c+' '+(max?'MAXED':l>0?'Upgrade':'Unlock')+'</button></div>'}).join('');
+
+  // Tower HUD
+  updateHUD();
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────────
+
+function switchTab(t){document.querySelectorAll('.t').forEach(b=>b.classList.remove('on'));document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
+  document.querySelector('.t[data-t="'+t+'"]').classList.add('on');document.getElementById(t+'-pane').classList.add('on');
+  if(t==='build')requestAnimationFrame(()=>resizeCanvas())}
+
+// ─── SAVE ─────────────────────────────────────────────────────────────
+
+function save(){try{localStorage.setItem('babel_save',JSON.stringify(S))}catch(e){}}
+function load(){try{const d=localStorage.getItem('babel_save');if(d){Object.assign(S,JSON.parse(d));
+  if(!S.cp)S.cp={};if(!S.tech)S.tech={};if(!S.tal)S.tal={};if(!S.skills)S.skills={gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}};
+  if(!S.tower)S.tower={rows:[],colCount:3,collapses:0};if(!S.tower.rows)S.tower.rows=[];if(S._ms===undefined)S._ms=0;if(S.tower._collapsing===undefined)S.tower._collapsing=false;
+  return true}}catch(e){}return false}
+
+// ─── INIT ─────────────────────────────────────────────────────────────
+
+function init(){
+  document.querySelectorAll('.t').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.t)));
+  document.getElementById('gather-zone').addEventListener('click',()=>gather(gatherFocus().id));
+  document.getElementById('craft-zone').addEventListener('click',()=>{const s=S._selCraft||MAT[0].id;if(s)craft(s)});
+  canvas.addEventListener('click',()=>tapBuild());
+  document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+    if(e.key===' '||e.key==='Enter'){e.preventDefault();tapBuild()}
+    if(e.key>='1'&&e.key<='5')switchTab(['','gather','craft','build','skills','talents'][+e.key])});
+  if(!load()){initTower()}
+  window.addEventListener('resize',()=>resizeCanvas());
+  resizeCanvas();updateUI();
+  setInterval(()=>{autoTick();S.tick++;if(S.tick%5===0)updateUI()},100);
+  setInterval(save,5000);
+  (function loop(){draw();requestAnimationFrame(loop)})();
+  console.log('🗼 Babel loaded!');
+}
+
+window.G={
+  init,gather,craft,tapBuild,buyUpg,buyTech,
+  selCraft(id){S._selCraft=id;updateUI()},
+  buyMs(i){buyMilestone(i)},buyTalent,
+  toggleUpg(){document.getElementById('tupg-panel').classList.toggle('sh')},
+};
+function buyMilestone(i){buyMs(i)}
+})();
+document.addEventListener('DOMContentLoaded',()=>{G.init()});
+</script>
+</body>
+</html>
