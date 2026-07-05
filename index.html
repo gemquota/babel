@@ -222,6 +222,20 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
     </div>
     <div class="pane" id="skills-pane">
       <div class="sk-scroll">
+        <div id="stats-display" style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:4px">
+          <div style="background:rgba(15,10,6,0.5);border:1px solid #1a0e08;border-radius:4px;padding:3px 5px;text-align:center">
+            <div style="font-size:9px;color:#8a7a6a">👆 Total Clicks</div>
+            <div style="font-size:14px;font-weight:700;color:#e8ddd0" id="stat-clicks">0</div>
+          </div>
+          <div style="background:rgba(15,10,6,0.5);border:1px solid #1a0e08;border-radius:4px;padding:3px 5px;text-align:center">
+            <div style="font-size:9px;color:#8a7a6a">🗼 Tallest Tower</div>
+            <div style="font-size:14px;font-weight:700;color:#e8c87a" id="stat-tallest">0</div>
+          </div>
+          <div style="background:rgba(15,10,6,0.5);border:1px solid #1a0e08;border-radius:4px;padding:3px 5px;text-align:center">
+            <div style="font-size:9px;color:#8a7a6a">💥 Collapses</div>
+            <div style="font-size:14px;font-weight:700;color:#cc5050" id="stat-collapses">0</div>
+          </div>
+        </div>
         <div id="skills-list"></div>
         <div id="milestones-area"></div>
         <div id="skill-upgs-area" class="su"></div>
@@ -268,7 +282,7 @@ const BC = {
 const GOLD_COL='#ffd700',RES_COL='#c46a3a',GXP_COL='#e0d0c0',
   GAT_COL='#d06040',CRA_COL='#50b050',BLD_COL='#5090d0';
 
-const S = {res:{},mat:{},upg:{},tech:{},tower:{rows:[],colCount:3,collapses:0,_coll:false},stat:{gold:0,bricks:0,totalClicks:0,taps:0},
+const S = {res:{},mat:{},upg:{},tech:{},tower:{rows:[],colCount:3,collapses:0,_coll:false},stat:{gold:0,bricks:0,totalClicks:0,taps:0,tallest:0},
   cp:{},sk:{gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}},
   ms:{gathering:0,crafting:0,building:0,general:0},tal:{},tick:0,_selCraft:null,
   auto:{gather:0,craft:0,build:0},craftTick:0,autoCraftTick:0};
@@ -366,7 +380,7 @@ function aL(id){return S.auto[id]||0}
 
 
 function rC(id){const s=S.sk[id];let l=1,x=s.xp;while(x>=xpN(l)){x-=xpN(l);l++}s.lv=l}
-function fmt(n){if(n>=1e9)return (n/1e9).toFixed(1)+'B';if(n>=1e6)return (n/1e6).toFixed(1)+'M';if(n>=1e4)return (n/1e3).toFixed(1)+'K';return Math.floor(n).toString()}
+function fmt(n){if(typeof n!=='number')n=0;if(n>=1e9)return (n/1e9).toFixed(1)+'B';if(n>=1e6)return (n/1e6).toFixed(1)+'M';if(n>=1e4)return (n/1e3).toFixed(1)+'K';if(n<10&&n>0)return n.toFixed(1);return Math.floor(n).toString()}
 
 // ─── XP OVERLAY & BARS ───────────────────────────────────────────────
 
@@ -558,11 +572,11 @@ function tapBuild(){
   if(row.bricks.length>=bw){
     const st=getStab();
     if(st.p<=0||(st.p<5&&Math.random()<0.05)){
-      S.tower._coll=true;notif('💥 TOWER COLLAPSED!');
+      S.tower._coll=true;S.tower.collapses=(S.tower.collapses||0)+1;notif('💥 TOWER COLLAPSED!');
       S.stat.gold=(S.stat.gold||0)+Math.floor(Math.max(10,rows.length*5));
       updateUI();return
     }
-    rows.push({bricks:[]});row=rows[rows.length-1]
+    rows.push({bricks:[]});row=rows[rows.length-1];S.stat.tallest=Math.max(S.stat.tallest||0,rows.length)
   }
   S.mat[mat]=(S.mat[mat]||0)-1;S.mat.mortar=(S.mat.mortar||0)-1;
   S.stat.taps=(S.stat.taps||0)+1;
@@ -693,6 +707,9 @@ function updateUI(){
   document.getElementById('st-gold').textContent=fmt(S.stat.gold||0);
   let tc=0;Object.values(S.mat).forEach(v=>tc+=v);document.getElementById('st-bricks').textContent=fmt(tc);
   document.getElementById('st-hgt').textContent=S.tower.rows.length;
+  document.getElementById('stat-clicks').textContent=fmt(S.stat.totalClicks||0);
+  document.getElementById('stat-tallest').textContent=fmt(S.stat.tallest||0);
+  document.getElementById('stat-collapses').textContent=fmt(S.tower.collapses||0);
 
   // Resource grid
   const resHtml=unlockedRes().map(r=>{
@@ -791,7 +808,7 @@ function getAutoInterval(id){
 
 let autoStarted=false;
 function runAuto(){
-  if(!autoStarted){autoStarted=true;return} // skip first tick to avoid instant burst
+  if(S.tick<1){autoStarted=true;return} // skip tick 0 to avoid instant burst on load
   // Auto-gather
   if(aL('gather')>0&&S.tick>1){
     const gi=getAutoInterval('gather');
@@ -876,7 +893,7 @@ function load(){try{const d=localStorage.getItem('babel_save');if(d){Object.assi
 function init(){
   document.querySelectorAll('.t').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.t)));
   document.getElementById('gather-zone').addEventListener('click',()=>gather(gF().id));
-  document.getElementById('craft-zone').addEventListener('click',()=>{const s=autoCraft();if(s)craft(s)});
+  document.getElementById('craft-zone').addEventListener('click',()=>{const s=autoCraft();if(s){S.autoCraftTick=0;craft(s)}});
   ca.addEventListener('click',()=>tapBuild());
   document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
     if(e.key===' '||e.key==='Enter'){e.preventDefault();tapBuild()}
