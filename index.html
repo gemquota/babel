@@ -271,7 +271,7 @@ const GOLD_COL='#ffd700',RES_COL='#c46a3a',GXP_COL='#e0d0c0',
 const S = {res:{},mat:{},upg:{},tech:{},tower:{rows:[],colCount:3,collapses:0,_coll:false},stat:{gold:0,bricks:0,totalClicks:0,taps:0},
   cp:{},sk:{gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}},
   ms:{gathering:0,crafting:0,building:0,general:0},tal:{},tick:0,_selCraft:null,
-  auto:{gather:0,craft:0,build:0}};
+  auto:{gather:0,craft:0,build:0},craftTick:0,autoCraftTick:0};
 
 const UPG_G = [
   {id:'g1',n:'Clay Fingers',d:'+1 gather per tap',c:20,m:2.5,L:10,sk:'gather',v:1},
@@ -364,7 +364,9 @@ function skLv(id){return S.sk[id]?.lv||1}
 function xpN(lv){return Math.floor(50*lv*(1+lv*0.12))}
 function aL(id){return S.auto[id]||0}
 
+
 function rC(id){const s=S.sk[id];let l=1,x=s.xp;while(x>=xpN(l)){x-=xpN(l);l++}s.lv=l}
+function fmt(n){if(n>=1e9)return (n/1e9).toFixed(1)+'B';if(n>=1e6)return (n/1e6).toFixed(1)+'M';if(n>=1e4)return (n/1e3).toFixed(1)+'K';return Math.floor(n).toString()}
 
 // ─── XP OVERLAY & BARS ───────────────────────────────────────────────
 
@@ -375,6 +377,7 @@ const XP_XF=['xpf-g','xpf-c','xpf-b'];
 const XP_IDS=['xp-g','xp-c','xp-b'];
 let xpOverlayTimer=null;
 let currentBoostedSkill=null;
+
 
 function triggerXpOverlay(skill){
   if(!skill||skill==='general')return;
@@ -478,18 +481,19 @@ function gather(id){
 // ─── CRAFT ────────────────────────────────────────────────────────────
 
 function autoCraft(){
-  const goodMats=unlockedMat().filter(m=>m.id!=='mortar');
-  const avail=goodMats.filter(m=>{const r=m.r;for(const[k,v]of Object.entries(r))if((S.res[k]||0)<v)return false;return true});
-  if(!avail.length){
-    // Try mortar if no other craft possible
-    const mort=MAT_ALL.find(m=>m.id==='mortar');
-    if(mort){const r=mort.r;for(const[k,v]of Object.entries(r))if((S.res[k]||0)<v)return null;return mort}
-    return null
+  const mats=unlockedMat();
+  // Try to craft the selected/advanced recipe first (excluding mortar)
+  const bricks=mats.filter(m=>m.id!=='mortar'&&Object.entries(m.r).every(([k,v])=>(S.res[k]||0)>=v));
+  if(bricks.length){
+    const sel=S._selCraft?bricks.find(m=>m.id===S._selCraft):null;
+    if(sel)return sel;
+    const best=bricks.reduce((a,b)=>MAT_ALL.indexOf(a)>MAT_ALL.indexOf(b)?a:b);
+    S._selCraft=best.id;return best
   }
-  const sel=S._selCraft?avail.find(m=>m.id===S._selCraft):null;
-  if(sel)return sel;
-  const best=avail.reduce((a,b)=>MAT_ALL.indexOf(a)>MAT_ALL.indexOf(b)?a:b);
-  S._selCraft=best.id;return best
+  // Fall back to mortar if we can
+  const mort=mats.find(m=>m.id==='mortar');
+  if(mort&&Object.entries(mort.r).every(([k,v])=>(S.res[k]||0)>=v))return mort;
+  return null
 }
 
 function craft(mat){
@@ -536,13 +540,13 @@ function getMatId(){const l=skLv('crafting');if(l>=18)return'megalith';if(l>=12)
 function bT(){return 4-Math.min(3,skLv('building')*0.1)}
 function mT(){return 5-Math.min(4,skLv('building')*0.1)}
 
-let buildPhase=0,slotIdx=0,rowPhase=0,mPhase=0;
+
 
 function initTower(){S.tower.rows=[];S.tower._coll=false;
   const bw=getBaseW();const row={bricks:[]};
   for(let i=0;i<bw;i++)row.bricks.push({st:'e'});
   S.tower.rows.push(row);
-  slotIdx=0;buildPhase=0;rowPhase=0;mPhase=0;
+  
 }
 
 function tapBuild(){
@@ -558,23 +562,21 @@ function tapBuild(){
       S.stat.gold=(S.stat.gold||0)+Math.floor(Math.max(10,rows.length*5));
       updateUI();return
     }
-    rows.push({bricks:[]});row=rows[rows.length-1];slotIdx=0;buildPhase=0;rowPhase=0;mPhase=0
+    rows.push({bricks:[]});row=rows[rows.length-1]
   }
   S.mat[mat]=(S.mat[mat]||0)-1;S.mat.mortar=(S.mat.mortar||0)-1;
   S.stat.taps=(S.stat.taps||0)+1;
   S.stat.totalClicks=(S.stat.totalClicks||0)+1;
   S.stat.gold=(S.stat.gold||0)+Math.floor(Math.random()*3+1);
-  const rowFill=row.bricks.length;
   const brick={st:'p',pr:0};
-  row.bricks.push(brick);
-  slotIdx=row.bricks.length-1;
+  row.bricks.push(brick);row.bricks[row.bricks.length-1].st='d';
   earnX('building',2);
   showFeed(BLD_COL,RES_COL,GOLD_COL,'+1🧱','+'+(Math.floor(Math.random()*3+1))+'🪙','+2🧱XP','+'+(Math.floor(2*0.5))+'⚡XP');
-  row.bricks[slotIdx].st='d';
+
   updateUI();
 }
 
-function initTowerIfNeeded(){if(!S.tower.rows||!S.tower.rows.length)initTower()}
+
 
 // ─── UPGRADES & TECH ─────────────────────────────────────────────────
 
@@ -688,15 +690,15 @@ function updateHUD(){
 
 function updateUI(){
   updateXPBars();
-  document.getElementById('st-gold').textContent=Math.floor(S.stat.gold||0);
-  let tc=0;Object.values(S.mat).forEach(v=>tc+=v);document.getElementById('st-bricks').textContent=tc;
+  document.getElementById('st-gold').textContent=fmt(S.stat.gold||0);
+  let tc=0;Object.values(S.mat).forEach(v=>tc+=v);document.getElementById('st-bricks').textContent=fmt(tc);
   document.getElementById('st-hgt').textContent=S.tower.rows.length;
 
   // Resource grid
   const resHtml=unlockedRes().map(r=>{
-    const amt=Math.floor(S.res[r.id]||0);
+    const amt=S.res[r.id]||0;
     const isActive=gF()&&gF().id===r.id;
-    return '<div class="r'+(isActive?' glow':'')+'"><span class="i">'+r.i+'</span><span class="n">'+r.n+'</span><span class="v">'+amt+'</span></div>'
+    return '<div class="r'+(isActive?' glow':'')+'"><span class="i">'+r.i+'</span><span class="n">'+r.n+'</span><span class="v">'+fmt(amt)+'</span></div>'
   }).join('');
   document.getElementById('g-res').innerHTML=resHtml;
 
@@ -715,12 +717,12 @@ function updateUI(){
     '<div class="uh">💰 Tap Upgrades</div>'+
     UPG_G.filter(u=>u.sk==='gather').map(u=>{
       const l=uL(u.id),mx=l>=u.L,c=Math.floor(u.c*Math.pow(u.m,l));const ok=(S.stat.gold||0)>=c&&!mx;
-      return '<div class="u"><div class="d"><div class="nm">'+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">🪙'+c+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
+      return '<div class="u"><div class="d"><div class="nm">'+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">🪙'+fmt(c)+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
     }).join('')+
     '<div class="uh">🪨 Resource Upgrades</div>'+
     UPG_R.map(u=>{
       const l=uL(u.id),mx=l>=u.L,c=Math.floor(u.c*Math.pow(u.m,l));const ok=(S.stat.gold||0)>=c&&!mx;
-      return '<div class="u"><div class="d"><div class="nm">'+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">🪙'+c+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
+      return '<div class="u"><div class="d"><div class="nm">'+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">🪙'+fmt(c)+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
     }).join('');
 
   // Gather AUTO upgrades
@@ -730,7 +732,7 @@ function updateUI(){
     '<div class="uh">⚙️ Automation</div>'+
     gatherAuto.map(u=>{
       const l=uL(u.id),mx=l>=u.L,c=Math.floor(u.c*Math.pow(u.m,l));const ok=(S.stat.gold||0)>=c&&!mx;
-      return '<div class="u"><div class="d"><div class="nm">🤖 '+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">🪙'+c+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
+      return '<div class="u"><div class="d"><div class="nm">🤖 '+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">🪙'+fmt(c)+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
     }).join('');
 
   // Craft pane
@@ -747,17 +749,20 @@ function updateUI(){
     document.getElementById('c-hint').textContent='Tap to craft '+ac.n;
     document.getElementById('c-sub').textContent=ac.d+' · '+Object.entries(ac.r).map(([k,v])=>RES_ALL.find(r=>r.id===k)?.i+v+' '+RES_ALL.find(r=>r.id===k)?.n).join(' + ');
   }else{
-    document.getElementById('c-hint').textContent='Not enough resources';
-    document.getElementById('c-sub').textContent='Gather more materials first';
+    document.getElementById('c-hint').textContent='Need resources';
+    document.getElementById('c-sub').textContent='Tap Gather tab to collect materials';
   }
-  document.getElementById('c-bar').style.display=S._selCraft&&unlockedMat().find(m=>m.id===S._selCraft)?'block':'none';
+  const cbar=document.getElementById('c-bar');const cfill=document.getElementById('c-fill');
+  const cac=autoCraft();
+  if(cac&&cbar){cbar.style.display='block';const ct=ac.t||4;const pct=Math.min(100,Math.floor((S.autoCraftTick||0)/ct*100));cfill.style.width=pct+'%'}
+  else if(cbar)cbar.style.display='none';
 
   // Craft TAP upgrades
   document.getElementById('c-upgs').innerHTML=
     '<div class="uh">💰 Tap Upgrades</div>'+
     UPG_G.filter(u=>u.sk==='craft').map(u=>{
       const l=uL(u.id),mx=l>=u.L,c=Math.floor(u.c*Math.pow(u.m,l));const ok=(S.stat.gold||0)>=c&&!mx;
-      return '<div class="u"><div class="d"><div class="nm">'+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">🪙'+c+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
+      return '<div class="u"><div class="d"><div class="nm">'+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">🪙'+fmt(c)+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
     }).join('');
 
   // Craft AUTO upgrades
@@ -766,9 +771,14 @@ function updateUI(){
     '<div class="uh">⚙️ Automation</div>'+
     craftAuto.map(u=>{
       const l=uL(u.id),mx=l>=u.L,c=Math.floor(u.c*Math.pow(u.m,l));const ok=(S.stat.gold||0)>=c&&!mx;
-      return '<div class="u"><div class="d"><div class="nm">🤖 '+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">🪙'+c+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
+      return '<div class="u"><div class="d"><div class="nm">🤖 '+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">🪙'+fmt(c)+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
     }).join('');
 
+  // Tech panel
+  (function(){const gs=[{n:'📐 Width',t:'w',u:TECH.filter(x=>x.t==='w')},{n:'🛡️ Reinforce',t:'r',u:TECH.filter(x=>x.t==='r')},{n:'🏛️ Foundation',t:'f',u:TECH.filter(x=>x.t==='f')}];
+  const tp=document.getElementById('ttech-panel');
+  tp.innerHTML=gs.map(g=>'<div class="tuh">'+g.n+'</div>'+g.u.map(function(ti){const o=S.tech[ti.id];
+    const r=(S.stat.gold||0)>=ti.cost;var q=String.fromCharCode(39);return '<div class="tu"><div class="td"><div class="tnm">'+ti.n+'</div><div class="tdc">'+ti.d+'</div></div><span class="tco">ðª'+fmt(ti.cost)+'</span><button onclick='+q+'G.buyTech(\''+ti.id+'\')'+q+(o?'disabled':r?'':'disabled')+'>'+(o?'OWNED':'Buy')+'</button></div>'}).join('')).join('')})();
   updateHUD();
   updateSkillsUI();
 }
@@ -779,9 +789,11 @@ function getAutoInterval(id){
   return (levels[l]||0.5)*1000;
 }
 
+let autoStarted=false;
 function runAuto(){
+  if(!autoStarted){autoStarted=true;return} // skip first tick to avoid instant burst
   // Auto-gather
-  if(aL('gather')>0){
+  if(aL('gather')>0&&S.tick>1){
     const gi=getAutoInterval('gather');
     if(S.tick%(gi/100)<1){
       const gr=gF();if(gr)gather(gr.id);
@@ -790,9 +802,7 @@ function runAuto(){
   // Auto-craft
   if(aL('craft')>0){
     const ci=getAutoInterval('craft');
-    if(S.tick%(ci/100)<1){
-      const s=autoCraft();if(s)craft(s);
-    }
+    if(aL('craft')>0){S.autoCraftTick=(S.autoCraftTick||0)+1;const ci2=getAutoInterval('craft');if(S.autoCraftTick>=ci2/100){S.autoCraftTick=0;const s=autoCraft();if(s)craft(s)}}
   }
   // Auto-build
   if(aL('build')>0){
@@ -834,7 +844,7 @@ function updateSkillsUI(){
   document.getElementById('skill-upgs-area').innerHTML=ss.map(set=>{
     let h='<h>'+set.n+' <span style="color:#60a060;font-size:10px">(Lv'+skLv(set.sk)+')</span></h>';
     h+=set.u.map(u=>{const l=uL(u.id),mx=l>=u.L,c=Math.floor(u.c*Math.pow(u.m,l));const ok=(S.stat.gold||0)>=c&&!mx,hl=skLv(set.sk)>=u.rL;
-      return '<div class="u"><div class="d"><div class="nm">'+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+' (Lv'+u.rL+')</div></div><span class="co">🪙'+c+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok&&hl?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'}).join('');
+      return '<div class="u"><div class="d"><div class="nm">'+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+' (Lv'+u.rL+')</div></div><span class="co">🪙'+fmt(c)+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok&&hl?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'}).join('');
     return h;
   }).join('');
 
@@ -844,7 +854,7 @@ function updateSkillsUI(){
     const e=t.ef(l);const es=Object.entries(e).map(([k,v])=>k+': +'+(typeof v==='number'?Math.round(v*100):v)+'%').join(', ');
     return '<div class="parapet" style="border-color:'+(mx?'#3a5a3a':hl?'#2a180e':'#0a0604')+'"><div class="phdr"><span class="pn">'+t.i+' '+t.n+'</span><span class="pl" style="color:'+(mx?'#60a060':'#8a6a4a')+'">'+(mx?'MAX':'Lv'+l+'/'+t.L)+'</span></div>'+
       '<div class="pdesc">'+t.d+' · '+rs+' Lv'+rl+'</div><div class="pbar"><div class="pf" style="width:'+(l/t.L*100)+'%"></div></div><div class="peff">'+es+'</div>'+
-      '<button onclick="G.buyTalent(\''+t.id+'\')"'+(ok&&hl?'':'disabled')+'>🪙'+c+' '+(mx?'MAXED':l>0?'Upgrade':'Unlock')+'</button></div>'}).join('');
+      '<button onclick="G.buyTalent(\''+t.id+'\')"'+(ok&&hl?'':'disabled')+'>🪙'+fmt(c)+' '+(mx?'MAXED':l>0?'Upgrade':'Unlock')+'</button></div>'}).join('');
 
   updateHUD();
 }
@@ -858,7 +868,7 @@ function load(){try{const d=localStorage.getItem('babel_save');if(d){Object.assi
   if(!S.cp)S.cp={};if(!S.tech)S.tech={};if(!S.tal)S.tal={};if(!S.ms)S.ms={gathering:0,crafting:0,building:0,general:0};
   if(!S.sk)S.sk={gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}};
   if(!S.tower)S.tower={rows:[],colCount:3,collapses:0};if(!S.tower.rows)S.tower.rows=[];if(S.tower._coll===undefined)S.tower._coll=false;
-  if(!S._selCraft)S._selCraft=null;if(!S.auto)S.auto={gather:0,craft:0,build:0};
+  if(!S._selCraft)S._selCraft=null;if(!S.auto)S.auto={gather:0,craft:0,build:0};if(S.craftTick===undefined)S.craftTick=0;if(S.autoCraftTick===undefined)S.autoCraftTick=0;
   // Recalculate all skill levels from XP
   if(S.sk){Object.keys(S.sk).forEach(k=>{if(S.sk[k])rC(k)})}
   return true}}catch(e){}return false}
