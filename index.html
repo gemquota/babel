@@ -440,8 +440,11 @@ function updateXPBars(){
 
 function earnX(sk,base){
   let m=1;
-  if(msG('general')>=2)m*=2;
-  if(msG('general')>=8)m*=4;
+  if(msG("general")>=2)m*=2;
+  if(msG("general")>=8)m*=4;
+  if(sk==="gathering"){const v=uL("sg1");if(v>0)m*=1+v}
+  if(sk==="crafting"){const v=uL("sc1");if(v>0)m*=1+v}
+  if(sk==="building"){const v=uL("sb1");if(v>0)m*=1+v}
   if(tL('d1')>0)m*=1+tL('d1')*0.15;
   const x=Math.floor(base*m);
   if(sk==='general'){S.sk.general.xp+=x;rC('general')}
