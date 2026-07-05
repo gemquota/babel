@@ -687,6 +687,7 @@ function updateHUD(){
 // ─── RENDER UI ────────────────────────────────────────────────────────
 
 function updateUI(){
+  updateXPBars();
   document.getElementById('st-gold').textContent=Math.floor(S.stat.gold||0);
   let tc=0;Object.values(S.mat).forEach(v=>tc+=v);document.getElementById('st-bricks').textContent=tc;
   document.getElementById('st-hgt').textContent=S.tower.rows.length;
@@ -857,7 +858,10 @@ function load(){try{const d=localStorage.getItem('babel_save');if(d){Object.assi
   if(!S.cp)S.cp={};if(!S.tech)S.tech={};if(!S.tal)S.tal={};if(!S.ms)S.ms={gathering:0,crafting:0,building:0,general:0};
   if(!S.sk)S.sk={gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}};
   if(!S.tower)S.tower={rows:[],colCount:3,collapses:0};if(!S.tower.rows)S.tower.rows=[];if(S.tower._coll===undefined)S.tower._coll=false;
-  if(!S._selCraft)S._selCraft=null;if(!S.auto)S.auto={gather:0,craft:0,build:0};return true}}catch(e){}return false}
+  if(!S._selCraft)S._selCraft=null;if(!S.auto)S.auto={gather:0,craft:0,build:0};
+  // Recalculate all skill levels from XP
+  if(S.sk){Object.keys(S.sk).forEach(k=>{if(S.sk[k])rC(k)})}
+  return true}}catch(e){}return false}
 
 function init(){
   document.querySelectorAll('.t').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.t)));
