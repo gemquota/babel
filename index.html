@@ -283,7 +283,7 @@ const GOLD_COL='#ffd700',RES_COL='#c46a3a',GXP_COL='#e0d0c0',
   GAT_COL='#d06040',CRA_COL='#50b050',BLD_COL='#5090d0';
 
 const S = {res:{},mat:{},upg:{},tech:{},tower:{rows:[],colCount:3,collapses:0,_coll:false},stat:{gold:0,bricks:0,totalClicks:0,taps:0,tallest:0},
-  cp:{},sk:{gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}},
+  sk:{gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}},
   ms:{gathering:0,crafting:0,building:0,general:0},tal:{},tick:0,_selCraft:null,
   auto:{gather:0,craft:0,build:0},craftTick:0,autoCraftTick:0};
 
@@ -547,12 +547,10 @@ function getStab(){const h=S.tower.rows.length;if(h===0)return{s:100,p:100,m:1};
   const maxSafe=bw*5+25+ri*30+fd*10;if(maxSafe<=0)return{s:0,p:0,m:1};
   const p=Math.max(0,Math.min(100,100-((h/maxSafe)*100)));
   const hp=Math.max(0.1,1-p/100);
-  const c=hp*hp*1.2;let cc=false;
-  if(Math.random()<c/300)cc=true;
   return{s:p,p:p,m:ms*(1+ri)}}
 function getMatId(){const l=skLv('crafting');if(l>=18)return'megalith';if(l>=12)return'glazedBrick';if(l>=8)return'reinfBrick';if(l>=6)return'stoneBlock';if(l>=3)return'firedBrick';return'mudBrick'}
-function bT(){return 4-Math.min(3,skLv('building')*0.1)}
-function mT(){return 5-Math.min(4,skLv('building')*0.1)}
+
+
 
 
 
@@ -573,7 +571,7 @@ function tapBuild(){
     const st=getStab();
     if(st.p<=0||(st.p<5&&Math.random()<0.05)){
       S.tower._coll=true;S.tower.collapses=(S.tower.collapses||0)+1;notif('💥 TOWER COLLAPSED!');
-      S.stat.gold=(S.stat.gold||0)+Math.floor(Math.max(10,rows.length*5));
+      S.stat.gold=(S.stat.gold||0)+Math.floor(Math.max(50,50+rows.length*10+S.stat.totalClicks*0.1));
       updateUI();return
     }
     rows.push({bricks:[]});row=rows[rows.length-1];S.stat.tallest=Math.max(S.stat.tallest||0,rows.length)
@@ -695,9 +693,9 @@ function updateHUD(){
   if(rows&&rows.length){const row=rows[rows.length-1];
     document.getElementById('bhud-row').innerHTML=row.bricks.map((b,i)=>{let c='dot'+(b.st==='d'?' done':'');if(s.p<10&&b.st==='d'&&(i+rows.length)%3===0)c+=' crack';return '<span class="'+c+'"></span>'}).join('')}
   else document.getElementById('bhud-row').innerHTML='';
-  let ct=0,cm=4;const lr=rows.length?rows[rows.length-1]:null;
+
   if(lr){const cb=lr.bricks.find(b=>b.st==='p'||b.st==='m');if(cb){ct=cb.st==='p'?(cb.pr||0):(cb.mp||0);cm=cb.st==='p'?bT():mT()}}
-  document.getElementById('bhud-action').innerHTML=ct>0?'⏳ '+(cm-ct)+' taps left':'👉 Tap to build';
+  document.getElementById("bhud-action").innerHTML=S.tower._coll?"💥 Rebuild!":rows.length?"👉 Tap to add row":"👉 Tap to start!";
 }
 
 // ─── RENDER UI ────────────────────────────────────────────────────────
@@ -749,7 +747,7 @@ function updateUI(){
     '<div class="uh">⚙️ Automation</div>'+
     gatherAuto.map(u=>{
       const l=uL(u.id),mx=l>=u.L,c=Math.floor(u.c*Math.pow(u.m,l));const ok=(S.stat.gold||0)>=c&&!mx;
-      return '<div class="u"><div class="d"><div class="nm">🤖 '+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">🪙'+fmt(c)+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
+      return '<div class="u"><div class="d"><div class="nm">🤖 '+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+(' ⏱'+Math.round(getAutoInterval(u.sk)/1000*10)/10+'s')+'</div></div><span class="co">🪙'+fmt(c)+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
     }).join('');
 
   // Craft pane
@@ -788,7 +786,7 @@ function updateUI(){
     '<div class="uh">⚙️ Automation</div>'+
     craftAuto.map(u=>{
       const l=uL(u.id),mx=l>=u.L,c=Math.floor(u.c*Math.pow(u.m,l));const ok=(S.stat.gold||0)>=c&&!mx;
-      return '<div class="u"><div class="d"><div class="nm">🤖 '+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co">🪙'+fmt(c)+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
+      return '<div class="u"><div class="d"><div class="nm">🤖 '+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+(' ⏱'+Math.round(getAutoInterval(u.sk)/1000*10)/10+'s')+'</div></div><span class="co">🪙'+fmt(c)+'</span><button onclick="G.buyUpg(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
     }).join('');
 
   // Tech panel
@@ -800,11 +798,7 @@ function updateUI(){
   updateSkillsUI();
 }
 
-function getAutoInterval(id){
-  const levels=[0,3,1.5,0.75,0.4,0.2];
-  const l=Math.min(aL(id),levels.length-1);
-  return (levels[l]||0.5)*1000;
-}
+function getAutoInterval(id){const l=Math.min(aL(id),15);return Math.max(100,3000/(1+l*0.5))*1000;}
 
 let autoStarted=false;
 function runAuto(){
@@ -882,7 +876,7 @@ function switchTab(t){document.querySelectorAll('.t').forEach(b=>b.classList.rem
 
 function save(){try{localStorage.setItem('babel_save',JSON.stringify(S))}catch(e){}}
 function load(){try{const d=localStorage.getItem('babel_save');if(d){Object.assign(S,JSON.parse(d));
-  if(!S.cp)S.cp={};if(!S.tech)S.tech={};if(!S.tal)S.tal={};if(!S.ms)S.ms={gathering:0,crafting:0,building:0,general:0};
+  if(!S.tech)S.tech={};if(!S.tal)S.tal={};if(!S.ms)S.ms={gathering:0,crafting:0,building:0,general:0};
   if(!S.sk)S.sk={gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}};
   if(!S.tower)S.tower={rows:[],colCount:3,collapses:0};if(!S.tower.rows)S.tower.rows=[];if(S.tower._coll===undefined)S.tower._coll=false;
   if(!S._selCraft)S._selCraft=null;if(!S.auto)S.auto={gather:0,craft:0,build:0};if(S.craftTick===undefined)S.craftTick=0;if(S.autoCraftTick===undefined)S.autoCraftTick=0;
