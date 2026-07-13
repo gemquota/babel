@@ -51,11 +51,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
 .g-res .r .v{font-weight:700;font-size:13px;color:#e8ddd0}.g-res .r.glow{border-color:#5a3a1a;background:rgba(30,18,8,0.9)}
 .g-res .r .ps{font-size:9px;color:#4a6a3a}.g-res .r.locked{opacity:0.2}
 
-#gather-zone,.czone{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px;cursor:pointer;min-height:50px;position:relative}
-#gather-zone:active,.czone:active{background:rgba(255,255,255,0.01)}
-#gather-zone .big-icon,.czone .big-icon{font-size:44px;margin-bottom:2px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5))}
-#gather-zone .hint,.czone .hint{font-size:17px;font-weight:700;color:#e8c87a;text-shadow:0 1px 4px rgba(0,0,0,0.4)}
-#gather-zone .sub,.czone .sub{font-size:12px;color:#8a6a4a;margin-top:2px}
 
 .feed{position:absolute;font-weight:700;pointer-events:none;animation:feedUp 0.8s ease forwards;z-index:20;text-align:center;line-height:1}
 .feed .l1{display:block;font-size:17px;margin-bottom:2px}.feed .l2{display:block;font-size:12px}
@@ -100,12 +95,13 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
 .bhud .stab .sf{height:100%;border-radius:2px;transition:width 0.3s;position:relative}
 
 /* ── BIG TAP BUTTONS ── */
-.tz{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 10px;margin:6px 8px 8px;background:linear-gradient(135deg,#1a0e08,#25140a);border:1px solid #3a2a1a;border-radius:10px;cursor:pointer;transition:all 0.08s;position:relative}
-.tz:active{background:linear-gradient(135deg,#2a1a10,#3a2018);transform:scale(0.97);border-color:#5a4a3a}
-.tz .tz-icon{font-size:38px;margin-bottom:2px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5))}
-.tz .tz-hint{font-size:16px;font-weight:700;color:#e8c87a;text-shadow:0 1px 4px rgba(0,0,0,0.4)}
-.tz .tz-sub{font-size:12px;color:#8a6a4a;margin-top:2px}
-#build-tap-overlay{position:absolute;bottom:4px;left:4px;right:4px;z-index:6}
+.tz{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 10px;margin:0;background:linear-gradient(135deg,#1a0e08,#25140a);border-top:2px solid #3a2a1a;border-left:none;border-right:none;border-bottom:none;cursor:pointer;transition:all 0.08s;width:100%;min-height:80px}
+.tz:active{background:linear-gradient(135deg,#2a1a10,#3a2018);border-top-color:#5a4a3a}
+.tz .tz-icon{font-size:36px;margin-bottom:1px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5))}
+.tz .tz-hint{font-size:15px;font-weight:700;color:#e8c87a;text-shadow:0 1px 4px rgba(0,0,0,0.4)}
+.tz .tz-sub{font-size:11px;color:#8a6a4a;margin-top:1px}
+#build-tap-overlay{position:absolute;bottom:0;left:0;right:0;z-index:6;border-radius:0}
+.pane-body{flex:1;overflow-y:auto;min-height:0;-webkit-overflow-scrolling:touch}
 .bhud .ah{font-size:11px;color:#c0a070}
 .row{display:flex;gap:2px;flex-wrap:wrap}.row .dot{width:5px;height:5px;border-radius:1px;background:#1a0e08;border:1px solid #2a180e}
 .row .dot.done{background:#c46a3a;border-color:#e8a050}.row .dot.crack{background:#cc3030;border-color:#cc5050;animation:pulse 0.3s infinite}
@@ -124,7 +120,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
 #ttech-panel .tu button{font-size:9px;padding:2px 5px;font-family:inherit;background:linear-gradient(135deg,#3a2010,#5a3018);color:#e8ddd0;border:1px solid #6a3820;border-radius:3px;cursor:pointer;white-space:nowrap}
 #ttech-panel .tu button:disabled{opacity:0.3;cursor:not-allowed}#ttech-panel .tuh{font-size:9px;text-transform:uppercase;color:#4a3a2a;margin:2px 0 2px;border-top:1px solid #1a0e08;padding-top:2px}
 
-.sk-scroll{padding:5px;flex:1;overflow-y:auto}
+.sk-scroll{padding:5px}
 .sk{background:rgba(15,10,6,0.6);border:1px solid #1a0e08;border-radius:4px;padding:4px 7px;margin-bottom:3px}
 .sk .shdr{display:flex;justify-content:space-between;align-items:center}
 .sk .shdr .sn{font-weight:700;font-size:13px}.sk .shdr .sl{font-size:11px;font-weight:600}
@@ -149,7 +145,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
 .su .u button{font-size:9px;padding:3px 6px;font-family:inherit;background:linear-gradient(135deg,#3a2010,#5a3018);color:#e8ddd0;border:1px solid #6a3820;border-radius:3px;cursor:pointer;white-space:nowrap}
 .su .u button:disabled{opacity:0.3;cursor:not-allowed}
 
-.t-scroll{padding:5px;flex:1;overflow-y:auto}.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:3px}
+.t-scroll{padding:5px}.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:3px}
 .parapet{border:1px solid #1a0e08;border-radius:5px;padding:4px;background:rgba(15,10,6,0.6)}
 .parapet .phdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
 .parapet .phdr .pn{font-size:12px;font-weight:700}.parapet .phdr .pl{font-size:10px;font-weight:600}
@@ -195,23 +191,27 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
   </div>
   <div id="content">
     <div class="pane on" id="gather-pane">
-      <div class="g-res" id="g-res"></div>
-      <div class="g-upgs" id="g-upgs"></div>
-      <div class="a-upgs" id="g-auto-upgs"></div>
-      <div id="gather-zone">
-        <div class="big-icon" id="g-icon">🟤</div>
-        <div class="hint" id="g-hint">Tap to gather Mud</div>
-        <div class="sub" id="g-sub">+1 per tap</div>
+      <div class="pane-body">
+        <div class="g-res" id="g-res"></div>
+        <div class="g-upgs" id="g-upgs"></div>
+        <div class="a-upgs" id="g-auto-upgs"></div>
+      </div>
+      <div class="tz" id="gather-zone">
+        <div class="tz-icon" id="g-icon">🟤</div>
+        <div class="tz-hint" id="g-hint">Tap to gather Mud</div>
+        <div class="tz-sub" id="g-sub">+1 per tap</div>
       </div>
     </div>
     <div class="pane" id="craft-pane">
-      <div class="c-recipes" id="c-recipes" style="margin-top:2px"></div>
-      <div class="c-upgs" id="c-upgs"></div>
-      <div class="a-upgs" id="c-auto-upgs"></div>
-      <div id="craft-zone">
-        <div class="big-icon" id="c-icon">🧱</div>
-        <div class="hint" id="c-hint">Tap to craft</div>
-        <div class="sub" id="c-sub">Select a recipe</div>
+      <div class="pane-body">
+        <div class="c-recipes" id="c-recipes" style="margin-top:2px"></div>
+        <div class="c-upgs" id="c-upgs"></div>
+        <div class="a-upgs" id="c-auto-upgs"></div>
+      </div>
+      <div class="tz" id="craft-zone">
+        <div class="tz-icon" id="c-icon">🧱</div>
+        <div class="tz-hint" id="c-hint">Tap to craft</div>
+        <div class="tz-sub" id="c-sub">Select a recipe</div>
         <div class="cbar" id="c-bar" style="display:none"><div class="cf" id="c-fill" style="width:0%"></div></div>
       </div>
     </div>
@@ -233,7 +233,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
       </div>
     </div>
     <div class="pane" id="skills-pane">
-      <div class="sk-scroll">
+      <div class="pane-body sk-scroll">
         <div id="stats-display" style="display:grid;grid-template-columns:repeat(2,1fr);gap:2px;margin-bottom:4px">
           <div style="background:rgba(15,10,6,0.5);border:1px solid #1a0e08;border-radius:4px;padding:3px 5px;text-align:center">
             <div style="font-size:9px;color:#8a7a6a">👆 Total Clicks</div>
@@ -267,8 +267,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
       </div>
     </div>
     <div class="pane" id="talents-pane">
-      <div class="t-scroll">
+      <div class="pane-body">
+        <div class="t-scroll">
         <div class="tg" id="talents-grid"></div>
+      </div>
       </div>
       <div class="tz" onclick="G.tapTalents()">
         <div class="tz-icon">🏛️</div>
