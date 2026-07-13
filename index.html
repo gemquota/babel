@@ -609,7 +609,7 @@ function unlockedMat(){const l=skLv('crafting');return MAT_ALL.filter(m=>m.unloc
 
 // ─── BUILD ────────────────────────────────────────────────────────────
 
-function getBaseW(){let w=50;[null,'bw1','bw2','bw3','bw4','bw5','bw6'].forEach(t=>{if(t&&S.tech[t])w=S.tech[t]});return w}
+function getBaseW(){let w=20;[null,'bw1','bw2','bw3','bw4','bw5','bw6'].forEach(t=>{if(t&&S.tech[t])w=S.tech[t]});return w}
 function getReinf(){let b=0;['rf1','rf2','rf3','rf4','rf5'].forEach(id=>{if(S.tech[id])b+=TECH.find(t=>t.id===id).val});
   b*=1+tL('f1')*0.1;
   if(msG('gathering')>=4||msG('crafting')>=4||msG('building')>=4||msG('general')>=4)b+=0.2;
