@@ -166,7 +166,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
     <div id="bar-top">
       <h1>🗼 <span>BABEL</span></h1>
       <div class="st">
-        <span class="gold">🪙<b id="st-gold">0</b></span>
+        <span class="gold">🪙<b id="st-gold">0</b></span><span id="db-indicator" style="font-size:9px;color:#ff6644"></span>
         <span>🧱<b id="st-bricks">0</b></span><span id="st-auto" style="font-size:10px;color:#5a8a3a"></span>
         <span class="hgt">🗼<b id="st-hgt">0</b></span>
       </div>
@@ -260,7 +260,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
         <div id="milestones-area"></div>
         <div id="skill-upgs-area" class="su"></div>
       </div>
-      <div class="tz" onclick="G.tapSkills()">
+      <div class="tz" id="skills-tap" onclick="G.tapSkills()">
         <div class="tz-icon">⚡</div>
         <div class="tz-hint">Meditate</div>
         <div class="tz-sub">+general XP & gold</div>
@@ -272,7 +272,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
         <div class="tg" id="talents-grid"></div>
       </div>
       </div>
-      <div class="tz" onclick="G.tapTalents()">
+      <div class="tz" id="talents-tap" onclick="G.tapTalents()">
         <div class="tz-icon">🏛️</div>
         <div class="tz-hint">Contemplate</div>
         <div class="tz-sub">+gold (scales with talents)</div>
@@ -313,6 +313,9 @@ const BC = {
 };
 const GOLD_COL='#ffd700',RES_COL='#c46a3a',GXP_COL='#e0d0c0',
   GAT_COL='#d06040',CRA_COL='#50b050',BLD_COL='#5090d0';
+
+// Debug: 10x everything while testing
+const DB=10;
 
 const S = {res:{},mat:{},upg:{},tech:{},tower:{rows:[],colCount:3,collapses:0,_coll:false},stat:{gold:0,totalClicks:0,taps:0,tallest:0,legacy:0},
   sk:{gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}},
@@ -506,7 +509,7 @@ function gF(){const l=skLv('gathering');return RES_ALL.filter(r=>r.unlock<=l)[0]
 
 function gather(id){
   const r=RES_ALL.find(x=>x.id===id);if(!r)return;
-  let base=r.y;let m=1;let g=1;
+  let base=r.y*DB;let m=1;let g=1;
   let mg=msG('gathering');if(mg>=1)g=Math.max(1,Math.round(g*(1+mg*0.3)));
   UPG_R.forEach(u=>{const l=uL(u.id);if(l>0)m+=u.v*l});
   if(tL('t3')>0)m+=tL('t3')*0.08;
@@ -515,8 +518,8 @@ function gather(id){
   const gAmt=Math.max(1,Math.floor(g*(1+uL('g1')*0.5+uL('g2')*1+uL('g3')*2+uL('g4')*4)));
   S.stat.gold=(S.stat.gold||0)+gAmt;
   S.stat.totalClicks=(S.stat.totalClicks||0)+1;
-  earnX('gathering',1);
-  showFeed(GAT_COL,RES_COL,GOLD_COL,'+'+amount+'R','+'+gAmt+'🪙','+1⛏️XP','+'+(Math.floor(1*0.5))+'⚡XP');
+  earnX('gathering',DB);
+  showFeed(GAT_COL,RES_COL,GOLD_COL,'+'+amount+'R','+'+gAmt+'🪙','+'+DB+'⛏️XP','+'+(Math.floor(DB*0.5))+'⚡XP');
   updateUI();
 }
 
@@ -542,7 +545,7 @@ function craft(mat){
   if(!mat)return;
   const r=mat.r;
   for(const[k,v]of Object.entries(r)){if((S.res[k]||0)<v)return}
-  let b=1;
+  let b=DB;
   let mc=msG('crafting');if(mc>=1)b=Math.max(1,Math.round(b*(1+mc*0.3)));
   let save=0;if(tL('t3')>0)save=Math.min(0.5,tL('t3')*0.08);
   for(const[k,v]of Object.entries(r)){S.res[k]-=v;if(save>0&&Math.random()<save)S.res[k]+=1}
@@ -551,8 +554,8 @@ function craft(mat){
   const g=Math.max(1,Math.floor(mat.t*(1+uL('c1')*0.5+uL('c2')*1+uL('c3')*2+uL('c4')*4)));
   S.stat.gold=(S.stat.gold||0)+g;
   S.stat.totalClicks=(S.stat.totalClicks||0)+1;
-  earnX('crafting',2);
-  showFeed(CRA_COL,RES_COL,GOLD_COL,'+'+amount+mat.i,'+'+g+'🪙','+2🔨XP','+'+(Math.floor(2*0.5))+'⚡XP');
+  earnX('crafting',2*DB);
+  showFeed(CRA_COL,RES_COL,GOLD_COL,'+'+amount+mat.i,'+'+g+'🪙','+'+2*DB+'🔨XP','+'+(Math.floor(2*DB*0.5))+'⚡XP');
   updateUI();
 }
 
@@ -608,10 +611,10 @@ function tapBuild(){
   S.mat[mat]=(S.mat[mat]||0)-1;S.mat.mortar=(S.mat.mortar||0)-1;
   S.stat.taps=(S.stat.taps||0)+1;
   S.stat.totalClicks=(S.stat.totalClicks||0)+1;
-  S.stat.gold=(S.stat.gold||0)+Math.floor(Math.random()*3+1);
+  S.stat.gold=(S.stat.gold||0)+Math.floor(Math.random()*3+1)*DB;
   row.bricks.push({st:'d'});
-  earnX('building',2);
-  showFeed(BLD_COL,RES_COL,GOLD_COL,'+1🧱','+'+(Math.floor(Math.random()*3+1))+'🪙','+2🧱XP','+'+(Math.floor(2*0.5))+'⚡XP');
+  earnX('building',2*DB);
+  showFeed(BLD_COL,RES_COL,GOLD_COL,'+1🧱','+'+(Math.floor(Math.random()*3+1)*DB)+'🪙','+'+2*DB+'🧱XP','+'+(Math.floor(2*DB*0.5))+'⚡XP');
 
   updateUI();
 }
@@ -619,16 +622,16 @@ function tapBuild(){
 // ─── SKILLS & TALENTS TAP ──────────────────────────────────────────
 
 function tapSkills(){
-  const g=Math.max(1,Math.floor(Math.random()*2+1));
+  const g=Math.max(1,Math.floor(Math.random()*2+1))*DB;
   S.stat.gold=(S.stat.gold||0)+g;
   S.stat.totalClicks=(S.stat.totalClicks||0)+1;
-  earnX('general',1);
-  showFeed(GXP_COL,GOLD_COL,GOLD_COL,'+'+g+'🪙','+1⚡XP','🧘 Meditate','');
+  earnX('general',DB);
+  showFeed(GXP_COL,GOLD_COL,GOLD_COL,'+'+g+'🪙','+'+DB+'⚡XP','🧘 Meditate','');
   updateUI();
 }
 
 function tapTalents(){
-  let g=Math.max(1,Math.floor(Math.random()*3+2));
+  let g=Math.max(1,Math.floor(Math.random()*3+2))*DB;
   if(tL('t5')>0)g=Math.floor(g*(1+tL('t5')*0.15));
   S.stat.gold=(S.stat.gold||0)+g;
   S.stat.totalClicks=(S.stat.totalClicks||0)+1;
@@ -677,6 +680,21 @@ function buyTalent(id){
   S.stat.gold-=c;S.tal[id]=(S.tal[id]||0)+1;
   notif('🏰 '+t.n+' Lv.'+(l+1));updateUI()
 }
+
+// ─── HOLD-TO-REPEAT (multi-tap) ────────────────────────────────────────
+
+let htInt=null;
+function htrStart(fn){
+  if(htInt)return;
+  fn();
+  htInt=setInterval(fn,60);
+}
+function htrStop(){
+  if(htInt){clearInterval(htInt);htInt=null}
+}
+document.addEventListener('mouseup',()=>htrStop());
+document.addEventListener('touchend',()=>htrStop());
+document.addEventListener('touchcancel',()=>htrStop());
 
 // ─── FEEDBACK ─────────────────────────────────────────────────────────
 
@@ -747,6 +765,7 @@ function updateHUD(){
 function updateUI(){
   updateXPBars();
   document.getElementById('st-gold').textContent=fmt(S.stat.gold||0);
+  const dbi=document.getElementById('db-indicator');if(dbi)dbi.textContent=DB>1?'🔬×'+DB:'';
   let tc=0;Object.values(S.mat).forEach(v=>tc+=v);document.getElementById('st-bricks').textContent=fmt(tc);
   document.getElementById('st-hgt').textContent=S.tower.rows.length;
   const ae=document.getElementById('st-auto');if(ae){const acts=[['⛏',aL('gather')],['🔨',aL('craft')],['🧱',aL('build')]].filter(x=>x[1]>0).map(x=>x[0]);ae.textContent=acts.length?'⚙'+acts.join(''):''}
@@ -947,8 +966,19 @@ function load(){try{const d=localStorage.getItem('babel_save');if(d){Object.assi
 
 function init(){
   document.querySelectorAll('.t').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.t)));
-  document.getElementById('gather-zone').addEventListener('click',()=>gather(gF().id));
-  document.getElementById('craft-zone').addEventListener('click',()=>{const s=autoCraft();if(s){S.autoCraftTick=0;craft(s)}});
+  ['gather-zone','craft-zone','build-tap-overlay'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const fn={'gather-zone':()=>gather(gF().id),'craft-zone':()=>{const s=autoCraft();if(s){S.autoCraftTick=0;craft(s)}},'build-tap-overlay':()=>tapBuild()}[id];
+    el.addEventListener('mousedown',()=>htrStart(fn));
+    el.addEventListener('touchstart',()=>htrStart(fn),{passive:true});
+  });
+  // Skills & talents tap zones
+  ['skills-tap','talents-tap'].forEach(id=>{
+    const el=document.getElementById(id);
+    const fn={'skills-tap':()=>G.tapSkills(),'talents-tap':()=>G.tapTalents()}[id];
+    if(el){el.addEventListener('mousedown',()=>htrStart(fn));el.addEventListener('touchstart',()=>htrStart(fn),{passive:true})}
+  });
   ca.addEventListener('click',()=>tapBuild());
   document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
     if(e.key===' '||e.key==='Enter'){e.preventDefault();tapBuild()}
