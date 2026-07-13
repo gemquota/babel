@@ -100,12 +100,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
 .bhud .stab .sf{height:100%;border-radius:2px;transition:width 0.3s;position:relative}
 
 /* ── BIG TAP BUTTONS ── */
-#build-tap-overlay{position:absolute;bottom:4px;left:4px;right:4px;height:50px;z-index:6;display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(20,12,8,0.85);border:1px solid #3a2a1a;border-radius:8px;cursor:pointer;transition:all 0.08s;backdrop-filter:blur(2px)}
-#build-tap-overlay:active{background:rgba(40,24,14,0.95);transform:scale(0.97);border-color:#5a4a3a}
-#build-tap-overlay .btap-icon{font-size:28px;filter:drop-shadow(0 1px 6px rgba(0,0,0,0.6))}
-#build-tap-overlay .btap-label{font-size:15px;font-weight:700;color:#e8c87a}
-.tap-bar{flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:6px;padding:12px;margin:6px 8px 8px;background:linear-gradient(135deg,#1a0e08,#25140a);border:1px solid #3a2a1a;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;color:#e8c87a;transition:all 0.08s}
-.tap-bar:active{background:linear-gradient(135deg,#2a1a10,#3a2018);transform:scale(0.97);border-color:#5a4a3a}
+.tz{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 10px;margin:6px 8px 8px;background:linear-gradient(135deg,#1a0e08,#25140a);border:1px solid #3a2a1a;border-radius:10px;cursor:pointer;transition:all 0.08s;position:relative}
+.tz:active{background:linear-gradient(135deg,#2a1a10,#3a2018);transform:scale(0.97);border-color:#5a4a3a}
+.tz .tz-icon{font-size:38px;margin-bottom:2px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5))}
+.tz .tz-hint{font-size:16px;font-weight:700;color:#e8c87a;text-shadow:0 1px 4px rgba(0,0,0,0.4)}
+.tz .tz-sub{font-size:12px;color:#8a6a4a;margin-top:2px}
+#build-tap-overlay{position:absolute;bottom:4px;left:4px;right:4px;z-index:6}
 .bhud .ah{font-size:11px;color:#c0a070}
 .row{display:flex;gap:2px;flex-wrap:wrap}.row .dot{width:5px;height:5px;border-radius:1px;background:#1a0e08;border:1px solid #2a180e}
 .row .dot.done{background:#c46a3a;border-color:#e8a050}.row .dot.crack{background:#cc3030;border-color:#cc5050;animation:pulse 0.3s infinite}
@@ -217,9 +217,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
     </div>
     <div class="pane" id="build-pane">
       <canvas id="bc"></canvas>
-      <div id="build-tap-overlay" onclick="G.tapBuild()">
-        <div class="btap-icon">🧱</div>
-        <div class="btap-label">Tap to Build</div>
+      <div class="tz" id="build-tap-overlay" onclick="G.tapBuild()">
+        <div class="tz-icon">🧱</div>
+        <div class="tz-hint">Tap to build</div>
+        <div class="tz-sub" id="build-sub">Place a row</div>
       </div>
       <div id="tower-tech"><button onclick="G.toggleTech()">⬆️</button></div>
       <div id="ttech-panel"></div>
@@ -259,16 +260,20 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
         <div id="milestones-area"></div>
         <div id="skill-upgs-area" class="su"></div>
       </div>
-      <div class="tap-bar" id="skills-tap" onclick="G.tapSkills()">
-        <span>⚡</span> Meditate <span style="font-size:11px;color:#8a7a6a">(+general XP)</span>
+      <div class="tz" onclick="G.tapSkills()">
+        <div class="tz-icon">⚡</div>
+        <div class="tz-hint">Meditate</div>
+        <div class="tz-sub">+general XP & gold</div>
       </div>
     </div>
     <div class="pane" id="talents-pane">
       <div class="t-scroll">
         <div class="tg" id="talents-grid"></div>
       </div>
-      <div class="tap-bar" id="talents-tap" onclick="G.tapTalents()">
-        <span>🏛️</span> Contemplate <span style="font-size:11px;color:#8a7a6a">(+gold)</span>
+      <div class="tz" onclick="G.tapTalents()">
+        <div class="tz-icon">🏛️</div>
+        <div class="tz-hint">Contemplate</div>
+        <div class="tz-sub">+gold (scales with talents)</div>
       </div>
     </div>
   </div>
@@ -732,6 +737,7 @@ function updateHUD(){
   else document.getElementById('bhud-row').innerHTML='';
 
   document.getElementById("bhud-action").innerHTML=S.tower._coll?"💥 Rebuild!":rows.length?"👉 Tap to add row":"👉 Tap to start!";
+  document.getElementById("build-sub").textContent=S.tower._coll?"💥 Collapsed! Tap to rebuild":rows.length?"Row "+(S.tower.rows.length)+" · Tap to place":"Tap to start building!";
 }
 
 // ─── RENDER UI ────────────────────────────────────────────────────────
