@@ -95,18 +95,18 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
 .bhud .stab .sf{height:100%;border-radius:2px;transition:width 0.3s;position:relative}
 
 /* ── BIG TAP BUTTONS ── */
-.tz{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;margin:0;background:linear-gradient(135deg,#1a0e08,#25140a);border-top:2px solid #3a2a1a;border-left:none;border-right:none;border-bottom:none;cursor:pointer;transition:all 0.08s;width:100%;aspect-ratio:1/1}
+.tz{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;margin:0;background:linear-gradient(135deg,#1a0e08,#25140a);border-top:2px solid #3a2a1a;border-left:none;border-right:none;border-bottom:none;cursor:pointer;transition:all 0.08s;width:100%;aspect-ratio:1/1;max-height:30vh}
 .tz:active{background:linear-gradient(135deg,#2a1a10,#3a2018);border-top-color:#5a4a3a}
 .tz .tz-icon{font-size:36px;margin-bottom:1px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5))}
 .tz .tz-hint{font-size:15px;font-weight:700;color:#e8c87a;text-shadow:0 1px 4px rgba(0,0,0,0.4)}
 .tz .tz-sub{font-size:11px;color:#8a6a4a;margin-top:1px}
-#build-tap-overlay{position:absolute;bottom:0;left:0;right:0;z-index:6;border-radius:0;aspect-ratio:1/1;max-height:40vh}
+#build-tap-overlay{position:absolute;bottom:90px;left:4px;right:4px;z-index:6;border-radius:8px;height:48px;display:flex!important;flex-direction:row!important;aspect-ratio:auto;border-top:none}
 .pane-body{flex:1;overflow-y:auto;min-height:0;-webkit-overflow-scrolling:touch}
 .bhud .ah{font-size:11px;color:#c0a070}
 .row{display:flex;gap:2px;flex-wrap:wrap}.row .dot{width:5px;height:5px;border-radius:1px;background:#1a0e08;border:1px solid #2a180e}
 .row .dot.done{background:#c46a3a;border-color:#e8a050}.row .dot.crack{background:#cc3030;border-color:#cc5050;animation:pulse 0.3s infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 2px rgba(255,215,0,0.3)}50%{box-shadow:0 0 4px rgba(255,215,0,0.5)}}
-#fb{position:absolute;bottom:48px;right:6px;z-index:6;font-size:12px;padding:5px 12px;background:linear-gradient(135deg,#3a2010,#5a3018);color:#e8c87a;border:1px solid #6a3820;border-radius:5px;cursor:pointer;font-family:inherit;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,0.5)}
+
 #fb:active{transform:scale(0.95)}
 #tower-tech{position:absolute;top:4px;right:4px;z-index:6}
 #tower-tech button{background:rgba(10,6,4,0.85);border:1px solid #2a180e;border-radius:4px;padding:3px 6px;cursor:pointer;font-size:11px;color:#8a6a4a;font-family:inherit}
@@ -166,7 +166,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
     <div id="bar-top">
       <h1>🗼 <span>BABEL</span></h1>
       <div class="st">
-        <span class="gold">🪙<b id="st-gold">0</b></span><span id="db-indicator" style="font-size:9px;color:#ff6644"></span>
+        <span class="gold">🪙<b id="st-gold">0</b></span><span id="db-indicator" style="font-size:9px;color:#ff6644"></span><span id="ul-indicator" style="font-size:9px;color:#44ff66"></span>
         <span>🧱<b id="st-bricks">0</b></span><span id="st-auto" style="font-size:10px;color:#5a8a3a"></span>
         <span class="hgt">🗼<b id="st-hgt">0</b></span>
       </div>
@@ -218,9 +218,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
     <div class="pane" id="build-pane">
       <canvas id="bc"></canvas>
       <div class="tz" id="build-tap-overlay" onclick="G.tapBuild()">
-        <div class="tz-icon">🧱</div>
-        <div class="tz-hint">Tap to build</div>
-        <div class="tz-sub" id="build-sub">Place a row</div>
+        <span class="tz-icon" style="font-size:24px">🧱</span>
+        <span class="tz-hint" style="font-size:14px">Tap to build</span>
+        <span class="tz-sub" style="font-size:10px" id="build-sub">Place a row</span>
       </div>
       <div id="tower-tech"><button onclick="G.toggleTech()">⬆️</button></div>
       <div id="ttech-panel"></div>
@@ -316,6 +316,7 @@ const GOLD_COL='#ffd700',RES_COL='#c46a3a',GXP_COL='#e0d0c0',
 
 // Debug: 10x everything while testing
 const DB=10;
+const DB_UNLIMITED=true; // debug: resources not consumed
 
 const S = {res:{},mat:{},upg:{},tech:{},tower:{rows:[],colCount:3,collapses:0,_coll:false},stat:{gold:0,totalClicks:0,taps:0,tallest:0,legacy:0},
   sk:{gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}},
@@ -549,11 +550,11 @@ function autoCraft(){
 function craft(mat){
   if(!mat)return;
   const r=mat.r;
-  for(const[k,v]of Object.entries(r)){if((S.res[k]||0)<v)return}
+  for(const[k,v]of Object.entries(r)){if(!DB_UNLIMITED&&(S.res[k]||0)<v)return}
   let b=DB;
   let mc=msG('crafting');if(mc>=1)b=Math.max(1,Math.round(b*(1+mc*0.3)));
   let save=0;if(tL('t3')>0)save=Math.min(0.5,tL('t3')*0.08);
-  for(const[k,v]of Object.entries(r)){S.res[k]-=v;if(save>0&&Math.random()<save)S.res[k]+=1}
+  if(!DB_UNLIMITED)for(const[k,v]of Object.entries(r)){S.res[k]-=v;if(save>0&&Math.random()<save)S.res[k]+=1}
   let amount=Math.max(1,b||1);
   S.mat[mat.id]=(S.mat[mat.id]||0)+amount;
   const g=Math.max(1,Math.floor(mat.t*(1+uL('c1')*0.5+uL('c2')*1+uL('c3')*2+uL('c4')*4)));
@@ -600,7 +601,7 @@ function initTower(){
 
 function tapBuild(){
   if(S.tower._coll){notif('💥 Collapsed! Rebuild?');initTower();updateUI();return}
-  const mat=getMatId();if(!mat||!(S.mat[mat]||0)||!(S.mat.mortar||0)){notif('Need '+(MAT_ALL.find(m=>m.id===mat)?.n||mat)+' & Mortar!');return}
+  const mat=getMatId();if(!mat||(!DB_UNLIMITED&&(!(S.mat[mat]||0)||!(S.mat.mortar||0)))){notif('Need '+(MAT_ALL.find(m=>m.id===mat)?.n||mat)+' & Mortar!');return}
   const bw=getBaseW();
   let rows=S.tower.rows;if(!rows.length)rows.push({bricks:[]});
   let row=rows[rows.length-1];
@@ -613,7 +614,7 @@ function tapBuild(){
     }
     rows.push({bricks:[]});row=rows[rows.length-1];S.stat.tallest=Math.max(S.stat.tallest||0,rows.length)
   }
-  S.mat[mat]=(S.mat[mat]||0)-1;S.mat.mortar=(S.mat.mortar||0)-1;
+  if(!DB_UNLIMITED){S.mat[mat]=(S.mat[mat]||0)-1;S.mat.mortar=(S.mat.mortar||0)-1}
   S.stat.taps=(S.stat.taps||0)+1;
   S.stat.totalClicks=(S.stat.totalClicks||0)+1;
   S.stat.gold=(S.stat.gold||0)+Math.floor(Math.random()*3+1)*DB;
@@ -709,8 +710,8 @@ function showFeed(col1,col2,col3,t1,t2,t3,t4){
   const f=document.createElement('div');f.className='feed';
   f.innerHTML='<span class="l1"><span style="color:'+col2+'">'+t1+'</span> <span style="color:'+col3+'">'+t2+'</span></span><span class="l2"><span style="color:'+col1+'">'+t3+'</span> <span style="color:'+GXP_COL+'">'+t4+'</span></span>';
   const r=zone.getBoundingClientRect();
-  const lx=Math.max(0,Math.min(r.width-80,lastTapX-r.left+(Math.random()-0.5)*40));
-  const ly=Math.max(0,Math.min(r.height-30,lastTapY-r.top+(Math.random()-0.5)*30-20));
+  const lx=Math.max(0,Math.min(r.width-80,lastTapX-r.left+(Math.random()-0.5)*100));
+  const ly=Math.max(0,Math.min(r.height-30,lastTapY-r.top+(Math.random()-0.5)*100-20));
   f.style.left=lx+'px';f.style.top=ly+'px';
   zone.appendChild(f);setTimeout(()=>f.remove(),800)
 }
@@ -773,6 +774,7 @@ function updateUI(){
   updateXPBars();
   document.getElementById('st-gold').textContent=fmt(S.stat.gold||0);
   const dbi=document.getElementById('db-indicator');if(dbi)dbi.textContent=DB>1?'🔬×'+DB:'';
+  const uli=document.getElementById('ul-indicator');if(uli)uli.textContent=DB_UNLIMITED?'♾️':'·';
   let tc=0;Object.values(S.mat).forEach(v=>tc+=v);document.getElementById('st-bricks').textContent=fmt(tc);
   document.getElementById('st-hgt').textContent=S.tower.rows.length;
   const ae=document.getElementById('st-auto');if(ae){const acts=[['⛏',aL('gather')],['🔨',aL('craft')],['🧱',aL('build')]].filter(x=>x[1]>0).map(x=>x[0]);ae.textContent=acts.length?'⚙'+acts.join(''):''}
