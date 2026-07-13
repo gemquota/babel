@@ -630,7 +630,7 @@ function getMatId(){const l=skLv('crafting');if(l>=18)return'megalith';if(l>=12)
 function initTower(){
   // Fresh start resources
   S.res.mud=5;S.res.straw=2;S.res.sand=3;S.res.water=3;S.res.lime=1;S.mat.mortar=2;S.mat.mudBrick=2;
-  S.tower.rows=[];S.tower._coll=false;
+  S.tower.rows=[];S.tower._coll=false;S.tower.lastRowTime=0;
   const bw=getBaseW();const row={bricks:[]};
   for(let i=0;i<bw;i++)row.bricks.push({st:'e'});
   S.tower.rows.push(row);
@@ -641,7 +641,7 @@ function tapBuild(){
   if(S.tower._coll){notif('💥 Collapsed! Rebuild?');initTower();updateUI();return}
   const mat=getMatId();if(!mat||(!DB_UNLIMITED&&(!(S.mat[mat]||0)||!(S.mat.mortar||0)))){notif('Need '+(MAT_ALL.find(m=>m.id===mat)?.n||mat)+' & Mortar!');return}
   const bw=getBaseW();
-  let rows=S.tower.rows;if(!rows.length)rows.push({bricks:[]});
+  let rows=S.tower.rows;if(!rows.length)rows.push({bricks:[],t:Date.now()});
   let row=rows[rows.length-1];
   if(row.bricks.length>=bw){
     const st=getStab();
@@ -650,7 +650,7 @@ function tapBuild(){
       S.stat.gold=(S.stat.gold||0)+Math.floor(Math.max(50,50+rows.length*10+S.stat.totalClicks*0.1));
       updateUI();return
     }
-    rows.push({bricks:[]});row=rows[rows.length-1];S.stat.tallest=Math.max(S.stat.tallest||0,rows.length)
+    rows.push({bricks:[],t:Date.now()});row=rows[rows.length-1];S.stat.tallest=Math.max(S.stat.tallest||0,rows.length)
   }
   if(!DB_UNLIMITED){S.mat[mat]=(S.mat[mat]||0)-1;S.mat.mortar=(S.mat.mortar||0)-1}
   S.stat.taps=(S.stat.taps||0)+1;
@@ -782,33 +782,150 @@ function rC2(){const p=document.getElementById('build-pane'),r=p.getBoundingClie
 function draw(){
   const d=window.devicePixelRatio||1;cx.setTransform(d,0,0,d,0,0);
   if(cW<20||cH<20){if(rP||cW<20)rC2();if(cW<20||cH<20)return}
-  const w=cW,h=cH;
-  const g=cx.createLinearGradient(0,0,0,h);g.addColorStop(0,'#080504');g.addColorStop(0.3,'#120a06');g.addColorStop(0.7,'#1a0e08');g.addColorStop(1,'#0a0604');
+  const w=cW,h=cH,now=Date.now();
+  
+  // ── Sky background ──
+  const rowCount=S.tower.rows.length;
+  const skyH=Math.min(0.6,0.3+rowCount*0.003);
+  const g=cx.createLinearGradient(0,0,0,h);
+  g.addColorStop(0,'#060302');g.addColorStop(skyH,'#0a0604');g.addColorStop(1,'#120a06');
   cx.fillStyle=g;cx.fillRect(0,0,w,h);
-  if(S.tower.rows.length>10){cx.fillStyle='rgba(255,255,240,0.06)';for(let i=0;i<25;i++){const x=(i*131+47)%w,y=(i*89+11)%(h*0.2);cx.beginPath();cx.arc(x,y,0.3,0,Math.PI*2);cx.fill()}}
-  cx.fillStyle='#0a0604';cx.fillRect(0,h-24,w,24);cx.fillStyle='#1a0e08';cx.fillRect(0,h-24,w,1.2);
+  
+  // ── Stars ──
+  if(rowCount>5){cx.fillStyle='rgba(255,255,240,0.08)';
+    for(let i=0;i<20+rowCount;i++){const x=(i*131+now*0.001)%w,y=(i*89+11)%(h*skyH);
+      cx.beginPath();cx.arc(x,y,0.3+Math.sin(i+now*0.002)*0.2,0,Math.PI*2);cx.fill()}}
+  
+  // ── Ground ──
+  cx.fillStyle='#0a0604';cx.fillRect(0,h-24,w,24);
+  cx.fillStyle='#1a0e08';cx.fillRect(0,h-24,w,1.2);
+  cx.fillStyle='rgba(20,12,8,0.3)';cx.fillRect(0,h-20,w,16);
+  
+  // ── Empty state ──
   const rows=S.tower.rows,bw=getBaseW();
   if(!rows||!rows.length){cx.fillStyle='rgba(255,255,255,0.04)';cx.font='14px sans-serif';cx.textAlign='center';cx.fillText('Tap to start!',w/2,h/2-10);return}
+  
   const maxDrawH=h-28,totalSlots=Math.max(rows.length,5);
   const bH=Math.min(10,Math.max(3.5,(maxDrawH/totalSlots)*0.55)),gap=1,mH=Math.max(0.8,bH*0.18),rowH=bH+mH;
   const bW=Math.min(28,Math.max(6,(w-20)/(bw+0.5)));const wallW=bw*bW+(bw-1)*gap,ox=(w-wallW)/2;
+  const pW=Math.max(2,bW*0.4); // pillar width
   const cols=BC[getMatId()]||BC.mudBrick,mCols=BC.mortar;
+  const st=getStab();
+  
+  // ── Tower sway ──
+  const swayAmt=st.p<30?(30-st.p)*0.008:0;
+  const sway=swayAmt*Math.sin(now/300+rowCount*0.1)*Math.min(1,rowCount/20);
+  
+  // ── Ground shadow ──
+  cx.fillStyle='rgba(0,0,0,0.3)';cx.beginPath();
+  cx.ellipse(w/2+sway*5,h-24,wallW/2+8,4,0,0,Math.PI*2);cx.fill();
+  
+  cx.save();cx.translate(sway,0);
+  
+  // ── Draw pillars on sides ──
+  const pillarCol='#3a2a1a';
+  for(let ri=Math.max(0,rows.length-Math.floor(maxDrawH/rowH));ri<rows.length;ri++){
+    const y=h-26-(ri+1)*rowH;if(y<-rowH||y>h)continue;
+    const rowAge=now-(rows[ri].t||0);
+    const animT=Math.min(1,rowAge/400);
+    if(animT<=0)continue;
+    const animScale=0.3+0.7*animT;
+    const pY=y+(bH+mH)*(1-animScale);
+    const pH=bH*animScale;
+    if(pH<1)continue;
+    // Left pillar
+    cx.fillStyle=pillarCol;cx.fillRect(ox-pW-1,pY,pW,pH);
+    cx.fillStyle='rgba(60,50,30,0.3)';cx.fillRect(ox-pW-1,pY,1,pH);
+    // Right pillar
+    cx.fillStyle=pillarCol;cx.fillRect(ox+wallW+1,pY,pW,pH);
+    cx.fillStyle='rgba(60,50,30,0.3)';cx.fillRect(ox+wallW+1+pW-1,pY,1,pH);
+  }
+  
+  // ── Draw rows ──
   const startRow=Math.max(0,rows.length-Math.floor(maxDrawH/rowH));
-  for(let ri=startRow;ri<rows.length;ri++){const row=rows[ri],y=h-26-(ri+1)*rowH;if(y<-rowH||y>h)continue;
-    for(let b=0;b<bw;b++){const bx=ox+b*(bW+gap);if(bx+bW<0||bx>w)continue;const brick=row.bricks[b]||{st:'e'};const st=getStab();
-      if(brick.st==='d'){const g2=cx.createLinearGradient(bx,y,bx,y+bH);g2.addColorStop(0,cols.s);g2.addColorStop(0.5,cols.m);g2.addColorStop(1,cols.e);
-        cx.fillStyle=g2;cx.fillRect(bx,y,bW,bH);cx.strokeStyle='rgba(0,0,0,0.12)';cx.lineWidth=0.2;cx.strokeRect(bx,y,bW,bH);
-        if(st.p<15&&(b+ri)%3===0){cx.strokeStyle='rgba(200,50,50,'+(0.1+(15-st.p)/15*0.3)+')';cx.lineWidth=0.3;
-          cx.beginPath();cx.moveTo(bx+1,y+1);cx.lineTo(bx+bW-1,y+bH-1);cx.moveTo(bx+bW-1,y+1);cx.lineTo(bx+1,y+bH-1);cx.stroke()}
-      }else{cx.strokeStyle='rgba(255,255,255,0.02)';cx.lineWidth=0.2;cx.strokeRect(bx,y,bW,bH)}}
-    if(ri<rows.length-1){cx.fillStyle=mCols.m;cx.fillRect(ox,y+bH,wallW,mH)}}
-  cx.fillStyle='#2a1508';cx.fillRect(ox-3,h-26,wallW+6,2);
-  const st=getStab();if(st.p<20){const sw=(20-st.p)*0.15*Math.sin(Date.now()/350);cx.save();cx.translate(sw,0);
-    cx.fillStyle='rgba(200,100,50,0.04)';cx.fillRect(ox-2,h-26-wallW*0.12,wallW+4,24);cx.restore()}
-  if(S.tower._coll){const t=Date.now()*0.003;const cols=['#cc5050','#e8a050','#c46a3a','#e8c87a'];
-    for(let i=0;i<25;i++){const a=(i*97+t)%(Math.PI*2);const r=5+((i*53+t*2)%80);const size=1+Math.sin(i*2.7+t)*1.5;
-      cx.fillStyle=cols[i%4];cx.globalAlpha=0.2+Math.sin(i*1.3+t*0.5)*0.15;
-      cx.beginPath();cx.arc(w/2+Math.cos(a)*r,h*0.3+Math.sin(a*1.3)*r*0.4+Math.sin(i+t)*5,size,0,Math.PI*2);cx.fill()}
+  for(let ri=startRow;ri<rows.length;ri++){
+    const row=rows[ri],y=h-26-(ri+1)*rowH;if(y<-rowH||y>h)continue;
+    const rowAge=now-(row.t||0);
+    const animT=Math.min(1,rowAge/400);
+    if(animT<=0)continue;
+    const animScale=0.3+0.7*animT;
+    const rY=y+(bH+mH)*(1-animScale);
+    const rH=bH*animScale;
+    if(rH<1)continue;
+    
+    // Row highlight for newest row
+    const isNew=ri===rows.length-1&&rowAge<800;
+    if(isNew){cx.fillStyle='rgba(232,200,122,'+(0.06*(1-rowAge/800))+')';cx.fillRect(ox-1,rY-1,wallW+2,rH+2)}
+    
+    // Draw each brick
+    for(let b=0;b<bw;b++){
+      const bx=ox+b*(bW+gap);if(bx+bW<0||bx>w)continue;
+      const brick=row.bricks[b]||{st:'e'};
+      if(brick.st==='d'){
+        const bAnimT=Math.min(1,Math.max(0,rowAge-b*20)/400);
+        const bScale=0.5+0.5*bAnimT;
+        const bY=rY+(rH)*(1-bScale);
+        const bHt=rH*bScale;
+        if(bHt<1)continue;
+        const g2=cx.createLinearGradient(bx,bY,bx,bY+bHt);
+        g2.addColorStop(0,cols.s);g2.addColorStop(0.5,cols.m);g2.addColorStop(1,cols.e);
+        cx.fillStyle=g2;cx.fillRect(bx,bY,bW,bHt);
+        cx.strokeStyle='rgba(0,0,0,0.12)';cx.lineWidth=0.2;cx.strokeRect(bx,bY,bW,bHt);
+        
+        // Cracked bricks
+        if(st.p<25&&(b+ri)%3===0){
+          const crackIntensity=Math.max(0,Math.min(1,(25-st.p)/25));
+          if(crackIntensity>0.05){
+            const pulse=Math.sin(now/200+b+ri)*0.3+0.7;
+            const alpha=crackIntensity*0.4*pulse;
+            cx.strokeStyle='rgba(200,50,50,'+alpha+')';cx.lineWidth=0.4;
+            cx.beginPath();cx.moveTo(bx+1,bY+1);cx.lineTo(bx+bW-1,bY+bHt-1);
+            cx.moveTo(bx+bW-1,bY+1);cx.lineTo(bx+1,bY+bHt-1);cx.stroke();
+            // Glow on cracks
+            if(crackIntensity>0.3){cx.fillStyle='rgba(200,50,50,'+(alpha*0.3)+')';
+              cx.beginPath();cx.arc(bx+bW/2,bY+bHt/2,1.5,0,Math.PI*2);cx.fill()}
+          }
+        }
+      }else{
+        cx.strokeStyle='rgba(255,255,255,0.02)';cx.lineWidth=0.2;cx.strokeRect(bx,rY,bW,rH)
+      }
+    }
+    // Mortar between rows
+    if(ri<rows.length-1){cx.fillStyle=mCols.m;cx.fillRect(ox,rY+rH,wallW,mH)}
+  }
+  
+  // ── Height tier decorations ──
+  if(rowCount>=20){const decY=h-26-20*rowH;
+    cx.fillStyle='rgba(180,160,120,0.08)';cx.fillRect(ox-3,decY,wallW+6,2);
+    for(let b=0;b<bw;b++){if(b%2===0){const dx=ox+b*(bW+gap);
+      cx.fillStyle='rgba(200,180,140,0.05)';cx.fillRect(dx+bW*0.2,decY-rowH*0.5,bW*0.6,rowH*0.5)}}}
+  if(rowCount>=50){const dec2Y=h-26-50*rowH;
+    cx.fillStyle='rgba(200,180,140,0.12)';cx.fillRect(ox-4,dec2Y,wallW+8,3);
+    for(let b=1;b<bw-1;b+=2){const dx=ox+b*(bW+gap);
+      cx.fillStyle='rgba(232,200,122,0.06)';cx.fillRect(dx+bW*0.15,dec2Y-rowH-1,bW*0.7,rowH*1.5)}}
+  
+  // ── Foundation line ──
+  cx.fillStyle='#2a1508';cx.fillRect(ox-3,h-26,wallW+6,3);
+  cx.fillStyle='rgba(60,40,20,0.3)';cx.fillRect(ox-pW-3,h-26,pW,3);
+  cx.fillStyle='rgba(60,40,20,0.3)';cx.fillRect(ox+wallW+3-pW,h-26,pW,3);
+  
+  cx.restore(); // end sway translate
+  
+  // ── Low stability visual effects ──
+  if(st.p<20){
+    const sw=swayAmt*5*Math.sin(now/350);
+    cx.save();cx.translate(sw,0);
+    cx.fillStyle='rgba(200,100,50,'+((20-st.p)/20*0.06)+')';
+    cx.fillRect(ox-2,h-26-wallW*0.12,wallW+4,24);
+    cx.restore()
+  }
+  
+  // ── Collapse particles ──
+  if(S.tower._coll){const t=now*0.003;const pCols=['#cc5050','#e8a050','#c46a3a','#e8c87a'];
+    for(let i=0;i<30;i++){const a=(i*97+t)%(Math.PI*2);const r=3+((i*53+t*2)%(60+rowCount));
+      const size=1+Math.sin(i*2.7+t)*2;
+      cx.fillStyle=pCols[i%4];cx.globalAlpha=0.25+Math.sin(i*1.3+t*0.5)*0.2;
+      cx.beginPath();cx.arc(w/2+Math.cos(a)*r,h*0.3+Math.sin(a*1.5)*r*0.4+Math.sin(i+t)*8,size,0,Math.PI*2);cx.fill()}
     cx.globalAlpha=1}
 }
 
@@ -1016,7 +1133,7 @@ function save(){try{S.lastSave=Date.now();localStorage.setItem('babel_save',JSON
 function load(){try{const d=localStorage.getItem('babel_save');if(d){Object.assign(S,JSON.parse(d));
   if(!S.tech)S.tech={};if(!S.tal)S.tal={};if(!S.ms)S.ms={gathering:0,crafting:0,building:0,general:0};
   if(!S.sk)S.sk={gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}};
-  if(!S.tower)S.tower={rows:[],colCount:3,collapses:0};if(!S.tower.rows)S.tower.rows=[];if(S.tower._coll===undefined)S.tower._coll=false;
+  if(!S.tower)S.tower={rows:[],colCount:3,collapses:0};if(!S.tower.rows)S.tower.rows=[];if(S.tower._coll===undefined)S.tower._coll=false;if(!S.tower.lastRowTime)S.tower.lastRowTime=0;
   if(!S._selCraft)S._selCraft=null;if(!S.auto)S.auto={gather:0,craft:0,build:0};if(S.autoCraftTick===undefined)S.autoCraftTick=0;if(typeof S.tower.collapses!=='number')S.tower.collapses=0;if(typeof S.stat.tallest!=='number')S.stat.tallest=0;if(typeof S.stat.legacy!=='number')S.stat.legacy=0;if(typeof S.lastSave!=='number')S.lastSave=0;
   // Recalculate all skill levels from XP
   if(S.sk){Object.keys(S.sk).forEach(k=>{if(S.sk[k])rC(k)})}
@@ -1032,7 +1149,7 @@ function load(){try{const d=localStorage.getItem('babel_save');if(d){Object.assi
     let gains=[];
     if(autoGathers>0){const r=gF();if(r){S.res[r.id]=(S.res[r.id]||0)+autoGathers;S.stat.gold=(S.stat.gold||0)+autoGathers;gains.push('⛏x'+autoGathers)}}
     if(autoCrafts>0){const s=autoCraft();if(s){S.mat[s.id]=(S.mat[s.id]||0)+autoCrafts;S.stat.gold=(S.stat.gold||0)+autoCrafts*2;gains.push('🔨x'+autoCrafts)}}
-    if(autoBuilds>0){const mat=getMatId();if(mat&&(S.mat[mat]||0)>=autoBuilds&&(S.mat.mortar||0)>=autoBuilds){S.mat[mat]-=autoBuilds;S.mat.mortar-=autoBuilds;S.tower.rows=[];for(let i=0;i<Math.min(autoBuilds,500);i++){const row={bricks:[]};for(let j=0;j<getBaseW();j++)row.bricks.push({st:'d'});S.tower.rows.push(row)}gains.push('🧱x'+autoBuilds)}}
+    if(autoBuilds>0){const mat=getMatId();if(mat&&(S.mat[mat]||0)>=autoBuilds&&(S.mat.mortar||0)>=autoBuilds){S.mat[mat]-=autoBuilds;S.mat.mortar-=autoBuilds;S.tower.rows=[];for(let i=0;i<Math.min(autoBuilds,500);i++){const row={bricks:[],t:Date.now()};for(let j=0;j<getBaseW();j++)row.bricks.push({st:'d'});S.tower.rows.push(row)}gains.push('🧱x'+autoBuilds)}}
     if(gains.length){notif('⚡Offline: '+gains.join(' '));S.stat.tallest=Math.max(S.stat.tallest||0,S.tower.rows.length);updateUI()}
   }
   return true}}catch(e){}return false}
