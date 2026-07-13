@@ -216,7 +216,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
         <div class="sn" id="bhud-name">🗼 Tower of Babel</div>
         <div class="pt" id="bhud-progress">H:0 W:3</div>
         <div class="stab" id="stab-bar"><div class="sf" id="stab-fill" style="width:100%;background:#40a040"></div></div>
-        <div class="ah" id="bhud-action">👉 Tap <span class="tc">0/4</span></div>
+        <div class="ah" id="bhud-action">👉 Tap </div>
         <div class="row" id="bhud-row"></div>
       </div>
     </div>
@@ -238,6 +238,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
           <div style="background:rgba(15,10,6,0.5);border:1px solid #1a0e08;border-radius:4px;padding:3px 5px;text-align:center">
             <div style="font-size:9px;color:#8a7a6a">🔜 Legacy Bonus</div>
             <div style="font-size:14px;font-weight:700;color:#ffd700" id="stat-legacy">0%</div>
+          </div>
+          <div style="background:rgba(15,10,6,0.5);border:1px solid #1a0e08;border-radius:4px;padding:3px 5px;text-align:center">
+            <div style="font-size:9px;color:#8a7a6a">👆 Taps</div>
+            <div style="font-size:14px;font-weight:700;color:#70b0d0" id="stat-taps">0</div>
           </div>
         </div>
         <div id="skills-list"></div>
@@ -269,8 +273,8 @@ const RES_ALL = [
   {id:'lime',n:'Lime',i:'🪨',y:1,unlock:5},{id:'stone',n:'Stone',i:'⛰️',y:1,unlock:7},
 ];
 const MAT_ALL = [
-  {id:'mortar',n:'Mortar',i:'🧴',t:3,r:{sand:2,water:1,lime:1},d:'Mix',unlock:0,str:0},
-  {id:'mudBrick',n:'Mud Brick',i:'🧱',t:4,r:{mud:3,straw:1},d:'Mud→Dry',unlock:0,str:1.0},
+  {id:'mortar',n:'Mortar',i:'🧴',t:2,r:{sand:2,water:1,lime:1},d:'Mix',unlock:0,str:0},
+  {id:'mudBrick',n:'Mud Brick',i:'🧱',t:2,r:{mud:2,straw:1},d:'Mud→Dry',unlock:0,str:1.0},
   {id:'firedBrick',n:'Fired Brick',i:'🔥',t:4,r:{clay:2,sand:1,water:1},d:'Fire',unlock:3,str:0.8},
   {id:'stoneBlock',n:'Stone Block',i:'🗿',t:5,r:{stone:3},d:'Quarry',unlock:6,str:0.6},
   {id:'reinfBrick',n:'Reinf.Brick',i:'⚔️',t:5,r:{firedBrick:1,stone:1,lime:1},d:'Reinforce',unlock:8,str:0.4},
@@ -286,10 +290,10 @@ const BC = {
 const GOLD_COL='#ffd700',RES_COL='#c46a3a',GXP_COL='#e0d0c0',
   GAT_COL='#d06040',CRA_COL='#50b050',BLD_COL='#5090d0';
 
-const S = {res:{},mat:{},upg:{},tech:{},tower:{rows:[],colCount:3,collapses:0,_coll:false},stat:{gold:0,bricks:0,totalClicks:0,taps:0,tallest:0,legacy:0},
+const S = {res:{},mat:{},upg:{},tech:{},tower:{rows:[],colCount:3,collapses:0,_coll:false},stat:{gold:0,totalClicks:0,taps:0,tallest:0,legacy:0},
   sk:{gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}},
   ms:{gathering:0,crafting:0,building:0,general:0},tal:{},tick:0,_selCraft:null,
-  auto:{gather:0,craft:0,build:0},craftTick:0,autoCraftTick:0};
+  auto:{gather:0,craft:0,build:0},autoCraftTick:0};
 
 const UPG_G = [
   {id:'g1',n:'Clay Fingers',d:'+1 gather per tap',c:20,m:2.5,L:10,sk:'gather',v:1},
@@ -479,7 +483,7 @@ function gF(){const l=skLv('gathering');return RES_ALL.filter(r=>r.unlock<=l)[0]
 function gather(id){
   const r=RES_ALL.find(x=>x.id===id);if(!r)return;
   let base=r.y;let m=1;let g=1;
-  let mg=msG('gathering');if(mg>=1)g=Math.max(1,Math.floor(g*(1+mg*0.3)));
+  let mg=msG('gathering');if(mg>=1)g=Math.max(1,Math.round(g*(1+mg*0.3)));
   UPG_R.forEach(u=>{const l=uL(u.id);if(l>0)m+=u.v*l});
   if(tL('t3')>0)m+=tL('t3')*0.08;
   const amount=Math.max(1,Math.floor(Math.abs(base*(1+m)))||1);
@@ -515,7 +519,7 @@ function craft(mat){
   const r=mat.r;
   for(const[k,v]of Object.entries(r)){if((S.res[k]||0)<v)return}
   let b=1;
-  let mc=msG('crafting');if(mc>=1)b=Math.max(1,Math.floor(b*(1+mc*0.3)));
+  let mc=msG('crafting');if(mc>=1)b=Math.max(1,Math.round(b*(1+mc*0.3)));
   let save=0;if(tL('t3')>0)save=Math.min(0.5,tL('t3')*0.08);
   for(const[k,v]of Object.entries(r)){S.res[k]-=v;if(save>0&&Math.random()<save)S.res[k]+=1}
   let amount=Math.max(1,b||1);
@@ -552,7 +556,10 @@ function getMatId(){const l=skLv('crafting');if(l>=18)return'megalith';if(l>=12)
 
 
 
-function initTower(){S.tower.rows=[];S.tower._coll=false;
+function initTower(){
+  // Fresh start resources
+  S.res.mud=5;S.res.straw=2;S.res.sand=3;S.res.water=3;S.res.lime=1;S.mat.mortar=2;S.mat.mudBrick=2;
+  S.tower.rows=[];S.tower._coll=false;
   const bw=getBaseW();const row={bricks:[]};
   for(let i=0;i<bw;i++)row.bricks.push({st:'e'});
   S.tower.rows.push(row);
@@ -568,7 +575,7 @@ function tapBuild(){
   if(row.bricks.length>=bw){
     const st=getStab();
     if(st.p<=0||(st.p<5&&Math.random()<0.05)){
-      S.tower._coll=true;S.tower.collapses=(S.tower.collapses||0)+1;S.stat.legacy=Math.max(S.stat.legacy||0,Math.floor(rows.length*0.1));notif('💥 TOWER COLLAPSED! +'+(S.stat.legacy||0)+'% legacy!');
+      S.tower._coll=true;S.tower.collapses=(S.tower.collapses||0)+1;S.stat.legacy=Math.max(S.stat.legacy||0,Math.floor((S.stat.tallest||rows.length)*0.1));notif('💥 TOWER COLLAPSED! +'+(S.stat.legacy||0)+'% legacy!');
       S.stat.gold=(S.stat.gold||0)+Math.floor(Math.max(50,50+rows.length*10+S.stat.totalClicks*0.1));
       updateUI();return
     }
@@ -607,7 +614,8 @@ function buyTech(id){
   notif('⬆️ '+t.n);updateUI()
 }
 function buyMs(skill,i){
-  if(msG(skill)>i)return;
+  if(msG(skill)!==i)return;
+  if(S.ms[skill]>=i+1)return;
   const track=MS[skill];
   if(i>=track.length)return;
   if(skLv(skill)<track[i].lv)return;
@@ -685,7 +693,6 @@ function updateHUD(){
     document.getElementById('bhud-row').innerHTML=row.bricks.map((b,i)=>{let c='dot'+(b.st==='d'?' done':'');if(s.p<10&&b.st==='d'&&(i+rows.length)%3===0)c+=' crack';return '<span class="'+c+'"></span>'}).join('')}
   else document.getElementById('bhud-row').innerHTML='';
 
-  if(lr){const cb=lr.bricks.find(b=>b.st==='p'||b.st==='m');if(cb){ct=cb.st==='p'?(cb.pr||0):(cb.mp||0);cm=cb.st==='p'?bT():mT()}}
   document.getElementById("bhud-action").innerHTML=S.tower._coll?"💥 Rebuild!":rows.length?"👉 Tap to add row":"👉 Tap to start!";
 }
 
@@ -701,6 +708,7 @@ function updateUI(){
   document.getElementById('stat-tallest').textContent=fmt(S.stat.tallest||0);
   document.getElementById('stat-collapses').textContent=fmt(S.tower.collapses||0);
   document.getElementById('stat-legacy').textContent=(S.stat.legacy||0)+'%';
+  document.getElementById('stat-taps').textContent=fmt(S.stat.taps||0);
 
   // Resource grid
   const resHtml=unlockedRes().map(r=>{
@@ -717,7 +725,7 @@ function updateUI(){
     let perTap=1;perTap+=uL('g1')*1+uL('g2')*2+uL('g3')*4+uL('g4')*8;
     let rBonus=0;UPG_R.forEach(u=>{const l=uL(u.id);if(l>0)rBonus+=u.v*l});
     const eff=Math.max(1,Math.floor(1*(1+rBonus)));
-    document.getElementById('g-sub').textContent='+'+eff+'R +'+(perTap)+'🪙 per tap';
+    document.getElementById('g-sub').textContent='+'+eff+'R +'+perTap+'🪙 per tap';
   }
 
   // Gather TAP upgrades
@@ -762,7 +770,7 @@ function updateUI(){
   }
   const cbar=document.getElementById('c-bar');const cfill=document.getElementById('c-fill');
   const cac=autoCraft();
-  if(cac&&cbar){cbar.style.display='block';const ct=ac.t||4;const pct=Math.min(100,Math.floor((S.autoCraftTick||0)/ct*100));cfill.style.width=pct+'%'}
+  if(cac&&cbar){cbar.style.display='block';const ct=aL('craft')>0?getAutoInterval('craft')/100:(cac.t||4);const pct=Math.min(100,Math.floor((S.autoCraftTick||0)/ct*100));cfill.style.width=pct+'%'}
   else if(cbar)cbar.style.display='none';
 
   // Craft TAP upgrades
@@ -793,9 +801,8 @@ function updateUI(){
 
 function getAutoInterval(id){const l=Math.min(aL(id),15);return Math.max(100,3000/(1+l*0.5))*1000;}
 
-let autoStarted=false;
 function runAuto(){
-  if(S.tick<1){autoStarted=true;return} // skip tick 0 to avoid instant burst on load
+  if(S.tick<1)return // skip tick 0 to avoid instant burst on load
   // Auto-gather
   if(aL('gather')>0&&S.tick>1){
     const gi=getAutoInterval('gather');
@@ -853,11 +860,11 @@ function updateSkillsUI(){
   }).join('');
 
   document.getElementById('talents-grid').innerHTML=TALENTS.map(t=>{
-    const l=tL(t.id),mx=l>=t.L,rs=t.rS||'general',rl=t.rL+(t.rS2||0)*l,hl=skLv(rs)>=rl;
+    const l=tL(t.id),mx=l>=t.L,rs=t.rS||'general',rl=t.rL+(t.rS2||0)*l,hl=skLv(rs)>=rl;const rlStr=t.rS2?'Lv'+t.rL+'+'+t.rS2+'/lv':'Lv'+t.rL;
     const c=Math.floor(t.cb*Math.pow(t.cm,l)),ok=(S.stat.gold||0)>=c&&!mx;
     const e=t.ef(l);const es=Object.entries(e).map(([k,v])=>k+': +'+(typeof v==='number'?Math.round(v*100):v)+'%').join(', ');
     return '<div class="parapet" style="border-color:'+(mx?'#3a5a3a':hl?'#2a180e':'#0a0604')+'"><div class="phdr"><span class="pn">'+t.i+' '+t.n+'</span><span class="pl" style="color:'+(mx?'#60a060':'#8a6a4a')+'">'+(mx?'MAX':'Lv'+l+'/'+t.L)+'</span></div>'+
-      '<div class="pdesc">'+t.d+' · '+rs+' Lv'+rl+'</div><div class="pbar"><div class="pf" style="width:'+(l/t.L*100)+'%"></div></div><div class="peff">'+es+'</div>'+
+      '<div class="pdesc">'+t.d+' · '+rs+' '+rlStr+'</div><div class="pbar"><div class="pf" style="width:'+(l/t.L*100)+'%"></div></div><div class="peff">'+es+'</div>'+
       '<button onclick="G.buyTalent(\''+t.id+'\')"'+(ok&&hl?'':'disabled')+'>🪙'+fmt(c)+' '+(mx?'MAXED':l>0?'Upgrade':'Unlock')+'</button></div>'}).join('');
 
   updateHUD();
@@ -867,14 +874,29 @@ function switchTab(t){document.querySelectorAll('.t').forEach(b=>b.classList.rem
   document.querySelector('.t[data-t="'+t+'"]').classList.add('on');document.getElementById(t+'-pane').classList.add('on');
   if(t==='build')requestAnimationFrame(()=>rC2())}
 
-function save(){try{localStorage.setItem('babel_save',JSON.stringify(S))}catch(e){}}
+function save(){try{S.lastSave=Date.now();localStorage.setItem('babel_save',JSON.stringify(S))}catch(e){}}
 function load(){try{const d=localStorage.getItem('babel_save');if(d){Object.assign(S,JSON.parse(d));
   if(!S.tech)S.tech={};if(!S.tal)S.tal={};if(!S.ms)S.ms={gathering:0,crafting:0,building:0,general:0};
   if(!S.sk)S.sk={gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}};
   if(!S.tower)S.tower={rows:[],colCount:3,collapses:0};if(!S.tower.rows)S.tower.rows=[];if(S.tower._coll===undefined)S.tower._coll=false;
-  if(!S._selCraft)S._selCraft=null;if(!S.auto)S.auto={gather:0,craft:0,build:0};if(S.craftTick===undefined)S.craftTick=0;if(S.autoCraftTick===undefined)S.autoCraftTick=0;if(typeof S.tower.collapses!=='number')S.tower.collapses=0;if(typeof S.stat.tallest!=='number')S.stat.tallest=0;if(typeof S.stat.legacy!=='number')S.stat.legacy=0;
+  if(!S._selCraft)S._selCraft=null;if(!S.auto)S.auto={gather:0,craft:0,build:0};if(S.autoCraftTick===undefined)S.autoCraftTick=0;if(typeof S.tower.collapses!=='number')S.tower.collapses=0;if(typeof S.stat.tallest!=='number')S.stat.tallest=0;if(typeof S.stat.legacy!=='number')S.stat.legacy=0;if(typeof S.lastSave!=='number')S.lastSave=0;
   // Recalculate all skill levels from XP
   if(S.sk){Object.keys(S.sk).forEach(k=>{if(S.sk[k])rC(k)})}
+
+  // Offline progress
+  const now=Date.now();const elapsed=now-(S.lastSave||now);S.lastSave=now;
+  const maxOffline=86400000;const ticks=Math.min(elapsed,maxOffline)/100;
+  if(ticks>5&&(S.auto.gather||S.auto.craft||S.auto.build)){
+    let autoGathers=0,autoCrafts=0,autoBuilds=0;
+    if(aL('gather')>0){const gi=getAutoInterval('gather');autoGathers=Math.floor(ticks/(gi/100))}
+    if(aL('craft')>0){const ci=getAutoInterval('craft');autoCrafts=Math.floor(ticks/(ci/100))}
+    if(aL('build')>0){const bi=getAutoInterval('build');autoBuilds=Math.floor(ticks/(bi/100))}
+    let gains=[];
+    if(autoGathers>0){const r=gF();if(r){S.res[r.id]=(S.res[r.id]||0)+autoGathers;S.stat.gold=(S.stat.gold||0)+autoGathers;gains.push('⛏x'+autoGathers)}}
+    if(autoCrafts>0){const s=autoCraft();if(s){S.mat[s.id]=(S.mat[s.id]||0)+autoCrafts;S.stat.gold=(S.stat.gold||0)+autoCrafts*2;gains.push('🔨x'+autoCrafts)}}
+    if(autoBuilds>0){const mat=getMatId();if(mat&&(S.mat[mat]||0)>=autoBuilds&&(S.mat.mortar||0)>=autoBuilds){S.mat[mat]-=autoBuilds;S.mat.mortar-=autoBuilds;S.tower.rows=[];for(let i=0;i<Math.min(autoBuilds,500);i++){const row={bricks:[]};for(let j=0;j<getBaseW();j++)row.bricks.push({st:'d'});S.tower.rows.push(row)}gains.push('🧱x'+autoBuilds)}}
+    if(gains.length){notif('⚡Offline: '+gains.join(' '));S.stat.tallest=Math.max(S.stat.tallest||0,S.tower.rows.length);updateUI()}
+  }
   return true}}catch(e){}return false}
 
 function init(){
