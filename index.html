@@ -222,7 +222,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
     </div>
     <div class="pane" id="skills-pane">
       <div class="sk-scroll">
-        <div id="stats-display" style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:4px">
+        <div id="stats-display" style="display:grid;grid-template-columns:repeat(2,1fr);gap:2px;margin-bottom:4px">
           <div style="background:rgba(15,10,6,0.5);border:1px solid #1a0e08;border-radius:4px;padding:3px 5px;text-align:center">
             <div style="font-size:9px;color:#8a7a6a">👆 Total Clicks</div>
             <div style="font-size:14px;font-weight:700;color:#e8ddd0" id="stat-clicks">0</div>
@@ -234,6 +234,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
           <div style="background:rgba(15,10,6,0.5);border:1px solid #1a0e08;border-radius:4px;padding:3px 5px;text-align:center">
             <div style="font-size:9px;color:#8a7a6a">💥 Collapses</div>
             <div style="font-size:14px;font-weight:700;color:#cc5050" id="stat-collapses">0</div>
+          </div>
+          <div style="background:rgba(15,10,6,0.5);border:1px solid #1a0e08;border-radius:4px;padding:3px 5px;text-align:center">
+            <div style="font-size:9px;color:#8a7a6a">🔜 Legacy Bonus</div>
+            <div style="font-size:14px;font-weight:700;color:#ffd700" id="stat-legacy">0%</div>
           </div>
         </div>
         <div id="skills-list"></div>
@@ -282,7 +286,7 @@ const BC = {
 const GOLD_COL='#ffd700',RES_COL='#c46a3a',GXP_COL='#e0d0c0',
   GAT_COL='#d06040',CRA_COL='#50b050',BLD_COL='#5090d0';
 
-const S = {res:{},mat:{},upg:{},tech:{},tower:{rows:[],colCount:3,collapses:0,_coll:false},stat:{gold:0,bricks:0,totalClicks:0,taps:0,tallest:0},
+const S = {res:{},mat:{},upg:{},tech:{},tower:{rows:[],colCount:3,collapses:0,_coll:false},stat:{gold:0,bricks:0,totalClicks:0,taps:0,tallest:0,legacy:0},
   sk:{gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}},
   ms:{gathering:0,crafting:0,building:0,general:0},tal:{},tick:0,_selCraft:null,
   auto:{gather:0,craft:0,build:0},craftTick:0,autoCraftTick:0};
@@ -306,15 +310,15 @@ const UPG_R = [
   {id:'r6',n:'Magic Loom',d:'+100% resource gain',c:50000,m:5,L:15,sk:'gather',v:1},
 ];
 const UPG_A = [
-  {id:'ag1',n:'Auto-Scoop',d:'Auto-gather every 2s',c:80,m:2.8,L:10,sk:'gather'},
-  {id:'ag2',n:'Auto-Windmill',d:'Auto-gather every 1s',c:500,m:3.2,L:10,sk:'gather'},
-  {id:'ag3',n:'Auto-Earth Mover',d:'Auto-gather every 0.5s',c:3000,m:3.8,L:10,sk:'gather'},
-  {id:'ac1',n:'Auto-Stir',d:'Auto-craft every 3s',c:120,m:2.8,L:10,sk:'craft'},
-  {id:'ac2',n:'Auto-Press',d:'Auto-craft every 1.5s',c:800,m:3.2,L:10,sk:'craft'},
-  {id:'ac3',n:'Auto-Factory',d:'Auto-craft every 0.75s',c:5000,m:3.8,L:10,sk:'craft'},
-  {id:'ab1',n:'Auto-Trowel',d:'Auto-place bricks every 3s',c:200,m:2.8,L:10,sk:'build'},
-  {id:'ab2',n:'Auto-Crane',d:'Auto-place bricks every 1.5s',c:1200,m:3.2,L:10,sk:'build'},
-  {id:'ab3',n:'Auto-Gigalith',d:'Auto-place bricks every 0.75s',c:8000,m:3.8,L:10,sk:'build'},
+  {id:'ag1',n:'Auto-Scoop',d:'Auto-gather (1.5s→0.2s per lv)',c:80,m:2.8,L:10,sk:'gather'},
+  {id:'ag2',n:'Auto-Windmill',d:'Faster auto-gather II',c:500,m:3.2,L:10,sk:'gather'},
+  {id:'ag3',n:'Auto-Earth Mover',d:'Faster auto-gather III',c:3000,m:3.8,L:10,sk:'gather'},
+  {id:'ac1',n:'Auto-Stir',d:'Auto-craft (1.5s→0.2s per lv)',c:120,m:2.8,L:10,sk:'craft'},
+  {id:'ac2',n:'Auto-Press',d:'Faster auto-craft II',c:800,m:3.2,L:10,sk:'craft'},
+  {id:'ac3',n:'Auto-Factory',d:'Faster auto-craft III',c:5000,m:3.8,L:10,sk:'craft'},
+  {id:'ab1',n:'Auto-Trowel',d:'Auto-build (1.5s→0.2s per lv)',c:200,m:2.8,L:10,sk:'build'},
+  {id:'ab2',n:'Auto-Crane',d:'Faster auto-build II',c:1200,m:3.2,L:10,sk:'build'},
+  {id:'ab3',n:'Auto-Gigalith',d:'Faster auto-build III',c:8000,m:3.8,L:10,sk:'build'},
 ];
 const UPG_S = [
   {id:'sg1',n:'Gatherer Focus',d:'×2 gather rate',c:100,m:2.5,L:10,sk:'gathering',rL:0},
@@ -379,7 +383,7 @@ function xpN(lv){return Math.floor(50*lv*(1+lv*0.12))}
 function aL(id){return S.auto[id]||0}
 
 
-function rC(id){const s=S.sk[id];let l=1,x=s.xp;while(x>=xpN(l)){x-=xpN(l);l++}s.lv=l}
+function rC(id){const s=S.sk[id];if(!s)return;let l=1,x=s.xp||0,m=0;while(x>=xpN(l)&&m<10000){x-=xpN(l);l++;m++}s.lv=l}
 function fmt(n){if(typeof n!=='number')n=0;if(n>=1e9)return (n/1e9).toFixed(1)+'B';if(n>=1e6)return (n/1e6).toFixed(1)+'M';if(n>=1e4)return (n/1e3).toFixed(1)+'K';if(n<10&&n>0)return n.toFixed(1);return Math.floor(n).toString()}
 
 // ─── XP OVERLAY & BARS ───────────────────────────────────────────────
@@ -390,7 +394,6 @@ const XP_FO=['xfo-g','xfo-c','xfo-b'];
 const XP_XF=['xpf-g','xpf-c','xpf-b'];
 const XP_IDS=['xp-g','xp-c','xp-b'];
 let xpOverlayTimer=null;
-let currentBoostedSkill=null;
 
 
 function triggerXpOverlay(skill){
@@ -406,7 +409,6 @@ function triggerXpOverlay(skill){
   }
 
   // Grow the boosted bar, shrink others
-  currentBoostedSkill=skill;
   for(let i=0;i<3;i++){
     const el=document.getElementById(XP_IDS[i]);
     if(el)el.style.flex=(SKILL_IDS[i]===skill?'4':'1');
@@ -424,7 +426,6 @@ function triggerXpOverlay(skill){
       const el=document.getElementById(XP_IDS[i]);
       if(el)el.style.flex='1';
     }
-    currentBoostedSkill=null;
     // After fade, restore actual levels
     setTimeout(()=>updateXPBars(),500);
   },1200);
@@ -463,6 +464,7 @@ function earnX(sk,base){
   if(sk==="crafting"){const v=uL("sc1");if(v>0)m*=1+v}
   if(sk==="building"){const v=uL("sb1");if(v>0)m*=1+v}
   if(tL('d1')>0)m*=1+tL('d1')*0.15;
+  const leg=S.stat.legacy||0;if(leg>0)m*=1+leg*0.01;
   const x=Math.floor(base*m);
   if(sk==='general'){S.sk.general.xp+=x;rC('general')}
   else{S.sk[sk].xp+=x;rC(sk);S.sk.general.xp+=Math.floor(x*0.5);rC('general')}
@@ -566,7 +568,7 @@ function tapBuild(){
   if(row.bricks.length>=bw){
     const st=getStab();
     if(st.p<=0||(st.p<5&&Math.random()<0.05)){
-      S.tower._coll=true;S.tower.collapses=(S.tower.collapses||0)+1;notif('💥 TOWER COLLAPSED!');
+      S.tower._coll=true;S.tower.collapses=(S.tower.collapses||0)+1;S.stat.legacy=Math.max(S.stat.legacy||0,Math.floor(rows.length*0.1));notif('💥 TOWER COLLAPSED! +'+(S.stat.legacy||0)+'% legacy!');
       S.stat.gold=(S.stat.gold||0)+Math.floor(Math.max(50,50+rows.length*10+S.stat.totalClicks*0.1));
       updateUI();return
     }
@@ -576,8 +578,7 @@ function tapBuild(){
   S.stat.taps=(S.stat.taps||0)+1;
   S.stat.totalClicks=(S.stat.totalClicks||0)+1;
   S.stat.gold=(S.stat.gold||0)+Math.floor(Math.random()*3+1);
-  const brick={st:'p',pr:0};
-  row.bricks.push(brick);row.bricks[row.bricks.length-1].st='d';
+  row.bricks.push({st:'d'});
   earnX('building',2);
   showFeed(BLD_COL,RES_COL,GOLD_COL,'+1🧱','+'+(Math.floor(Math.random()*3+1))+'🪙','+2🧱XP','+'+(Math.floor(2*0.5))+'⚡XP');
 
@@ -664,18 +665,12 @@ function draw(){
         cx.fillStyle=g2;cx.fillRect(bx,y,bW,bH);cx.strokeStyle='rgba(0,0,0,0.12)';cx.lineWidth=0.2;cx.strokeRect(bx,y,bW,bH);
         if(st.p<15&&(b+ri)%3===0){cx.strokeStyle='rgba(200,50,50,'+(0.1+(15-st.p)/15*0.3)+')';cx.lineWidth=0.3;
           cx.beginPath();cx.moveTo(bx+1,y+1);cx.lineTo(bx+bW-1,y+bH-1);cx.moveTo(bx+bW-1,y+1);cx.lineTo(bx+1,y+bH-1);cx.stroke()}
-      }else if(brick.st==='p'){const f=Math.min(1,(brick.pr||0)/bT());cx.globalAlpha=0.06;cx.fillStyle='rgba(255,255,255,0.05)';cx.fillRect(bx,y,bW,bH);cx.globalAlpha=1;
-        const sl=y-(1-f)*10;cx.shadowColor='rgba(232,200,122,0.06)';cx.shadowBlur=2;
-        const g2=cx.createLinearGradient(bx,sl,bx,sl+bH);g2.addColorStop(0,cols.s);g2.addColorStop(0.5,cols.m);g2.addColorStop(1,cols.e);
-        cx.fillStyle=g2;cx.fillRect(bx,sl,bW,bH);cx.shadowBlur=0
-      }else if(brick.st==='m'){const g2=cx.createLinearGradient(bx,y,bx,y+bH);g2.addColorStop(0,cols.s);g2.addColorStop(0.5,cols.m);g2.addColorStop(1,cols.e);
-        cx.fillStyle=g2;cx.fillRect(bx,y,bW,bH);cx.strokeStyle='rgba(0,0,0,0.12)';cx.lineWidth=0.2;cx.strokeRect(bx,y,bW,bH);
-        const mf=Math.min(1,(brick.mp||0)/mT());cx.fillStyle='rgba(180,160,130,'+(0.08+0.2*mf)+')';cx.fillRect(bx,y-mH,bW,mH)
       }else{cx.strokeStyle='rgba(255,255,255,0.02)';cx.lineWidth=0.2;cx.strokeRect(bx,y,bW,bH)}}
     if(ri<rows.length-1){cx.fillStyle=mCols.m;cx.fillRect(ox,y+bH,wallW,mH)}}
   cx.fillStyle='#2a1508';cx.fillRect(ox-3,h-26,wallW+6,2);
   const st=getStab();if(st.p<20){const sw=(20-st.p)*0.15*Math.sin(Date.now()/350);cx.save();cx.translate(sw,0);
     cx.fillStyle='rgba(200,100,50,0.04)';cx.fillRect(ox-2,h-26-wallW*0.12,wallW+4,24);cx.restore()}
+  if(S.tower._coll){cx.fillStyle='rgba(200,80,50,0.15)';for(let i=0;i<15;i++){const a=(i*137+Date.now()*0.01)%(Math.PI*2);const r=10+((i*73+Date.now()*0.05)%60);cx.beginPath();cx.arc(w/2+Math.cos(a)*r,h*0.3+Math.sin(a)*r*0.5,1.5+Math.sin(i)*0.5,0,Math.PI*2);cx.fill()}}
 }
 
 // ─── HUD ──────────────────────────────────────────────────────────────
@@ -701,10 +696,11 @@ function updateUI(){
   document.getElementById('st-gold').textContent=fmt(S.stat.gold||0);
   let tc=0;Object.values(S.mat).forEach(v=>tc+=v);document.getElementById('st-bricks').textContent=fmt(tc);
   document.getElementById('st-hgt').textContent=S.tower.rows.length;
-  const ae=document.getElementById('st-auto');if(ae){const ac=[aL('gather'),aL('craft'),aL('build')].filter(x=>x>0).length;ae.textContent=ac?'⚙'+ac+'/3':''}
+  const ae=document.getElementById('st-auto');if(ae){const acts=[['⛏',aL('gather')],['🔨',aL('craft')],['🧱',aL('build')]].filter(x=>x[1]>0).map(x=>x[0]);ae.textContent=acts.length?'⚙'+acts.join(''):''}
   document.getElementById('stat-clicks').textContent=fmt(S.stat.totalClicks||0);
   document.getElementById('stat-tallest').textContent=fmt(S.stat.tallest||0);
   document.getElementById('stat-collapses').textContent=fmt(S.tower.collapses||0);
+  document.getElementById('stat-legacy').textContent=(S.stat.legacy||0)+'%';
 
   // Resource grid
   const resHtml=unlockedRes().map(r=>{
@@ -876,7 +872,7 @@ function load(){try{const d=localStorage.getItem('babel_save');if(d){Object.assi
   if(!S.tech)S.tech={};if(!S.tal)S.tal={};if(!S.ms)S.ms={gathering:0,crafting:0,building:0,general:0};
   if(!S.sk)S.sk={gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}};
   if(!S.tower)S.tower={rows:[],colCount:3,collapses:0};if(!S.tower.rows)S.tower.rows=[];if(S.tower._coll===undefined)S.tower._coll=false;
-  if(!S._selCraft)S._selCraft=null;if(!S.auto)S.auto={gather:0,craft:0,build:0};if(S.craftTick===undefined)S.craftTick=0;if(S.autoCraftTick===undefined)S.autoCraftTick=0;
+  if(!S._selCraft)S._selCraft=null;if(!S.auto)S.auto={gather:0,craft:0,build:0};if(S.craftTick===undefined)S.craftTick=0;if(S.autoCraftTick===undefined)S.autoCraftTick=0;if(typeof S.tower.collapses!=='number')S.tower.collapses=0;if(typeof S.stat.tallest!=='number')S.stat.tallest=0;if(typeof S.stat.legacy!=='number')S.stat.legacy=0;
   // Recalculate all skill levels from XP
   if(S.sk){Object.keys(S.sk).forEach(k=>{if(S.sk[k])rC(k)})}
   return true}}catch(e){}return false}
