@@ -217,12 +217,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
     </div>
     <div class="pane" id="build-pane">
       <canvas id="bc"></canvas>
-      <div class="tz" id="build-tap-overlay" onclick="G.tapBuild()">
+      <div class="tz" id="build-tap-overlay" onclick="buildBurst()">
         <span class="tz-icon" style="font-size:24px">🧱</span>
         <span class="tz-hint" style="font-size:14px">Tap to build</span>
         <span class="tz-sub" style="font-size:10px" id="build-sub">Place a row</span>
       </div>
-      <div id="tower-tech"><button onclick="G.toggleTech()">⬆️</button></div>
+      <div id="tower-tech"><button onclick="G.toggleTech()">⬆️</button><span style="color:#5a8a3a;font-size:9px;margin-left:4px">×100</span></div>
       <div id="ttech-panel"></div>
       <div class="bhud">
         <div class="sn" id="bhud-name">🗼 Tower of Babel</div>
@@ -625,6 +625,24 @@ function tapBuild(){
   updateUI();
 }
 
+// ─── BUILD BURST ────────────────────────────────────────────────────
+
+let burstTO=null;
+let burstBusy=false;
+function buildBurst(){
+  if(burstBusy)return;
+  burstBusy=true;
+  let count=0;
+  function next(){
+    if(count>=100){burstBusy=false;updateUI();return}
+    tapBuild();
+    count++;
+    if(count%10===0)updateUI();
+    burstTO=setTimeout(next,10);
+  }
+  next();
+}
+
 // ─── SKILLS & TALENTS TAP ──────────────────────────────────────────
 
 function tapSkills(){
@@ -765,7 +783,7 @@ function updateHUD(){
   else document.getElementById('bhud-row').innerHTML='';
 
   document.getElementById("bhud-action").innerHTML=S.tower._coll?"💥 Rebuild!":rows.length?"👉 Tap to add row":"👉 Tap to start!";
-  document.getElementById("build-sub").textContent=S.tower._coll?"💥 Collapsed! Tap to rebuild":rows.length?"Row "+(S.tower.rows.length)+" · Tap to place":"Tap to start building!";
+  document.getElementById("build-sub").textContent=S.tower._coll?"💥 Collapsed! Tap to rebuild":rows.length?"Row "+(S.tower.rows.length)+" · ×100 burst":"Tap to start building!";
 }
 
 // ─── RENDER UI ────────────────────────────────────────────────────────
@@ -978,7 +996,7 @@ function init(){
   ['gather-zone','craft-zone','build-tap-overlay'].forEach(id=>{
     const el=document.getElementById(id);
     if(!el)return;
-    const fn={'gather-zone':()=>gather(gF().id),'craft-zone':()=>{const s=autoCraft();if(s){S.autoCraftTick=0;craft(s)}},'build-tap-overlay':()=>tapBuild()}[id];
+    const fn={'gather-zone':()=>gather(gF().id),'craft-zone':()=>{const s=autoCraft();if(s){S.autoCraftTick=0;craft(s)}},'build-tap-overlay':()=>buildBurst()}[id];
     el.addEventListener('mousedown',()=>htrStart(fn));
     el.addEventListener('touchstart',()=>htrStart(fn),{passive:true});
   });
