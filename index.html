@@ -98,6 +98,14 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
 .bhud .pt span{color:#e8ddd0}
 .bhud .stab{height:5px;background:#0a0604;border-radius:3px;overflow:hidden;border:1px solid #1a0e08}
 .bhud .stab .sf{height:100%;border-radius:2px;transition:width 0.3s;position:relative}
+
+/* ── BIG TAP BUTTONS ── */
+#build-tap-overlay{position:absolute;top:4px;left:4px;right:4px;height:50px;z-index:6;display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(20,12,8,0.85);border:1px solid #3a2a1a;border-radius:8px;cursor:pointer;transition:all 0.08s;backdrop-filter:blur(2px)}
+#build-tap-overlay:active{background:rgba(40,24,14,0.95);transform:scale(0.97);border-color:#5a4a3a}
+#build-tap-overlay .btap-icon{font-size:28px;filter:drop-shadow(0 1px 6px rgba(0,0,0,0.6))}
+#build-tap-overlay .btap-label{font-size:15px;font-weight:700;color:#e8c87a}
+.tap-bar{flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:6px;padding:12px;margin:6px 8px 8px;background:linear-gradient(135deg,#1a0e08,#25140a);border:1px solid #3a2a1a;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;color:#e8c87a;transition:all 0.08s}
+.tap-bar:active{background:linear-gradient(135deg,#2a1a10,#3a2018);transform:scale(0.97);border-color:#5a4a3a}
 .bhud .ah{font-size:11px;color:#c0a070}
 .row{display:flex;gap:2px;flex-wrap:wrap}.row .dot{width:5px;height:5px;border-radius:1px;background:#1a0e08;border:1px solid #2a180e}
 .row .dot.done{background:#c46a3a;border-color:#e8a050}.row .dot.crack{background:#cc3030;border-color:#cc5050;animation:pulse 0.3s infinite}
@@ -209,7 +217,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
     </div>
     <div class="pane" id="build-pane">
       <canvas id="bc"></canvas>
-      <button id="fb" onclick="G.tapBuild()">🧱 Place</button>
+      <div id="build-tap-overlay" onclick="G.tapBuild()">
+        <div class="btap-icon">🧱</div>
+        <div class="btap-label">Tap to Build</div>
+      </div>
       <div id="tower-tech"><button onclick="G.toggleTech()">⬆️</button></div>
       <div id="ttech-panel"></div>
       <div class="bhud">
@@ -248,10 +259,16 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
         <div id="milestones-area"></div>
         <div id="skill-upgs-area" class="su"></div>
       </div>
+      <div class="tap-bar" id="skills-tap" onclick="G.tapSkills()">
+        <span>⚡</span> Meditate <span style="font-size:11px;color:#8a7a6a">(+general XP)</span>
+      </div>
     </div>
     <div class="pane" id="talents-pane">
       <div class="t-scroll">
         <div class="tg" id="talents-grid"></div>
+      </div>
+      <div class="tap-bar" id="talents-tap" onclick="G.tapTalents()">
+        <span>🏛️</span> Contemplate <span style="font-size:11px;color:#8a7a6a">(+gold)</span>
       </div>
     </div>
   </div>
@@ -592,6 +609,27 @@ function tapBuild(){
   updateUI();
 }
 
+// ─── SKILLS & TALENTS TAP ──────────────────────────────────────────
+
+function tapSkills(){
+  const g=Math.max(1,Math.floor(Math.random()*2+1));
+  S.stat.gold=(S.stat.gold||0)+g;
+  S.stat.totalClicks=(S.stat.totalClicks||0)+1;
+  earnX('general',1);
+  showFeed(GXP_COL,GOLD_COL,GOLD_COL,'+'+g+'🪙','+1⚡XP','🧘 Meditate','');
+  updateUI();
+}
+
+function tapTalents(){
+  let g=Math.max(1,Math.floor(Math.random()*3+2));
+  if(tL('t5')>0)g=Math.floor(g*(1+tL('t5')*0.15));
+  S.stat.gold=(S.stat.gold||0)+g;
+  S.stat.totalClicks=(S.stat.totalClicks||0)+1;
+  // Small chance to refund a talent purchase (respec shard)
+  if(Math.random()<0.02){notif('✨ Insight gained!')}
+  showFeed(GOLD_COL,GOLD_COL,GOLD_COL,'+'+g+'🪙','🏛️ Contemplate','','');
+  updateUI();
+}
 
 
 // ─── UPGRADES & TECH ─────────────────────────────────────────────────
@@ -914,7 +952,7 @@ function init(){
   (function lp(){draw();requestAnimationFrame(lp)})();
   console.log('🗼 Babel loaded!');
 }
-window.G={init,gather,craft,tapBuild,buyUpg,buyTech,selCraft(id){S._selCraft=id;updateUI()},buyMs(s,i){buyMs(s,i)},buyTalent,toggleTech(){document.getElementById('ttech-panel').classList.toggle('sh')}};
+window.G={init,gather,craft,tapBuild,tapSkills,tapTalents,buyUpg,buyTech,selCraft(id){S._selCraft=id;updateUI()},buyMs(s,i){buyMs(s,i)},buyTalent,toggleTech(){document.getElementById('ttech-panel').classList.toggle('sh')}};
 })();
 document.addEventListener('DOMContentLoaded',()=>{G.init()});
 </script>
