@@ -217,7 +217,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
     </div>
     <div class="pane" id="build-pane">
       <canvas id="bc"></canvas>
-      <div class="tz" id="build-tap-overlay" onclick="buildBurst()">
+      <div class="tz" id="build-tap-overlay" onclick="G.buildBurst()">
         <span class="tz-icon" style="font-size:24px">🧱</span>
         <span class="tz-hint" style="font-size:14px">Tap to build</span>
         <span class="tz-sub" style="font-size:10px" id="build-sub">Place a row</span>
@@ -756,7 +756,7 @@ function draw(){
   const bW=Math.min(28,Math.max(6,(w-20)/(bw+0.5)));const wallW=bw*bW+(bw-1)*gap,ox=(w-wallW)/2;
   const cols=BC[getMatId()]||BC.mudBrick,mCols=BC.mortar;
   const startRow=Math.max(0,rows.length-Math.floor(maxDrawH/rowH));
-  for(let ri=startRow;ri<rows.length;ri++){const row=rows[ri],y=h-26-(rows.length-ri)*rowH;if(y<-rowH||y>h)continue;
+  for(let ri=startRow;ri<rows.length;ri++){const row=rows[ri],y=h-26-(ri+1)*rowH;if(y<-rowH||y>h)continue;
     for(let b=0;b<bw;b++){const bx=ox+b*(bW+gap);if(bx+bW<0||bx>w)continue;const brick=row.bricks[b]||{st:'e'};const st=getStab();
       if(brick.st==='d'){const g2=cx.createLinearGradient(bx,y,bx,y+bH);g2.addColorStop(0,cols.s);g2.addColorStop(0.5,cols.m);g2.addColorStop(1,cols.e);
         cx.fillStyle=g2;cx.fillRect(bx,y,bW,bH);cx.strokeStyle='rgba(0,0,0,0.12)';cx.lineWidth=0.2;cx.strokeRect(bx,y,bW,bH);
@@ -996,7 +996,7 @@ function init(){
   ['gather-zone','craft-zone','build-tap-overlay'].forEach(id=>{
     const el=document.getElementById(id);
     if(!el)return;
-    const fn={'gather-zone':()=>gather(gF().id),'craft-zone':()=>{const s=autoCraft();if(s){S.autoCraftTick=0;craft(s)}},'build-tap-overlay':()=>buildBurst()}[id];
+    const fn={'gather-zone':()=>gather(gF().id),'craft-zone':()=>{const s=autoCraft();if(s){S.autoCraftTick=0;craft(s)}},'build-tap-overlay':()=>G.buildBurst()}[id];
     el.addEventListener('mousedown',()=>htrStart(fn));
     el.addEventListener('touchstart',()=>htrStart(fn),{passive:true});
   });
@@ -1017,7 +1017,7 @@ function init(){
   (function lp(){draw();requestAnimationFrame(lp)})();
   console.log('🗼 Babel loaded!');
 }
-window.G={init,gather,craft,tapBuild,tapSkills,tapTalents,buyUpg,buyTech,selCraft(id){S._selCraft=id;updateUI()},buyMs(s,i){buyMs(s,i)},buyTalent,toggleTech(){document.getElementById('ttech-panel').classList.toggle('sh')}};
+window.G={init,gather,craft,tapBuild,buildBurst,tapSkills,tapTalents,buyUpg,buyTech,selCraft(id){S._selCraft=id;updateUI()},buyMs(s,i){buyMs(s,i)},buyTalent,toggleTech(){document.getElementById('ttech-panel').classList.toggle('sh')}};
 })();
 document.addEventListener('DOMContentLoaded',()=>{G.init()});
 </script>
