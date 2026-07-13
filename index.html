@@ -54,7 +54,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
 
 .feed{position:absolute;font-weight:700;pointer-events:none;animation:feedUp 0.8s ease forwards;z-index:20;text-align:center;line-height:1}
 .feed .l1{display:block;font-size:17px;margin-bottom:2px}.feed .l2{display:block;font-size:12px}
-@keyframes feedUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-50px) scale(1.08)}}
+@keyframes feedUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-40px) scale(1.06)}}
 
 /* ── UPGRADES (shared tap & auto sections) ── */
 .g-upgs,.c-upgs,.a-upgs{padding:3px 6px;flex-shrink:0;overflow-y:auto;max-height:30%}
@@ -404,6 +404,11 @@ const TALENTS = [
   {id:'f1',n:'Fortress Foundation',i:'🏛️',d:'+reinforcement',rS:'general',rL:15,rS2:4,cb:500,cm:3.5,L:10,ef:(l)=>({reinfMult:0.1*l})},
 ];
 
+// ─── TAP POSITION TRACKING ──────────────────────────────────────────
+let lastTapX=0,lastTapY=0;
+document.addEventListener('mousedown',e=>{lastTapX=e.clientX;lastTapY=e.clientY});
+document.addEventListener('touchstart',e=>{const t=e.touches[0];lastTapX=t.clientX;lastTapY=t.clientY},{passive:true});
+
 // ─── STATE HELPERS ────────────────────────────────────────────────────
 
 function uL(id){return S.upg[id]||0}
@@ -704,7 +709,9 @@ function showFeed(col1,col2,col3,t1,t2,t3,t4){
   const f=document.createElement('div');f.className='feed';
   f.innerHTML='<span class="l1"><span style="color:'+col2+'">'+t1+'</span> <span style="color:'+col3+'">'+t2+'</span></span><span class="l2"><span style="color:'+col1+'">'+t3+'</span> <span style="color:'+GXP_COL+'">'+t4+'</span></span>';
   const r=zone.getBoundingClientRect();
-  f.style.left=(10+Math.random()*(r.width-60))+'px';f.style.top=(30+Math.random()*(r.height*0.3))+'px';
+  const lx=Math.max(0,Math.min(r.width-80,lastTapX-r.left+(Math.random()-0.5)*40));
+  const ly=Math.max(0,Math.min(r.height-30,lastTapY-r.top+(Math.random()-0.5)*30-20));
+  f.style.left=lx+'px';f.style.top=ly+'px';
   zone.appendChild(f);setTimeout(()=>f.remove(),800)
 }
 
