@@ -55,6 +55,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
 .feed{position:absolute;font-weight:700;pointer-events:none;animation:feedUp 0.8s ease forwards;z-index:20;text-align:center;line-height:1}
 .feed .l1{display:block;font-size:17px;margin-bottom:2px}.feed .l2{display:block;font-size:12px}
 @keyframes feedUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-40px) scale(1.06)}}
+@keyframes celebPulse{0%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:0.8}100%{transform:scale(1);opacity:1}}
+@keyframes glowPulse{0%{box-shadow:0 0 3px rgba(232,200,122,0.1)}50%{box-shadow:0 0 12px rgba(232,200,122,0.25)}100%{box-shadow:0 0 3px rgba(232,200,122,0.1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes sparkle{0%{opacity:0;transform:translateY(0) scale(0) rotate(0deg)}50%{opacity:1;transform:translateY(-30px) scale(1) rotate(180deg)}100%{opacity:0;transform:translateY(-60px) scale(0) rotate(360deg)}}
 
 /* ── UPGRADES (shared tap & auto sections) ── */
 .g-upgs,.c-upgs,.a-upgs{padding:3px 6px;flex-shrink:0;overflow-y:auto;max-height:30%}
@@ -96,7 +100,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
 
 /* ── BIG TAP BUTTONS ── */
 .tz{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;margin:0;background:linear-gradient(135deg,#1a0e08,#25140a);border-top:2px solid #3a2a1a;border-left:none;border-right:none;border-bottom:none;cursor:pointer;transition:all 0.08s;width:100%;aspect-ratio:1/1;max-height:30vh}
-.tz:active{background:linear-gradient(135deg,#2a1a10,#3a2018);border-top-color:#5a4a3a}
+.tz{animation:glowPulse 3s ease-in-out infinite}
+.tz:active{background:linear-gradient(135deg,#2a1a10,#3a2018);border-top-color:#5a4a3a;animation:none}
 .tz .tz-icon{font-size:36px;margin-bottom:1px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5))}
 .tz .tz-hint{font-size:15px;font-weight:700;color:#e8c87a;text-shadow:0 1px 4px rgba(0,0,0,0.4)}
 .tz .tz-sub{font-size:11px;color:#8a6a4a;margin-top:1px}
@@ -373,6 +378,15 @@ const TECH = [
   {id:'fd1',n:'Foundation I',d:'×1.5 strength',val:0.5,cost:1000,t:'f'},{id:'fd2',n:'Foundation II',d:'×2.0 strength',val:1.0,cost:8000,t:'f'},
   {id:'fd3',n:'Foundation III',d:'×3.0 strength',val:2.0,cost:60000,t:'f'},
 ];
+const TOWER_MS = [
+  {h:10,b:'+10% width',ef:()=>{}},
+  {h:25,b:'+5% stability',ef:()=>{}},
+  {h:50,b:'Gold reward x2',ef:()=>{}},
+  {h:100,b:'Auto-repair cracks',ef:()=>{}},
+  {h:200,b:'Foundation bonus x2',ef:()=>{}},
+  {h:500,b:'Unlock Gigalith',ef:()=>{}},
+];
+
 const MS = {
   gathering:[
     {lv:5,n:'Gatherer Apprentice'},{lv:10,n:'Prospector'},{lv:25,n:'Excavator'},{lv:50,n:'Quarry Master'},{lv:75,n:'Mountain Mover'},
@@ -396,13 +410,26 @@ const MS = {
   ],
 };
 const TALENTS = [
+  // GATHERING BRANCH
+  {id:'t3',n:'Resource Efficiency',i:'♻️',d:'Less resources per craft',rS:'gathering',rL:5,rS2:3,cb:80,cm:2.2,L:10,ef:(l)=>({resourceSave:0.08*l})},
+  {id:'ga2',n:"Prospector's Eye",i:'🔍',d:'Find rare resources',rS:'gathering',rL:10,rS2:3,cb:200,cm:2.5,L:10,ef:(l)=>({rareChance:0.05*l})},
+  {id:'ga3',n:'Deep Mining',i:'⛏️',d:'More resources per tap',rS:'gathering',rL:20,rS2:5,cb:500,cm:3,L:10,ef:(l)=>({gatherMult:0.2*l})},
+  {id:'ga4',n:"Nature's Bounty",i:'🌿',d:'Auto-gather bonus',rS:'gathering',rL:35,rS2:8,cb:2000,cm:4,L:10,ef:(l)=>({autoGatherMult:0.15*l})},
+  // CRAFTING BRANCH
+  {id:'t4',n:'Stone Hardening',i:'⛰️',d:'Stronger bricks',rS:'crafting',rL:8,rS2:3,cb:150,cm:2.5,L:10,ef:(l)=>({brickStr:0.12*l})},
+  {id:'cr2',n:'Kiln Mastery',i:'🔥',d:'Faster crafting',rS:'crafting',rL:15,rS2:4,cb:400,cm:3,L:10,ef:(l)=>({craftSpeed:0.15*l})},
+  {id:'cr3',n:'Material Fusion',i:'🔬',d:'Unlock advanced recipes',rS:'crafting',rL:25,rS2:5,cb:1500,cm:3.5,L:10,ef:(l)=>({recipeTier:0.1*l})},
+  {id:'cr4',n:'Auto-Synthesis',i:'⚗️',d:'Auto-craft bonus',rS:'crafting',rL:40,rS2:10,cb:5000,cm:4.5,L:10,ef:(l)=>({autoCraftMult:0.15*l})},
+  // BUILDING BRANCH
   {id:'t1',n:'Scaffolding',i:'🪜',d:'Faster build placement',rS:'building',rL:5,rS2:2,cb:100,cm:2.2,L:10,ef:(l)=>({buildSpeed:0.15*l})},
   {id:'t2',n:'Mortar Mastery',i:'🧴',d:'Better mortar application',rS:'building',rL:10,rS2:3,cb:200,cm:2.5,L:10,ef:(l)=>({mortarStr:0.2*l})},
-  {id:'t3',n:'Resource Efficiency',i:'♻️',d:'Less resources per craft',rS:'gathering',rL:5,rS2:2,cb:80,cm:2.2,L:10,ef:(l)=>({resourceSave:0.08*l})},
-  {id:'t4',n:'Stone Hardening',i:'⛰️',d:'Stronger bricks',rS:'crafting',rL:8,rS2:3,cb:150,cm:2.5,L:10,ef:(l)=>({brickStr:0.12*l})},
+  {id:'bl3',n:'Reinforced Joints',i:'🔩',d:'Extra stability',rS:'building',rL:20,rS2:5,cb:600,cm:3,L:10,ef:(l)=>({jointStr:0.1*l})},
+  {id:'bl4',n:'Auto-Architect',i:'🏗️',d:'Auto-build bonus',rS:'building',rL:35,rS2:8,cb:3000,cm:4,L:10,ef:(l)=>({autoBuildMult:0.15*l})},
+  // GENERAL BRANCH
   {id:'t5',n:'Golden Touch',i:'✨',d:'More gold from taps',rS:'general',rL:10,rS2:4,cb:300,cm:3,L:10,ef:(l)=>({goldMult:0.15*l})},
-  {id:'d1',n:'Divine Inspiration',i:'💡',d:'×XP gain',rS:'general',rL:25,rS2:5,cb:1000,cm:4,L:10,ef:(l)=>({xpMult:0.15*l})},
   {id:'f1',n:'Fortress Foundation',i:'🏛️',d:'+reinforcement',rS:'general',rL:15,rS2:4,cb:500,cm:3.5,L:10,ef:(l)=>({reinfMult:0.1*l})},
+  {id:'d1',n:'Divine Inspiration',i:'💡',d:'×XP gain',rS:'general',rL:25,rS2:5,cb:1000,cm:4,L:10,ef:(l)=>({xpMult:0.15*l})},
+  {id:'ge4',n:"Babel's Blessing",i:'🔮',d:'All bonuses multiply',rS:'general',rL:50,rS2:12,cb:10000,cm:5,L:10,ef:(l)=>({allMult:0.1*l})},
 ];
 
 // ─── TAP POSITION TRACKING ──────────────────────────────────────────
@@ -419,8 +446,19 @@ function skLv(id){return S.sk[id]?.lv||1}
 function xpN(lv){return Math.floor(50*lv*(1+lv*0.12))}
 function aL(id){return S.auto[id]||0}
 
+function showCeleb(skill,count){
+  const names={'gathering':'⛏️','crafting':'🔨','building':'🧱','general':'⚡'};
+  const cols={'gathering':GAT_COL,'crafting':CRA_COL,'building':BLD_COL,'general':GXP_COL};
+  const icon=names[skill]||'✨';
+  notif('<span style="color:'+(cols[skill]||GXP_COL)+'">'+icon+' Level Up! x'+(count||1)+'</span>');
+  // Sparkle particles
+  for(let i=0;i<8;i++){const p=document.createElement('div');p.className='prtcl';
+    p.textContent=['✨','⭐','🌟','💫'][i%4];
+    p.style.left=(10+Math.random()*80)+'vw';p.style.top=(20+Math.random()*40)+'vh';
+    document.body.appendChild(p);setTimeout(()=>p.remove(),600)}
+}
 
-function rC(id){const s=S.sk[id];if(!s)return;let l=1,x=s.xp||0,m=0;while(x>=xpN(l)&&m<10000){x-=xpN(l);l++;m++}s.lv=l}
+function rC(id){const s=S.sk[id];if(!s)return;let l=1,x=s.xp||0,m=0,oldLv=s.lv;while(x>=xpN(l)&&m<10000){x-=xpN(l);l++;m++}s.lv=l;if(l>oldLv){showCeleb(id,l-oldLv)}}
 function fmt(n){if(typeof n!=='number')n=0;if(n>=1e9)return (n/1e9).toFixed(1)+'B';if(n>=1e6)return (n/1e6).toFixed(1)+'M';if(n>=1e4)return (n/1e3).toFixed(1)+'K';if(n<10&&n>0)return n.toFixed(1);return Math.floor(n).toString()}
 
 // ─── XP OVERLAY & BARS ───────────────────────────────────────────────
@@ -608,7 +646,7 @@ function tapBuild(){
   if(row.bricks.length>=bw){
     const st=getStab();
     if(st.p<=0||(st.p<5&&Math.random()<0.05)){
-      S.tower._coll=true;S.tower.collapses=(S.tower.collapses||0)+1;S.stat.legacy=Math.max(S.stat.legacy||0,Math.floor((S.stat.tallest||rows.length)*0.1));notif('💥 TOWER COLLAPSED! +'+(S.stat.legacy||0)+'% legacy!');
+      S.tower._coll=true;S.tower.collapses=(S.tower.collapses||0)+1;S.stat.legacy=Math.max(S.stat.legacy||0,Math.floor((S.stat.tallest||rows.length)*0.1));notif('💥 TOWER COLLAPSED! +'+(S.stat.legacy||0)+'% legacy!');document.getElementById('game').style.animation='shake 0.5s ease';setTimeout(()=>document.getElementById('game').style.animation='',500);
       S.stat.gold=(S.stat.gold||0)+Math.floor(Math.max(50,50+rows.length*10+S.stat.totalClicks*0.1));
       updateUI();return
     }
@@ -767,14 +805,19 @@ function draw(){
   cx.fillStyle='#2a1508';cx.fillRect(ox-3,h-26,wallW+6,2);
   const st=getStab();if(st.p<20){const sw=(20-st.p)*0.15*Math.sin(Date.now()/350);cx.save();cx.translate(sw,0);
     cx.fillStyle='rgba(200,100,50,0.04)';cx.fillRect(ox-2,h-26-wallW*0.12,wallW+4,24);cx.restore()}
-  if(S.tower._coll){cx.fillStyle='rgba(200,80,50,0.15)';for(let i=0;i<15;i++){const a=(i*137+Date.now()*0.01)%(Math.PI*2);const r=10+((i*73+Date.now()*0.05)%60);cx.beginPath();cx.arc(w/2+Math.cos(a)*r,h*0.3+Math.sin(a)*r*0.5,1.5+Math.sin(i)*0.5,0,Math.PI*2);cx.fill()}}
+  if(S.tower._coll){const t=Date.now()*0.003;const cols=['#cc5050','#e8a050','#c46a3a','#e8c87a'];
+    for(let i=0;i<25;i++){const a=(i*97+t)%(Math.PI*2);const r=5+((i*53+t*2)%80);const size=1+Math.sin(i*2.7+t)*1.5;
+      cx.fillStyle=cols[i%4];cx.globalAlpha=0.2+Math.sin(i*1.3+t*0.5)*0.15;
+      cx.beginPath();cx.arc(w/2+Math.cos(a)*r,h*0.3+Math.sin(a*1.3)*r*0.4+Math.sin(i+t)*5,size,0,Math.PI*2);cx.fill()}
+    cx.globalAlpha=1}
 }
 
 // ─── HUD ──────────────────────────────────────────────────────────────
 
 function updateHUD(){
   const h=S.tower.rows.length;const s=getStab();
-  document.getElementById('bhud-progress').textContent='H:'+h+' W:'+getBaseW()+' ☁️'+s.m.toFixed(1);
+  const hMs=TOWER_MS.filter(m=>h>=m.h).length;const nextHMs=TOWER_MS.find(m=>h<m.h);
+  document.getElementById('bhud-progress').textContent='H:'+h+' W:'+getBaseW()+' ☁️'+s.m.toFixed(1)+(hMs?(' 🏅'+hMs):'')+(nextHMs?' →'+nextHMs.h:' MAX');
   const f=document.getElementById('stab-fill');f.style.width=Math.max(0,Math.min(100,s.p))+'%';
   f.style.background=s.p>50?'#40a040':s.p>20?'#c0a040':s.p>5?'#c06030':'#cc2020';
   const rows=S.tower.rows,bw=getBaseW();
@@ -790,7 +833,10 @@ function updateHUD(){
 
 function updateUI(){
   updateXPBars();
-  document.getElementById('st-gold').textContent=fmt(S.stat.gold||0);
+  const goldEl=document.getElementById('st-gold');
+  const oldVal=goldEl._lastVal||0;const newVal=S.stat.gold||0;
+  if(oldVal!==newVal){goldEl._lastVal=newVal;goldEl._animStart=performance.now();goldEl._animFrom=oldVal}
+  if(goldEl._animStart){const t=Math.min(1,(performance.now()-goldEl._animStart)/200);const cur=Math.floor(goldEl._animFrom+(newVal-goldEl._animFrom)*t);goldEl.textContent=fmt(cur);if(t>=1)goldEl._animStart=0}else goldEl.textContent=fmt(newVal);
   const dbi=document.getElementById('db-indicator');if(dbi)dbi.textContent=DB>1?'🔬×'+DB:'';
   const uli=document.getElementById('ul-indicator');if(uli)uli.textContent=DB_UNLIMITED?'♾️':'·';
   let tc=0;Object.values(S.mat).forEach(v=>tc+=v);document.getElementById('st-bricks').textContent=fmt(tc);
