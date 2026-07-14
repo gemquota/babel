@@ -60,6 +60,19 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 @keyframes sparkle{0%{opacity:0;transform:translateY(0) scale(0) rotate(0deg)}50%{opacity:1;transform:translateY(-30px) scale(1) rotate(180deg)}100%{opacity:0;transform:translateY(-60px) scale(0) rotate(360deg)}}
 
+/* ── OPTIONS PANEL ── */
+#options-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:200;background:rgba(10,6,4,0.97);border:1px solid #3a2a1a;border-radius:10px;padding:10px 14px;min-width:240px;box-shadow:0 8px 40px rgba(0,0,0,0.8);display:none;backdrop-filter:blur(8px)}
+#options-panel.sh{display:block}
+#options-header{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:700;color:#e8c87a;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid #2a180e}
+#options-close{font-size:16px;cursor:pointer;color:#6a4a2a;padding:0 4px}
+#options-close:hover{color:#e8ddd0}
+.opt-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:12px}
+.opt-lbl{color:#b8a090}
+.opt-tog{font-size:11px;font-weight:700;padding:3px 10px;border-radius:4px;cursor:pointer;background:#1a3a10;color:#60a060;border:1px solid #2a5a18;min-width:40px;text-align:center}
+.opt-tog.off{background:#3a1010;color:#cc5050;border-color:#5a2020}
+.opt-btn{font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;cursor:pointer;background:#1a0e08;color:#b8a090;border:1px solid #3a2a1a;min-width:40px;text-align:center}
+.opt-btn:active{background:#2a1a10}
+
 /* ── UPGRADES (shared tap & auto sections) ── */
 .g-upgs,.c-upgs,.a-upgs{padding:3px 6px;flex-shrink:0;overflow-y:auto;max-height:30%}
 .g-upgs{border-top:1px solid #1a0e08}
@@ -170,6 +183,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
   <div id="bar">
     <div id="bar-top">
       <h1>🗼 <span>BABEL</span></h1>
+      <span id="gear-btn" onclick="G.toggleOptions()" style="font-size:16px;cursor:pointer;flex-shrink:0">⚙️</span>
       <div class="st">
         <span class="gold">🪙<b id="st-gold">0</b></span><span id="db-indicator" style="font-size:9px;color:#ff6644"></span><span id="ul-indicator" style="font-size:9px;color:#44ff66"></span>
         <span>🧱<b id="st-bricks">0</b></span><span id="st-auto" style="font-size:10px;color:#5a8a3a"></span>
@@ -286,6 +300,13 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
   </div>
 </div>
 <div id="notif"></div>
+<div id="options-panel">
+  <div id="options-header"><span>⚙️ Options</span><span id="options-close" onclick="G.toggleOptions()">✕</span></div>
+  <div class="opt-row"><span class="opt-lbl">🔬 ×10 Debug Buff</span><span class="opt-tog" id="opt-db" onclick="G.toggleDB()">ON</span></div>
+  <div class="opt-row"><span class="opt-lbl">♾️ Unlimited Resources</span><span class="opt-tog" id="opt-ul" onclick="G.toggleUL()">ON</span></div>
+  <div class="opt-row" style="border-top:1px solid #2a180e;margin-top:4px;padding-top:6px"><span class="opt-lbl">💾 Export Save</span><span class="opt-btn" onclick="G.exportSave()">Copy</span></div>
+  <div class="opt-row"><span class="opt-lbl" style="color:#cc5050">🗑️ Reset Game</span><span class="opt-btn" style="border-color:#6a2020" onclick="G.resetGame()">Reset</span></div>
+</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════════════
@@ -320,8 +341,10 @@ const GOLD_COL='#ffd700',RES_COL='#c46a3a',GXP_COL='#e0d0c0',
   GAT_COL='#d06040',CRA_COL='#50b050',BLD_COL='#5090d0';
 
 // Debug: 10x everything while testing
-const DB=10;
-const DB_UNLIMITED=true; // debug: resources not consumed
+let DB=10;
+let DB_UNLIMITED=true; // debug: resources not consumed
+function DB_ON(){DB=10}
+function DB_OFF(){DB=1}
 
 const S = {res:{},mat:{},upg:{},tech:{},tower:{rows:[],colCount:3,collapses:0,_coll:false},stat:{gold:0,totalClicks:0,taps:0,tallest:0,legacy:0},
   sk:{gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}},
@@ -983,8 +1006,8 @@ function updateUI(){
   const oldVal=goldEl._lastVal||0;const newVal=S.stat.gold||0;
   if(oldVal!==newVal){goldEl._lastVal=newVal;goldEl._animStart=performance.now();goldEl._animFrom=oldVal}
   if(goldEl._animStart){const t=Math.min(1,(performance.now()-goldEl._animStart)/200);const cur=Math.floor(goldEl._animFrom+(newVal-goldEl._animFrom)*t);goldEl.textContent=fmt(cur);if(t>=1)goldEl._animStart=0}else goldEl.textContent=fmt(newVal);
-  const dbi=document.getElementById('db-indicator');if(dbi)dbi.textContent=DB>1?'🔬×'+DB:'';
-  const uli=document.getElementById('ul-indicator');if(uli)uli.textContent=DB_UNLIMITED?'♾️':'·';
+  const dbi=document.getElementById('db-indicator');if(dbi){dbi.textContent=DB>1?'🔬×'+DB:'';dbi.style.cursor='pointer';dbi.onclick=()=>G.toggleDB()}
+  const uli=document.getElementById('ul-indicator');if(uli){uli.textContent=DB_UNLIMITED?'♾️':'·';uli.style.cursor='pointer';uli.onclick=()=>G.toggleUL()}
   let tc=0;Object.values(S.mat).forEach(v=>tc+=v);document.getElementById('st-bricks').textContent=fmt(tc);
   document.getElementById('st-hgt').textContent=S.tower.rows.length;
   const ae=document.getElementById('st-auto');if(ae){const acts=[['⛏',aL('gather')],['🔨',aL('craft')],['🧱',aL('build')]].filter(x=>x[1]>0).map(x=>x[0]);ae.textContent=acts.length?'⚙'+acts.join(''):''}
@@ -1209,7 +1232,12 @@ function init(){
   (function lp(){draw();requestAnimationFrame(lp)})();
   console.log('🗼 Babel loaded!');
 }
-window.G={init,gather,craft,tapBuild,buildBurst,tapSkills,tapTalents,buyUpg,buyTech,selCraft(id){S._selCraft=id;updateUI()},buyMs(s,i){buyMs(s,i)},buyTalent,toggleTech(){document.getElementById('ttech-panel').classList.toggle('sh')}};
+window.G={init,gather,craft,tapBuild,buildBurst,tapSkills,tapTalents,buyUpg,buyTech,selCraft(id){S._selCraft=id;updateUI()},buyMs(s,i){buyMs(s,i)},buyTalent,toggleTech(){document.getElementById('ttech-panel').classList.toggle('sh')},
+toggleOptions(){document.getElementById('options-panel').classList.toggle('sh')},
+toggleDB(){const el=document.getElementById('opt-db');if(el.textContent==='ON'){DB_OFF();el.textContent='OFF';el.classList.add('off')}else{DB_ON();el.textContent='ON';el.classList.remove('off')}updateUI()},
+toggleUL(){const el=document.getElementById('opt-ul');if(el.textContent==='ON'){DB_UNLIMITED=false;el.textContent='OFF';el.classList.add('off')}else{DB_UNLIMITED=true;el.textContent='ON';el.classList.remove('off')}updateUI()},
+exportSave(){const d=localStorage.getItem('babel_save');if(navigator.clipboard){navigator.clipboard.writeText(d||'');notif('💾 Save copied!')}else{prompt('Copy save:',d||'')}},
+resetGame(){if(confirm('Reset everything?')){localStorage.removeItem('babel_save');location.reload()}}};
 })();
 document.addEventListener('DOMContentLoaded',()=>{G.init()});
 </script>
