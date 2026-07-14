@@ -207,6 +207,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
     <button class="t" data-t="build">🗼 Build</button>
     <button class="t" data-t="skills">⚡ Skills</button>
     <button class="t" data-t="talents">🏰 Talents</button>
+    <button class="t" data-t="ascend">🏛️ Ascend</button>
   </div>
   <div id="content">
     <div class="pane on" id="gather-pane">
@@ -297,6 +298,26 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0604;color:#e8ddd
         <div class="tz-sub">+gold (scales with talents)</div>
       </div>
     </div>
+    <div class="pane" id="ascend-pane">
+      <div class="pane-body" style="padding:6px">
+        <div style="text-align:center;margin-bottom:6px">
+          <div style="font-size:24px;margin-bottom:2px">🏛️</div>
+          <div style="font-size:14px;font-weight:700;color:#e8c87a">Ascension</div>
+          <div style="font-size:10px;color:#6a5a4a">Permanent upgrades with Babel Shards</div>
+        </div>
+        <div style="display:flex;justify-content:center;align-items:center;gap:6px;margin-bottom:8px;background:rgba(15,10,6,0.6);border:1px solid #2a180e;border-radius:6px;padding:6px 10px">
+          <span style="font-size:18px">💎</span>
+          <span style="font-size:16px;font-weight:700;color:#70d0ff" id="shard-count">0</span>
+          <span style="font-size:10px;color:#6a5a4a">Babel Shards</span>
+        </div>
+        <div id="prestige-upgs" class="su"></div>
+      </div>
+      <div class="tz" onclick="G.tapAscend()">
+        <div class="tz-icon">💎</div>
+        <div class="tz-hint">Meditate on the Tower</div>
+        <div class="tz-sub">+small shard chance</div>
+      </div>
+    </div>
   </div>
 </div>
 <div id="notif"></div>
@@ -346,7 +367,7 @@ let DB_UNLIMITED=true; // debug: resources not consumed
 function DB_ON(){DB=10}
 function DB_OFF(){DB=1}
 
-const S = {res:{},mat:{},upg:{},tech:{},tower:{rows:[],colCount:3,collapses:0,_coll:false},stat:{gold:0,totalClicks:0,taps:0,tallest:0,legacy:0},
+const S = {res:{},mat:{},upg:{},tech:{},tower:{rows:[],colCount:3,collapses:0,_coll:false},stat:{gold:0,totalClicks:0,taps:0,tallest:0,legacy:0,shards:0},
   sk:{gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}},
   ms:{gathering:0,crafting:0,building:0,general:0},tal:{},tick:0,_selCraft:null,
   auto:{gather:0,craft:0,build:0},autoCraftTick:0};
@@ -456,6 +477,16 @@ const TALENTS = [
   {id:'ge4',n:"Babel's Blessing",i:'🔮',d:'All bonuses multiply',rS:'general',rL:50,rS2:12,cb:10000,cm:5,L:10,ef:(l)=>({allMult:0.1*l})},
 ];
 
+const PR_UPG = [
+  {id:'p1',n:'Diligent Start',i:'💰',d:'+100 starting gold',L:10,cb:1,cm:2.2},
+  {id:'p2',n:'Wider Legacy',i:'📐',d:'+1 starting base width',L:5,cb:3,cm:3},
+  {id:'p3',n:'Ancient Foundation',i:'🏛️',d:'+3% starting stability',L:5,cb:5,cm:3},
+  {id:'p4',n:'Echoes of Labor',i:'🔁',d:'+5% extra legacy per collapse',L:5,cb:8,cm:3.5},
+  {id:'p5',n:'Eternal Workshop',i:'⚙️',d:'+1 auto level on all skills',L:3,cb:15,cm:4},
+  {id:'p6',n:"Babel's Memory",i:'📜',d:'Start with +5 of each resource',L:5,cb:10,cm:3.5},
+  {id:'p7',n:'Golden Legacy',i:'👑',d:'+50% gold from all sources',L:5,cb:20,cm:4},
+];
+
 // ─── TAP POSITION TRACKING ──────────────────────────────────────────
 let lastTapX=0,lastTapY=0;
 document.addEventListener('mousedown',e=>{lastTapX=e.clientX;lastTapY=e.clientY});
@@ -469,6 +500,7 @@ function msG(id){return S.ms[id]||0}
 function skLv(id){return S.sk[id]?.lv||1}
 function xpN(lv){return Math.floor(50*lv*(1+lv*0.12))}
 function aL(id){return S.auto[id]||0}
+function lP(id){return S.pr?.[id]||0}
 
 function showCeleb(skill,count){
   const names={'gathering':'⛏️','crafting':'🔨','building':'🧱','general':'⚡'};
@@ -584,7 +616,7 @@ function gather(id){
   const amount=Math.max(1,Math.floor(Math.abs(base*(1+m)))||1);
   S.res[id]=(S.res[id]||0)+amount;
   const gAmt=Math.max(1,Math.floor(g*(1+uL('g1')*0.5+uL('g2')*1+uL('g3')*2+uL('g4')*4)));
-  S.stat.gold=(S.stat.gold||0)+gAmt;
+  S.stat.gold=(S.stat.gold||0)+Math.floor(gAmt*(1+lP('p7')*0.5));
   S.stat.totalClicks=(S.stat.totalClicks||0)+1;
   earnX('gathering',DB);
   showFeed(GAT_COL,RES_COL,GOLD_COL,'+'+amount+'R','+'+gAmt+'🪙','+'+DB+'⛏️XP','+'+(Math.floor(DB*0.5))+'⚡XP');
@@ -620,7 +652,7 @@ function craft(mat){
   let amount=Math.max(1,b||1);
   S.mat[mat.id]=(S.mat[mat.id]||0)+amount;
   const g=Math.max(1,Math.floor(mat.t*(1+uL('c1')*0.5+uL('c2')*1+uL('c3')*2+uL('c4')*4)));
-  S.stat.gold=(S.stat.gold||0)+g;
+  S.stat.gold=(S.stat.gold||0)+Math.floor(g*(1+lP('p7')*0.5));
   S.stat.totalClicks=(S.stat.totalClicks||0)+1;
   earnX('crafting',2*DB);
   showFeed(CRA_COL,RES_COL,GOLD_COL,'+'+amount+mat.i,'+'+g+'🪙','+'+2*DB+'🔨XP','+'+(Math.floor(2*DB*0.5))+'⚡XP');
@@ -632,8 +664,8 @@ function unlockedMat(){const l=skLv('crafting');return MAT_ALL.filter(m=>m.unloc
 
 // ─── BUILD ────────────────────────────────────────────────────────────
 
-function getBaseW(){let w=20;[null,'bw1','bw2','bw3','bw4','bw5','bw6'].forEach(t=>{if(t&&S.tech[t])w=S.tech[t]});return w}
-function getReinf(){let b=0;['rf1','rf2','rf3','rf4','rf5'].forEach(id=>{if(S.tech[id])b+=TECH.find(t=>t.id===id).val});
+function getBaseW(){let w=20+lP('p2');[null,'bw1','bw2','bw3','bw4','bw5','bw6'].forEach(t=>{if(t&&S.tech[t])w=S.tech[t]});return w}
+function getReinf(){let b=0+lP('p3')*0.03;['rf1','rf2','rf3','rf4','rf5'].forEach(id=>{if(S.tech[id])b+=TECH.find(t=>t.id===id).val});
   b*=1+tL('f1')*0.1;
   if(msG('gathering')>=4||msG('crafting')>=4||msG('building')>=4||msG('general')>=4)b+=0.2;
   if(msG('gathering')>=8||msG('crafting')>=8||msG('building')>=8||msG('general')>=8)b+=0.3;return b}
@@ -652,8 +684,9 @@ function getMatId(){const l=skLv('crafting');if(l>=18)return'megalith';if(l>=12)
 
 
 function initTower(){
-  // Fresh start resources
-  S.res.mud=50;S.res.straw=20;S.res.sand=30;S.res.water=30;S.res.lime=10;S.mat.mortar=20;S.mat.mudBrick=50;S.stat.gold=(S.stat.gold||0)+500;
+  // Fresh start resources (boosted by prestige)
+  const prLvl=lP('p6');S.res.mud=50+prLvl*5;S.res.straw=20+prLvl*5;S.res.sand=30+prLvl*5;S.res.water=30+prLvl*5;S.res.lime=10+prLvl*5;
+  S.mat.mortar=20;S.mat.mudBrick=50;S.stat.gold=(S.stat.gold||0)+500+lP('p1')*100;
   S.tower.rows=[];S.tower._coll=false;S.tower.lastRowTime=0;
   const bw=getBaseW();const row={bricks:[]};
   for(let i=0;i<bw;i++)row.bricks.push({st:'e'});
@@ -677,7 +710,10 @@ function tapBuild(){
     // Row is complete - check stability and start new row
     const st=getStab();
     if(st.p<=0||(st.p<5&&Math.random()<0.05)){
-      S.tower._coll=true;S.tower.collapses=(S.tower.collapses||0)+1;S.stat.legacy=Math.max(S.stat.legacy||0,Math.floor((S.stat.tallest||rows.length)*0.1));notif('💥 TOWER COLLAPSED! +'+(S.stat.legacy||0)+'% legacy!');document.getElementById('game').style.animation='shake 0.5s ease';setTimeout(()=>document.getElementById('game').style.animation='',500);
+      S.tower._coll=true;S.tower.collapses=(S.tower.collapses||0)+1;S.stat.legacy=Math.max(S.stat.legacy||0,Math.floor((S.stat.tallest||rows.length)*(0.1+lP('p4')*0.005)));
+  const shardGain=Math.floor((S.stat.tallest||rows.length)/25)+Math.floor((S.stat.legacy||0)/10);
+  if(shardGain>0){S.stat.shards=(S.stat.shards||0)+shardGain;notif('💥 TOWER COLLAPSED! +'+(S.stat.legacy||0)+'% legacy +💎'+shardGain+' shards!')}else{notif('💥 TOWER COLLAPSED! +'+(S.stat.legacy||0)+'% legacy!')}
+  document.getElementById('game').style.animation='shake 0.5s ease';setTimeout(()=>document.getElementById('game').style.animation='',500);
       S.stat.gold=(S.stat.gold||0)+Math.floor(Math.max(50,50+rows.length*10+S.stat.totalClicks*0.1));
       updateUI();return
     }
@@ -732,17 +768,26 @@ function buildBurst(){
 
 function tapSkills(){
   const g=Math.max(1,Math.floor(Math.random()*2+1))*DB;
-  S.stat.gold=(S.stat.gold||0)+g;
+  S.stat.gold=(S.stat.gold||0)+Math.floor(g*(1+lP('p7')*0.5));
   S.stat.totalClicks=(S.stat.totalClicks||0)+1;
   earnX('general',DB);
   showFeed(GXP_COL,GOLD_COL,GOLD_COL,'+'+g+'🪙','+'+DB+'⚡XP','🧘 Meditate','');
   updateUI();
 }
 
+function tapAscend(){
+  S.stat.totalClicks=(S.stat.totalClicks||0)+1;
+  // Small chance to find a shard
+  if(Math.random()<0.005*DB){S.stat.shards=(S.stat.shards||0)+1;notif('💎 Found a Babel Shard!')}
+  else{S.stat.gold=(S.stat.gold||0)+Math.floor(Math.random()*5+1)*DB}
+  showFeed('#70d0ff','#ffd700','#e0d0c0','+'+(Math.floor(Math.random()*5+1)*DB)+'🪙','💎 Meditate','','');
+  updateUI();
+}
+
 function tapTalents(){
   let g=Math.max(1,Math.floor(Math.random()*3+2))*DB;
   if(tL('t5')>0)g=Math.floor(g*(1+tL('t5')*0.15));
-  S.stat.gold=(S.stat.gold||0)+g;
+  S.stat.gold=(S.stat.gold||0)+Math.floor(g*(1+lP('p7')*0.5));
   S.stat.totalClicks=(S.stat.totalClicks||0)+1;
   // Small chance to refund a talent purchase (respec shard)
   if(Math.random()<0.02){notif('✨ Insight gained!')}
@@ -750,6 +795,18 @@ function tapTalents(){
   updateUI();
 }
 
+
+// ─── PRESTIGE ──────────────────────────────────────────────────────
+
+function buyPrestige(id){
+  const u=PR_UPG.find(x=>x.id===id);if(!u)return;
+  const l=lP(u.id);if(l>=u.L)return;
+  const c=Math.floor(u.cb*Math.pow(u.cm,l));
+  if((S.stat.shards||0)<c)return;
+  S.stat.shards=(S.stat.shards||0)-c;
+  if(!S.pr)S.pr={};S.pr[id]=(S.pr[id]||0)+1;
+  notif('🏛️ '+u.n+' Lv.'+(l+1));updateUI()
+}
 
 // ─── UPGRADES & TECH ─────────────────────────────────────────────────
 
@@ -1111,19 +1168,19 @@ function getAutoInterval(id){const l=Math.min(aL(id),15);return Math.max(100,300
 function runAuto(){
   if(S.tick<1)return // skip tick 0 to avoid instant burst on load
   // Auto-gather
-  if(aL('gather')>0&&S.tick>1){
+  const prAuto=lP('p5');if(aL('gather')+prAuto>0&&S.tick>1){
     const gi=getAutoInterval('gather');
     if(S.tick%(gi/100)<1){
       const gr=gF();if(gr)gather(gr.id);
     }
   }
   // Auto-craft
-  if(aL('craft')>0){
+  if(aL('craft')+prAuto>0){
     const ci=getAutoInterval('craft');
-    if(aL('craft')>0){S.autoCraftTick=(S.autoCraftTick||0)+1;const ci2=getAutoInterval('craft');if(S.autoCraftTick>=ci2/100){S.autoCraftTick=0;const s=autoCraft();if(s)craft(s)}}
+    if(aL('craft')+prAuto>0){S.autoCraftTick=(S.autoCraftTick||0)+1;const ci2=getAutoInterval('craft');if(S.autoCraftTick>=ci2/100){S.autoCraftTick=0;const s=autoCraft();if(s)craft(s)}}
   }
   // Auto-build
-  if(aL('build')>0){
+  if(aL('build')+prAuto>0){
     const bi=getAutoInterval('build');
     if(S.tick%(bi/100)<1){
       const mat=getMatId();
@@ -1174,19 +1231,27 @@ function updateSkillsUI(){
       '<div class="pdesc">'+t.d+' · '+rs+' '+rlStr+'</div><div class="pbar"><div class="pf" style="width:'+(l/t.L*100)+'%"></div></div><div class="peff">'+es+'</div>'+
       '<button onclick="G.buyTalent(\''+t.id+'\')"'+(ok&&hl?'':'disabled')+'>🪙'+fmt(c)+' '+(mx?'MAXED':l>0?'Upgrade':'Unlock')+'</button></div>'}).join('');
 
+  // Prestige upgrades
+  document.getElementById('shard-count').textContent=fmt(S.stat.shards||0);
+  document.getElementById('prestige-upgs').innerHTML=PR_UPG.map(u=>{
+    const l=lP(u.id),mx=l>=u.L,c=Math.floor(u.cb*Math.pow(u.cm,l)),ok=(S.stat.shards||0)>=c&&!mx;
+    return '<div class="u"><div class="d"><div class="nm">'+u.i+' '+u.n+(mx?' ✅':l>0?' Lv.'+l:'')+'</div><div class="dc">'+u.d+'</div></div><span class="co" style="color:#70d0ff">💎'+fmt(c)+'</span><button onclick="G.buyPrestige(\''+u.id+'\')"'+(ok?'':'disabled')+'>'+(mx?'MAX':'Buy')+'</button></div>'
+  }).join('');
+
   updateHUD();
 }
 
 function switchTab(t){document.querySelectorAll('.t').forEach(b=>b.classList.remove('on'));document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
   document.querySelector('.t[data-t="'+t+'"]').classList.add('on');document.getElementById(t+'-pane').classList.add('on');
   if(t==='build')requestAnimationFrame(()=>rC2())}
+  if(t==='ascend'&&!S.pr)S.pr={};
 
 function save(){try{S.lastSave=Date.now();localStorage.setItem('babel_save',JSON.stringify(S))}catch(e){}}
 function load(){try{const d=localStorage.getItem('babel_save');if(d){Object.assign(S,JSON.parse(d));
   if(!S.tech)S.tech={};if(!S.tal)S.tal={};if(!S.ms)S.ms={gathering:0,crafting:0,building:0,general:0};
   if(!S.sk)S.sk={gathering:{xp:0,lv:1},crafting:{xp:0,lv:1},building:{xp:0,lv:1},general:{xp:0,lv:1}};
   if(!S.tower)S.tower={rows:[],colCount:3,collapses:0};if(!S.tower.rows)S.tower.rows=[];if(S.tower._coll===undefined)S.tower._coll=false;if(!S.tower.lastRowTime)S.tower.lastRowTime=0;
-  if(!S._selCraft)S._selCraft=null;if(!S.auto)S.auto={gather:0,craft:0,build:0};if(S.autoCraftTick===undefined)S.autoCraftTick=0;if(typeof S.tower.collapses!=='number')S.tower.collapses=0;if(typeof S.stat.tallest!=='number')S.stat.tallest=0;if(typeof S.stat.legacy!=='number')S.stat.legacy=0;if(typeof S.lastSave!=='number')S.lastSave=0;
+  if(!S._selCraft)S._selCraft=null;if(!S.auto)S.auto={gather:0,craft:0,build:0};if(S.autoCraftTick===undefined)S.autoCraftTick=0;if(typeof S.tower.collapses!=='number')S.tower.collapses=0;if(typeof S.stat.tallest!=='number')S.stat.tallest=0;if(typeof S.stat.legacy!=='number')S.stat.legacy=0;if(typeof S.stat.shards!=='number')S.stat.shards=0;if(typeof S.lastSave!=='number')S.lastSave=0;if(!S.pr)S.pr={};
   // Recalculate all skill levels from XP
   if(S.sk){Object.keys(S.sk).forEach(k=>{if(S.sk[k])rC(k)})}
 
@@ -1196,8 +1261,8 @@ function load(){try{const d=localStorage.getItem('babel_save');if(d){Object.assi
   if(ticks>5&&(S.auto.gather||S.auto.craft||S.auto.build)){
     let autoGathers=0,autoCrafts=0,autoBuilds=0;
     if(aL('gather')>0){const gi=getAutoInterval('gather');autoGathers=Math.floor(ticks/(gi/100))}
-    if(aL('craft')>0){const ci=getAutoInterval('craft');autoCrafts=Math.floor(ticks/(ci/100))}
-    if(aL('build')>0){const bi=getAutoInterval('build');autoBuilds=Math.floor(ticks/(bi/100))}
+    if(aL('craft')+prAuto>0){const ci=getAutoInterval('craft');autoCrafts=Math.floor(ticks/(ci/100))}
+    if(aL('build')+prAuto>0){const bi=getAutoInterval('build');autoBuilds=Math.floor(ticks/(bi/100))}
     let gains=[];
     if(autoGathers>0){const r=gF();if(r){S.res[r.id]=(S.res[r.id]||0)+autoGathers;S.stat.gold=(S.stat.gold||0)+autoGathers;gains.push('⛏x'+autoGathers)}}
     if(autoCrafts>0){const s=autoCraft();if(s){S.mat[s.id]=(S.mat[s.id]||0)+autoCrafts;S.stat.gold=(S.stat.gold||0)+autoCrafts*2;gains.push('🔨x'+autoCrafts)}}
@@ -1224,7 +1289,7 @@ function init(){
   ca.addEventListener('click',()=>tapBuild());
   document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
     if(e.key===' '||e.key==='Enter'){e.preventDefault();tapBuild()}
-    if(e.key>='1'&&e.key<='5')switchTab(['','gather','craft','build','skills','talents'][+e.key])});
+    if(e.key>='1'&&e.key<='6')switchTab(['','gather','craft','build','skills','talents','ascend'][+e.key])});
   if(!load())initTower();
   window.addEventListener('resize',()=>rC2());rC2();updateUI();
   setInterval(()=>{autoTick();runAuto();S.tick++;if(S.tick%5===0)updateUI()},100);
@@ -1232,7 +1297,7 @@ function init(){
   (function lp(){draw();requestAnimationFrame(lp)})();
   console.log('🗼 Babel loaded!');
 }
-window.G={init,gather,craft,tapBuild,buildBurst,tapSkills,tapTalents,buyUpg,buyTech,selCraft(id){S._selCraft=id;updateUI()},buyMs(s,i){buyMs(s,i)},buyTalent,toggleTech(){document.getElementById('ttech-panel').classList.toggle('sh')},
+window.G={init,gather,craft,tapBuild,buildBurst,tapSkills,tapTalents,tapAscend,buyPrestige,buyUpg,buyTech,selCraft(id){S._selCraft=id;updateUI()},buyMs(s,i){buyMs(s,i)},buyTalent,toggleTech(){document.getElementById('ttech-panel').classList.toggle('sh')},
 toggleOptions(){document.getElementById('options-panel').classList.toggle('sh')},
 toggleDB(){const el=document.getElementById('opt-db');if(el.textContent==='ON'){DB_OFF();el.textContent='OFF';el.classList.add('off')}else{DB_ON();el.textContent='ON';el.classList.remove('off')}updateUI()},
 toggleUL(){const el=document.getElementById('opt-ul');if(el.textContent==='ON'){DB_UNLIMITED=false;el.textContent='OFF';el.classList.add('off')}else{DB_UNLIMITED=true;el.textContent='ON';el.classList.remove('off')}updateUI()},
