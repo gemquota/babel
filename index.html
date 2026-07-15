@@ -365,6 +365,12 @@ const RES_ALL = [
   {id:'mithril_ore',n:'Mithril',i:'🔮',y:1,unlock:18},{id:'crystal_shard',n:'Crystal',i:'💠',y:1,unlock:22},
   {id:'void_essence',n:'Void Essence',i:'🟣',y:1,unlock:25},{id:'aether_dust',n:'Aether',i:'✨',y:1,unlock:28},
   {id:'dragon_scale',n:'Dragon Scale',i:'🐉',y:1,unlock:32},{id:'star_shard',n:'Star Shard',i:'⭐',y:1,unlock:36},
+  {id:'bone',n:'Bone',i:'🦴',y:1,unlock:14},{id:'sinew',n:'Sinew',i:'🧵',y:1,unlock:17},
+  {id:'copper',n:'Copper',i:'🥉',y:1,unlock:19},{id:'tin',n:'Tin',i:'🥈',y:1,unlock:21},
+  {id:'silver',n:'Silver',i:'👑',y:1,unlock:24},{id:'platinum',n:'Platinum',i:'💎',y:1,unlock:27},
+  {id:'ess_light',n:'Light Essence',i:'☀️',y:1,unlock:30},{id:'ess_dark',n:'Dark Essence',i:'🌑',y:1,unlock:33},
+  {id:'ess_void',n:'Void Essence',i:'🌀',y:1,unlock:35},{id:'mana_crystal',n:'Mana Crystal',i:'💜',y:1,unlock:38},
+  {id:'time_frag',n:'Time Fragment',i:'⏳',y:1,unlock:42},{id:'space_shard',n:'Space Shard',i:'🌌',y:1,unlock:45},
 ];
 const MAT_ALL = [
   {id:'mortar',n:'Mortar',i:'🧴',t:2,r:{sand:1,gravel:1,water:1,lime:1},d:'Mix',unlock:0,str:0},
@@ -393,6 +399,18 @@ const MAT_ALL = [
   {id:'aetherBrick',n:'Aether Brick',i:'☁️',t:11,r:{aether_dust:4,voidStone:1},d:'Weave',unlock:30,str:0.05},
   {id:'dragonBlock',n:'Dragon Block',i:'🐉',t:12,r:{dragon_scale:3,aetherBrick:1},d:'Awaken',unlock:34,str:0.03},
   {id:'starBrick',n:'Star Brick',i:'🌟',t:14,r:{star_shard:3,dragonBlock:1},d:'Ascend',unlock:38,str:0.01},
+  {id:'boneBrick',n:'Bone Brick',i:'🦴',t:3,r:{bone:3,lime:1},d:'Bone Meal',unlock:8,str:0.75},
+  {id:'sinewCord',n:'Sinew Cord',i:'🧵',t:2,r:{sinew:2},d:'Twist',unlock:10,str:0},
+  {id:'copperBrick',n:'Copper Brick',i:'🥉',t:4,r:{copper:3,tin:1},d:'Smelt',unlock:12,str:0.55},
+  {id:'tinBrick',n:'Tin Brick',i:'🥈',t:4,r:{tin:3},d:'Cast',unlock:13,str:0.58},
+  {id:'bronzeBrick',n:'Bronze Brick',i:'🟤',t:5,r:{copperBrick:1,tinBrick:1},d:'Alloy',unlock:15,str:0.42},
+  {id:'silverBrick',n:'Silver Brick',i:'👑',t:6,r:{silver:3,bronzeBrick:1},d:'Polish',unlock:17,str:0.35},
+  {id:'platinumBrick',n:'Platinum Brick',i:'💎',t:7,r:{platinum:3,silverBrick:1},d:'Forge',unlock:20,str:0.28},
+  {id:'lightBrick',n:'Light Brick',i:'☀️',t:8,r:{ess_light:3,platinumBrick:1},d:'Infuse',unlock:24,str:0.18},
+  {id:'darkBrick',n:'Dark Brick',i:'🌑',t:9,r:{ess_dark:3,lightBrick:1},d:'Shadow',unlock:28,str:0.13},
+  {id:'voidBrick',n:'Void Brick',i:'🌀',t:10,r:{ess_void:3,darkBrick:1},d:'Nullify',unlock:32,str:0.09},
+  {id:'manaBrick',n:'Mana Brick',i:'💜',t:12,r:{mana_crystal:3,voidBrick:1,starBrick:1},d:'Enchant',unlock:36,str:0.04},
+  {id:'timeSpace',n:'Time-Space Block',i:'⏳',t:15,r:{time_frag:2,space_shard:2,manaBrick:1},d:'Transcend',unlock:42,str:0.005},
 ];
 const BC = {
   mudBrick:{s:'#c46a3a',m:'#a0522d',e:'#8b3a1a'},firedBrick:{s:'#d45030',m:'#b83820',e:'#8a2010'},
@@ -417,6 +435,18 @@ const BC = {
   aetherBrick:{s:'#e0e8f0',m:'#c0c8d0',e:'#a0a8b0'},
   dragonBlock:{s:'#d08040',m:'#b06030',e:'#904020'},
   starBrick:{s:'#ffe070',m:'#e0c050',e:'#c0a030'},
+  boneBrick:{s:'#d4c8b0',m:'#b8a890',e:'#9a8878'},
+  sinewCord:{s:'#c8b090',m:'#a89070',e:'#887050'},
+  copperBrick:{s:'#c07040',m:'#a05830',e:'#804020'},
+  tinBrick:{s:'#c0c0d0',m:'#a0a0b0',e:'#808090'},
+  bronzeBrick:{s:'#8a6a3a',m:'#6a4a2a',e:'#4a2a1a'},
+  silverBrick:{s:'#e0e0f0',m:'#c0c0d0',e:'#a0a0b0'},
+  platinumBrick:{s:'#f0f0ff',m:'#d0d0e0',e:'#b0b0c0'},
+  lightBrick:{s:'#ffe8a0',m:'#e0c880',e:'#c0a860'},
+  darkBrick:{s:'#2a1a2a',m:'#1a0a1a',e:'#0a000a'},
+  voidBrick:{s:'#1a1a2a',m:'#0a0a1a',e:'#00000a'},
+  manaBrick:{s:'#c080ff',m:'#a060d0',e:'#8040a0'},
+  timeSpace:{s:'#80c0ff',m:'#60a0e0',e:'#4080c0'},
   mortar:{m:'#b8a890',s:'#9a8878'}
 };
 const GOLD_COL='#ffd700',RES_COL='#c46a3a',GXP_COL='#e0d0c0',
@@ -450,6 +480,14 @@ const UPG_G = [
   {id:'b2',n:'Precision Trowel',d:'+2 build gold per tap',c:200,m:3,L:10,sk:'build',v:2},
   {id:'b3',n:'Master Mason',d:'+4 build gold per tap',c:800,m:3.2,L:10,sk:'build',v:4},
   {id:'b4',n:'Grand Architect',d:'+8 build gold per tap',c:3000,m:3.5,L:10,sk:'build',v:8},
+  {id:'g7',n:"Titan's Grip",d:'+64 gather per tap',c:100000,m:6,L:10,sk:'gather',v:64},
+  {id:'g8',n:"God's Touch",d:'+128 gather per tap',c:500000,m:7,L:10,sk:'gather',v:128},
+  {id:'c7',n:'Divine Furnace',d:'+64 craft per tap',c:150000,m:6,L:10,sk:'craft',v:64},
+  {id:'c8',n:'Creation Engine',d:'+128 craft per tap',c:750000,m:7,L:10,sk:'craft',v:128},
+  {id:'b5',n:'Blueprint Master',d:'+16 build gold',c:10000,m:4,L:10,sk:'build',v:16},
+  {id:'b6',n:'Cathedral Builder',d:'+32 build gold',c:40000,m:4.5,L:10,sk:'build',v:32},
+  {id:'b7',n:'Megalith Mason',d:'+64 build gold',c:150000,m:5,L:10,sk:'build',v:64},
+  {id:'b8',n:'Cosmic Architect',d:'+128 build gold',c:500000,m:5.5,L:10,sk:'build',v:128},
 ];
 const UPG_R = [
   {id:'r1',n:'Rustic Tools',d:'+10% resource gain',c:50,m:2.8,L:15,sk:'gather',v:0.1},
@@ -464,6 +502,12 @@ const UPG_R = [
   {id:'r10',n:'Dimensional Rift',d:'+1000% resource gain',c:2000000,m:5.5,L:15,sk:'gather',v:10},
   {id:'r11',n:'Cosmic Well',d:'+2000% resource gain',c:10000000,m:6,L:15,sk:'gather',v:20},
   {id:'r12',n:'Singularity',d:'+5000% resource gain',c:50000000,m:6.5,L:15,sk:'gather',v:50},
+  {id:'r13',n:"Philosopher's Stone",d:'+10000% resource gain',c:200000000,m:7,L:15,sk:'gather',v:100},
+  {id:'r14',n:'Cosmic Loom',d:'+20000% resource gain',c:1000000000,m:7.5,L:15,sk:'gather',v:200},
+  {id:'r15',n:'Genesis Engine',d:'+50000% resource gain',c:5000000000,m:8,L:15,sk:'gather',v:500},
+  {id:'r16',n:'Infinite Well',d:'+100000% resource gain',c:10000000000,m:8.5,L:15,sk:'gather',v:1000},
+  {id:'r17',n:'Absolute Zero',d:'+500000% resource gain',c:50000000000,m:9,L:15,sk:'gather',v:5000},
+  {id:'r18',n:'Omega Point',d:'+1000000% resource gain',c:1000000000000,m:10,L:15,sk:'gather',v:10000},
 ];
 const UPG_A = [
   {id:'ag1',n:'Auto-Scoop',d:'Auto-gather (1.5s→0.2s per lv)',c:80,m:2.8,L:10,sk:'gather'},
@@ -484,6 +528,12 @@ const UPG_A = [
   {id:'am1',n:'Auto-Meditate',d:'Auto-skills',c:5000,m:3.5,L:10,sk:'skill'},
   {id:'am2',n:'Auto-Ascend',d:'Auto-ascend',c:20000,m:4,L:10,sk:'skill'},
   {id:'am3',n:'Auto-Talent',d:'Auto-talents',c:50000,m:4.5,L:10,sk:'skill'},
+  {id:'ag6',n:'Auto-Titan',d:'Faster auto-gather VI',c:200000,m:5,L:10,sk:'gather'},
+  {id:'ag7',n:'Auto-Cosmos',d:'Faster auto-gather VII',c:1000000,m:5.5,L:10,sk:'gather'},
+  {id:'ac6',n:'Auto-Prime',d:'Faster auto-craft VI',c:250000,m:5,L:10,sk:'craft'},
+  {id:'ac7',n:'Auto-Reality',d:'Faster auto-craft VII',c:1500000,m:5.5,L:10,sk:'craft'},
+  {id:'ab6',n:'Auto-Genesis',d:'Faster auto-build VI',c:350000,m:5,L:10,sk:'build'},
+  {id:'ab7',n:'Auto-Omega',d:'Faster auto-build VII',c:2000000,m:5.5,L:10,sk:'build'},
 ];
 const UPG_S = [
   {id:'sg1',n:'Gatherer Focus',d:'×2 gather rate',c:100,m:2.5,L:10,sk:'gathering',rL:0},
@@ -506,6 +556,14 @@ const UPG_S = [
   {id:'sb5',n:'Builder Divinity',d:'×20 build rate',c:500000,m:7,L:10,sk:'building',rL:25},
   {id:'sm4',n:"Master's Transcendence",d:'×10 mastery rate',c:200000,m:6,L:10,sk:'mastery',rL:15},
   {id:'sm5',n:"Master's Divinity",d:'×20 mastery rate',c:1000000,m:7,L:10,sk:'mastery',rL:25},
+  {id:'sg6',n:'Gatherer Eternal',d:'×50 gather rate',c:2000000,m:8,L:10,sk:'gathering',rL:35},
+  {id:'sg7',n:'Gatherer Absolute',d:'×100 gather rate',c:10000000,m:9,L:10,sk:'gathering',rL:50},
+  {id:'sc6',n:'Crafter Eternal',d:'×50 craft rate',c:2000000,m:8,L:10,sk:'crafting',rL:35},
+  {id:'sc7',n:'Crafter Absolute',d:'×100 craft rate',c:10000000,m:9,L:10,sk:'crafting',rL:50},
+  {id:'sb6',n:'Builder Eternal',d:'×50 build rate',c:2000000,m:8,L:10,sk:'building',rL:35},
+  {id:'sb7',n:'Builder Absolute',d:'×100 build rate',c:10000000,m:9,L:10,sk:'building',rL:50},
+  {id:'sm6',n:"Master's Eternal",d:'×50 mastery rate',c:4000000,m:8,L:10,sk:'mastery',rL:35},
+  {id:'sm7',n:"Master's Absolute",d:'×100 mastery rate',c:20000000,m:9,L:10,sk:'mastery',rL:50},
 ];
 const TECH = [
   {id:'bw1',n:'Wider Base I',d:'Width→6',val:6,cost:100,t:'w'},{id:'bw2',n:'Wider Base II',d:'Width→10',val:10,cost:500,t:'w'},
@@ -545,6 +603,21 @@ const TECH = [
   {id:'dm1',n:'Dampener System I',d:'-15% collapse risk',val:0.15,cost:2000000,t:'d'},
   {id:'dm2',n:'Dampener System II',d:'-25% collapse risk',val:0.25,cost:15000000,t:'d'},
   {id:'dm3',n:'Dampener System III',d:'-40% collapse risk',val:0.40,cost:100000000,t:'d'},
+  {id:'bw13',n:'Wider Base XIII',d:'Width→500',val:500,cost:100000000,t:'w',stress:1},
+  {id:'bw14',n:'Wider Base XIV',d:'Width→1000',val:1000,cost:500000000,t:'w'},
+  {id:'rf11',n:'Reinforce XI',d:'+500% stability',val:8.0,cost:200000000,t:'r'},
+  {id:'rf12',n:'Reinforce XII',d:'+1000% stability',val:12.0,cost:1000000000,t:'r'},
+  {id:'fd9',n:'Foundation IX',d:'×100 strength',val:99.0,cost:500000000,t:'f'},
+  {id:'fd10',n:'Foundation X',d:'×200 strength',val:199.0,cost:2000000000,t:'f'},
+  {id:'br5',n:'Buttress V',d:'+150% stability threshold',val:1.50,cost:200000000,t:'x'},
+  {id:'pi5',n:'Pillar Support V',d:'+80 maxSafe',val:80,cost:300000000,t:'p'},
+  {id:'dm4',n:'Dampener System IV',d:'-60% collapse risk',val:0.60,cost:500000000,t:'d'},
+  {id:'dm5',n:'Dampener System V',d:'-80% collapse risk',val:0.80,cost:2000000000,t:'d'},
+  {id:'rs1',n:'Resonance I',d:'+1 stab per 10 rows',val:1,cost:5000000,t:'s'},
+  {id:'rs2',n:'Resonance II',d:'+2 stab per 10 rows',val:2,cost:40000000,t:'s'},
+  {id:'rs3',n:'Resonance III',d:'+4 stab per 10 rows',val:4,cost:200000000,t:'s'},
+  {id:'rs4',n:'Resonance IV',d:'+8 stab per 10 rows',val:8,cost:1000000000,t:'s'},
+  {id:'rs5',n:'Resonance V',d:'+16 stab per 10 rows',val:16,cost:5000000000,t:'s'},
 ];
 const BURST_UPG = [
   {id:'bp',n:'Crane Power',i:'🏗️',d:'+20 taps per burst',L:10,cb:200,cm:2.5,v:20},
@@ -557,6 +630,11 @@ const BURST_UPG = [
   {id:'bf',n:'Focused Energy',i:'🔋',d:'+1 charge regen (faster)',L:5,cb:5000,cm:4,v:1},
   {id:'br',n:'Rapid Recovery',i:'⏱️',d:'-1s cooldown',L:10,cb:4000,cm:3.8,v:1,min:0},
   {id:'bb',n:'Big Batch',i:'💥',d:'×3 cost ×5 power mode',L:5,cb:10000,cm:5,v:5},
+  {id:'bm',n:'Momentum',i:'🔄',d:'+10 taps/charge',L:8,cb:15000,cm:4,v:10},
+  {id:'bd',n:'Dual Burst',i:'⚡',d:'×2 power ×2 cost',L:5,cb:20000,cm:5,v:2},
+  {id:'bh',n:'Hyper Charge',i:'🔋',d:'+2 max charges',L:5,cb:25000,cm:4.5,v:2},
+  {id:'bl',n:'Lightning Speed',i:'💨',d:'-5ms base burst',L:8,cb:15000,cm:4,v:5},
+  {id:'bx',n:'Auto Execute',i:'🤖',d:'Auto-burst when full',L:3,cb:50000,cm:5,v:1},
 ];
 const TOWER_MS = [
   {h:1,b:'Tutorial',type:'none',val:1},
@@ -579,33 +657,38 @@ const TOWER_MS = [
   {h:50000,b:'Star Citadel',type:'stability',val:15},
   {h:100000,b:'Cosmic Needle',type:'width',val:0.5},
   {h:200000,b:'Babel Prime',type:'legacy',val:1.0},
+  {h:500000,b:'Star Forge',type:'width',val:1.0},
+  {h:1000000,b:'Cosmic Pillar',type:'stability',val:25},
+  {h:5000000,b:'Babel Eternal',type:'legacy',val:5.0},
+  {h:10000000,b:'Prime Creation',type:'foundation',val:10},
+  {h:50000000,b:'Omega Tower',type:'gold',val:10},
 ];
 
 const MS = {
   gathering:[
     {lv:5,n:'Gatherer Apprentice'},{lv:10,n:'Prospector'},{lv:25,n:'Excavator'},{lv:50,n:'Quarry Master'},{lv:75,n:'Mountain Mover'},
     {lv:100,n:'Earth Shaper'},{lv:125,n:'Terrain Forger'},{lv:150,n:'Resource Sage'},{lv:200,n:'Land Cleaver'},{lv:250,n:'Mine Lord'},
-    {lv:300,n:'World Harvester'},{lv:400,n:'Elemental Collector'},{lv:500,n:'Gathering God'},{lv:600,n:'Terra Lord'},{lv:750,n:'Planet Shaper'},{lv:1000,n:'Cosmic Miner'},{lv:1500,n:'Void Excavator'},{lv:2000,n:'Omni Gatherer'},
+    {lv:300,n:'World Harvester'},{lv:400,n:'Elemental Collector'},{lv:500,n:'Gathering God'},{lv:600,n:'Terra Lord'},{lv:750,n:'Planet Shaper'},{lv:1000,n:'Cosmic Miner'},{lv:1500,n:'Void Excavator'},{lv:2000,n:'Omni Gatherer'},{lv:3000,n:'Cosmic Absorber'},{lv:5000,n:'Universal Force'},{lv:10000,n:'Gatherer Prime'},
   ],
   crafting:[
     {lv:5,n:'Crafter Apprentice'},{lv:10,n:'Artisan'},{lv:25,n:'Workshop Master'},{lv:50,n:'Factory Owner'},{lv:75,n:'Industrialist'},
     {lv:100,n:'Innovator'},{lv:125,n:'Master Artisan'},{lv:150,n:'Manufacturing Sage'},{lv:200,n:'Grand Builder'},{lv:250,n:'Assembly Overlord'},
-    {lv:300,n:'Creation Force'},{lv:400,n:'Transmutation Expert'},{lv:500,n:'Crafting God'},{lv:600,n:'Fusion Master'},{lv:750,n:'Matter Weaver'},{lv:1000,n:'Creation Lord'},{lv:1500,n:'Reality Crafter'},{lv:2000,n:'Omni Crafter'},
+    {lv:300,n:'Creation Force'},{lv:400,n:'Transmutation Expert'},{lv:500,n:'Crafting God'},{lv:600,n:'Fusion Master'},{lv:750,n:'Matter Weaver'},{lv:1000,n:'Creation Lord'},{lv:1500,n:'Reality Crafter'},{lv:2000,n:'Omni Crafter'},{lv:3000,n:'Reality Weaver'},{lv:5000,n:'Creation Force'},{lv:10000,n:'Crafter Prime'},
   ],
   building:[
     {lv:5,n:'Builder Apprentice'},{lv:10,n:'Mason'},{lv:25,n:'Architect'},{lv:50,n:'Engineer'},{lv:75,n:'Master Builder'},
     {lv:100,n:'Structural Genius'},{lv:125,n:'Tower Designer'},{lv:150,n:'Monument Forger'},{lv:200,n:'City Planner'},{lv:250,n:'Wonder Architect'},
-    {lv:300,n:'Gigalith Crafter'},{lv:400,n:'World Sculptor'},{lv:500,n:'Building God'},{lv:600,n:'Monument Maker'},{lv:750,n:'Sky Forger'},{lv:1000,n:'Reality Architect'},{lv:1500,n:'Dimension Builder'},{lv:2000,n:'Omni Builder'},
+    {lv:300,n:'Gigalith Crafter'},{lv:400,n:'World Sculptor'},{lv:500,n:'Building God'},{lv:600,n:'Monument Maker'},{lv:750,n:'Sky Forger'},{lv:1000,n:'Reality Architect'},{lv:1500,n:'Dimension Builder'},{lv:2000,n:'Omni Builder'},{lv:3000,n:'Dimension Architect'},{lv:5000,n:'Universe Sculptor'},{lv:10000,n:'Builder Prime'},
   ],
   mastery:[
     {lv:5,n:'Novice'},{lv:10,n:'Disciple'},{lv:25,n:'Adept'},{lv:50,n:'Expert'},{lv:75,n:'Virtuoso'},
     {lv:100,n:'Master'},{lv:125,n:'Grandmaster'},{lv:150,n:'Sage'},{lv:200,n:'Elder'},{lv:250,n:'Patriarch'},
-    {lv:300,n:'Myth'},{lv:400,n:'Transcendent One'},{lv:500,n:'Babel Incarnate'},{lv:600,n:'Eternal Sage'},{lv:750,n:'Cosmic Master'},{lv:1000,n:'Singularity'},{lv:1500,n:'Infinite Loop'},{lv:2000,n:'Omni Master'},
+    {lv:300,n:'Myth'},{lv:400,n:'Transcendent One'},{lv:500,n:'Babel Incarnate'},{lv:600,n:'Eternal Sage'},{lv:750,n:'Cosmic Master'},{lv:1000,n:'Singularity'},{lv:1500,n:'Infinite Loop'},{lv:2000,n:'Omni Master'},{lv:3000,n:'Eternal Sage'},{lv:5000,n:'Transcendent Being'},{lv:10000,n:'Master Prime'},
   ],
   general:[
     {lv:5,n:'Learner'},{lv:10,n:'Scholar'},{lv:25,n:'Savant'},{lv:50,n:'Genius'},{lv:75,n:'Mastermind'},
     {lv:100,n:'Enlightened'},{lv:125,n:'Transcendent'},{lv:150,n:'Sage of Babel'},{lv:200,n:'Demigod'},{lv:250,n:'Ascended'},
-    {lv:300,n:'Cosmic Mind'},{lv:400,n:'Universal Force'},{lv:500,n:'Omnipotent'},{lv:600,n:'Cosmic Overlord'},{lv:750,n:'Multiverse Mind'},{lv:1000,n:'Absolute'},{lv:1500,n:'Babel Eternal'},{lv:2000,n:'Omni Potent'},
+    {lv:300,n:'Cosmic Mind'},{lv:400,n:'Universal Force'},{lv:500,n:'Omnipotent'},{lv:600,n:'Cosmic Overlord'},{lv:750,n:'Multiverse Mind'},{lv:1000,n:'Absolute'},{lv:1500,n:'Babel Eternal'},{lv:2000,n:'Omni Potent'},{lv:3000,n:'Cosmic Overlord'},{lv:5000,n:'Absolute Force'},{lv:10000,n:'General Prime'},
   ],
 };
 const TALENTS = [
@@ -658,6 +741,17 @@ const TALENTS = [
   {id:'m5',n:'Dimensional Anchor',i:'⚓',d:'+10% all bonuses',rS:'mastery',rL:50,rS2:12,cb:50000,cm:5,L:10,ef:(l)=>({dimAnchor:0.1*l})},
   {id:'m6',n:'Eternal Echo',i:'🔄',d:'+10% legacy gain',rS:'mastery',rL:60,rS2:15,cb:100000,cm:5.5,L:10,ef:(l)=>({echoLegacy:0.1*l})},
   {id:'m7',n:'Prime Nexus',i:'💠',d:'+10% prestige gain',rS:'mastery',rL:75,rS2:18,cb:200000,cm:6,L:10,ef:(l)=>({nexusPr:0.1*l})},
+  {id:'ga9',n:'Elemental Harmony',i:'🌊',d:'+200% all resources',rS:'gathering',rL:100,rS2:20,cb:200000,cm:6.5,L:10,ef:(l)=>({elemHarm:0.20*l})},
+  {id:'ga10',n:'Omega Harvest',i:'⚡',d:'+500% resource find',rS:'gathering',rL:120,rS2:25,cb:500000,cm:7,L:10,ef:(l)=>({omegaHarvest:0.50*l})},
+  {id:'cr9',n:'Quantum Craft',i:'⚛️',d:'+30% craft speed',rS:'crafting',rL:100,rS2:20,cb:250000,cm:6.5,L:10,ef:(l)=>({quantCraft:0.30*l})},
+  {id:'cr10',n:'Creation Nexus',i:'🌀',d:'+50% craft amount',rS:'crafting',rL:120,rS2:25,cb:600000,cm:7,L:10,ef:(l)=>({creationNexus:0.50*l})},
+  {id:'bl9',n:'Tower Genius',i:'🧠',d:'+1 stability per lv',rS:'building',rL:100,rS2:20,cb:200000,cm:6.5,L:10,ef:(l)=>({towerGenius:1.0*l})},
+  {id:'bl10',n:'Infinite Scaffold',i:'♾️',d:'+2 height cap per lv',rS:'building',rL:120,rS2:25,cb:500000,cm:7,L:10,ef:(l)=>({infScaffold:2.0*l})},
+  {id:'ge9',n:'Cosmic Wisdom',i:'🌌',d:'+25% all XP',rS:'general',rL:100,rS2:20,cb:300000,cm:6.5,L:10,ef:(l)=>({cosmicWisdom:0.25*l})},
+  {id:'ge10',n:'Eternal Blessing',i:'✨',d:'+50% gold all',rS:'general',rL:120,rS2:25,cb:600000,cm:7,L:10,ef:(l)=>({eternalBless:0.50*l})},
+  {id:'m8',n:'Timeless Echo',i:'⏳',d:'+20% all bonuses',rS:'mastery',rL:100,rS2:20,cb:500000,cm:6.5,L:10,ef:(l)=>({timeEcho:0.20*l})},
+  {id:'m9',n:'Infinite Loop',i:'♾️',d:'+25% legacy gain',rS:'mastery',rL:120,rS2:25,cb:1000000,cm:7,L:10,ef:(l)=>({infLoop:0.25*l})},
+  {id:'m10',n:'Babel Ascendant',i:'👁️',d:'+20% prestige gain',rS:'mastery',rL:150,rS2:30,cb:2000000,cm:7.5,L:10,ef:(l)=>({babelAsc:0.20*l})},
 ];
 
 const ACHIEVEMENTS = [
@@ -681,6 +775,16 @@ const ACHIEVEMENTS = [
   {id:'a18',n:'Perfectionist',d:'Claim 50 milestones',ch:()=>{let t=0;Object.values(S.ms).forEach(v=>t+=v);return t>=50},r:()=>{S.stat.shards+=10;notif('🏆 Perfectionist!')}},
   {id:'a19',n:'Master of All',d:'All skills Lv50+',ch:()=>Object.values(S.sk).every(s=>s.lv>=50),r:()=>{S.stat.shards+=25;notif('🏆 Master of All!')}},
   {id:'a20',n:'Babel Reborn',d:'Collapse 100 times',ch:()=>S.tower.collapses>=100,r:()=>{S.stat.shards+=50;notif('🏆 Babel Reborn!')}},
+  {id:'a21',n:'Resource King',d:'Gather 1M of one resource',ch:()=>Object.values(S.res).some(v=>v>=1000000),r:()=>{S.stat.shards+=10}},
+  {id:'a22',n:'Material Lord',d:'Have 100K of one material',ch:()=>Object.values(S.mat).some(v=>v>=100000),r:()=>{S.stat.shards+=15}},
+  {id:'a23',n:'Skill Master',d:'Reach Lv200 in any skill',ch:()=>Object.values(S.sk).some(s=>s.lv>=200),r:()=>{S.stat.shards+=20}},
+  {id:'a24',n:'Talent Collector',d:'Buy 30 talents',ch:()=>Object.keys(S.tal).length>=30,r:()=>{S.stat.shards+=25}},
+  {id:'a25',n:'Tech Baron',d:'Buy 30 tower techs',ch:()=>Object.keys(S.tech).length>=30,r:()=>{S.stat.shards+=20}},
+  {id:'a26',n:'Burst Master',d:'Max all burst upgrades',ch:()=>BURST_UPG.every(u=>(S.upg[u.id]||0)>=u.L),r:()=>{S.stat.legacy+=10}},
+  {id:'a27',n:'Prestige King',d:'Buy all prestige upgrades',ch:()=>PR_UPG.every(u=>(S.pr[u.id]||0)>=u.L),r:()=>{S.stat.shards+=100}},
+  {id:'a28',n:'Unstoppable',d:'Build height 10000',ch:()=>(S.stat.tallest||0)>=10000,r:()=>{S.stat.shards+=100}},
+  {id:'a29',n:'Babel God',d:'Reach mastery Lv500',ch:()=>skLv('mastery')>=500,r:()=>{S.stat.shards+=500}},
+  {id:'a30',n:'Ascended One',d:'Collapse 1000 times',ch:()=>S.tower.collapses>=1000,r:()=>{S.stat.legacy+=50;notif('🏆 Ascended One!')}},
 ];
 const PR_UPG = [
   {id:'p1',n:'Diligent Start',i:'💰',d:'+100 starting gold',L:10,cb:1,cm:2.2},
@@ -693,6 +797,11 @@ const PR_UPG = [
   {id:'p8',n:'Crystal Memory',i:'💎',d:'+10 starting resources per lv',L:5,cb:20,cm:4},
   {id:'p9',n:'Eternal Foundation',i:'🏛️',d:'+5% starting stability',L:3,cb:30,cm:5},
   {id:'p10',n:"Babel's Grace",i:'✨',d:'+50 starting gold per lv',L:10,cb:5,cm:3},
+  {id:'p11',n:'Ancient Cache',i:'📦',d:'+100 starting materials per lv',L:5,cb:40,cm:4.5},
+  {id:'p12',n:'Titan Legacy',i:'🏛️',d:'+10% all prestige effects',L:3,cb:60,cm:5},
+  {id:'p13',n:'Eternal Echoes',i:'🔄',d:'+20% bonus legacy per lv',L:5,cb:30,cm:4},
+  {id:'p14',n:'Babel Reforged',i:'💠',d:'Start with mastery Lv5 per lv',L:3,cb:100,cm:5.5},
+  {id:'p15',n:'Ascended Legacy',i:'👁️',d:'×2 gold from all sources',L:3,cb:200,cm:6},
 ];
 
 // ─── TAP POSITION TRACKING ──────────────────────────────────────────
@@ -711,11 +820,11 @@ function aL(id){return S.auto[id]||0}
 function lP(id){const v=S.pr?.[id]||0;const m4=tL('m4');return m4>0?v*(1+m4*0.05):v}
 function towerMsClaimed(type){const tm=S.tower.tm||0;let c=0;for(let i=0;i<TOWER_MS.length;i++){if(tm&(1<<i)&&(!type||TOWER_MS[i].type===type))c++}const m3=tL('m3');return m3>0?c*(1+m3*0.1):c}
 function burstLv(id){const u=BURST_UPG.find(x=>x.id===id);if(!u)return 0;const l=S.upg[id]||0;return l>=u.L?u.L:l}
-function getBurstPower(){const lv=burstLv('bp');const bwLv=burstLv('bw');const bbLv=burstLv('bb');const base=20+lv*20+bwLv*5;return bbLv>0?base*5:base}
-function getBurstSpeed(){const lv=burstLv('bs');const baLv=burstLv('ba');const base=Math.max(10,50-lv*5-baLv*2);return Math.max(3,base)}
-function getBurstCost(){const lv=burstLv('bc');const bbLv=burstLv('bb');const base=Math.max(0,20-lv*2);return bbLv>0?base*3:base}
+function getBurstPower(){const lv=burstLv('bp');const bwLv=burstLv('bw');const bbLv=burstLv('bb');const bdLv=burstLv('bd');const bmLv=burstLv('bm');const base=20+lv*20+bwLv*5+bmLv*10;const mul=bbLv>0?5:1;const dual=bdLv>0?2:1;return base*mul*dual}
+function getBurstSpeed(){const lv=burstLv('bs');const baLv=burstLv('ba');const blLv=burstLv('bl');const base=Math.max(10,50-lv*5-baLv*2-blLv*5);return Math.max(3,base)}
+function getBurstCost(){const lv=burstLv('bc');const bbLv=burstLv('bb');const bdLv=burstLv('bd');const base=Math.max(0,20-lv*2);const mul=bbLv>0?3:1;const dualMul=bdLv>0?2:1;return base*mul*dualMul}
 function getBurstCooldown(){const lv=burstLv('bcd');const brLv=burstLv('br');return Math.max(0,20-lv*2-brLv*1)}
-function getBurstCharges(){const lv=burstLv('bch');const bfLv=burstLv('bf');return 1+lv+bfLv}
+function getBurstCharges(){const lv=burstLv('bch');const bfLv=burstLv('bf');const bhLv=burstLv('bh');return 1+lv+bfLv+bhLv*2}
 function rechargeBurst(){const b=S.burst;if(!b)return;const maxCh=getBurstCharges();if(b.lchrg>=maxCh)return;const cd=getBurstCooldown()*1000;const since=Date.now()-(b.last||0);if(since>=cd){const gained=Math.floor(since/cd);const newCh=Math.min(maxCh,b.lchrg+gained);if(newCh>b.lchrg){b.lchrg=newCh;b.last=Date.now();if(b.chrg<b.lchrg)b.chrg=b.lchrg}}}
 function burstBuyUpg(id){const u=BURST_UPG.find(x=>x.id===id);if(!u)return;const l=S.upg[id]||0;if(l>=u.L)return;const c=Math.floor(u.cb*Math.pow(u.cm||2.5,l));if((S.stat.gold||0)<c)return;S.stat.gold-=c;S.upg[id]=l+1;notif('🔧 '+u.n+' Lv.'+(l+1));updateUI()}
 
@@ -815,9 +924,9 @@ function earnX(sk,base){
   let m=1;
   if(msG("general")>=2)m*=2;
   if(msG("general")>=8)m*=4;
-  if(sk==="gathering"){const v=uL("sg1");if(v>0)m*=1+v;const v2=uL('sg4');if(v2>0)m*=1+v2}
-  if(sk==="crafting"){const v=uL("sc1");if(v>0)m*=1+v;const v2=uL('sc4');if(v2>0)m*=1+v2}
-  if(sk==="building"){const v=uL("sb1");if(v>0)m*=1+v;const v2=uL('sb4');if(v2>0)m*=1+v2}
+  if(sk==="gathering"){const v=uL("sg1");if(v>0)m*=1+v;const v2=uL('sg4');if(v2>0)m*=1+v2;const v3=uL('sg6');if(v3>0)m*=1+v3}
+  if(sk==="crafting"){const v=uL("sc1");if(v>0)m*=1+v;const v2=uL('sc4');if(v2>0)m*=1+v2;const v3=uL('sc6');if(v3>0)m*=1+v3}
+  if(sk==="building"){const v=uL("sb1");if(v>0)m*=1+v;const v2=uL('sb4');if(v2>0)m*=1+v2;const v3=uL('sb6');if(v3>0)m*=1+v3}
   if(tL('d1')>0)m*=1+tL('d1')*0.15;if(tL('ge4')>0)m*=1+tL('ge4')*0.1;if(tL('ge6')>0)m*=1+tL('ge6')*0.1;if(tL('m1')>0)m*=1+tL('m1')*0.05;if(tL('m5')>0)m*=1+tL('m5')*0.1;
   const leg=S.stat.legacy||0;if(leg>0)m*=1+leg*0.01;
   const x=Math.floor(base*m);
@@ -839,7 +948,7 @@ function gather(id){
   if(tL('t3')>0)m+=tL('t3')*0.08;if(tL('ga3')>0)m+=tL('ga3')*0.2;
   const amount=Math.max(1,Math.floor(Math.abs(base*(1+m)))||1);
   S.res[id]=(S.res[id]||0)+amount;if(tL('ga2')>0&&Math.random()<tL('ga2')*0.05){const rare=Math.floor(amount*0.5);S.res[id]+=rare;}
-  const gAmt=Math.max(1,Math.floor(g*(1+uL('g1')*0.5+uL('g2')*1+uL('g3')*2+uL('g4')*4+uL('g5')*8+uL('g6')*16)*(tL('ge7')>0?1+tL('ge7')*0.15:1)));
+  const gAmt=Math.max(1,Math.floor(g*(1+uL('g1')*0.5+uL('g2')*1+uL('g3')*2+uL('g4')*4+uL('g5')*8+uL('g6')*16+uL('g7')*64+uL('g8')*128)*(tL('ge7')>0?1+tL('ge7')*0.15:1)*(tL('ga9')>0?1+tL('ga9')*0.20:1)*(tL('ga10')>0?1+tL('ga10')*0.50:1)));
   S.stat.gold=(S.stat.gold||0)+Math.floor(gAmt*(1+lP('p7')*0.5)*(tL('ge4')>0?1+tL('ge4')*0.1:1)*(tL('t5')>0?1+tL('t5')*0.15:1));
   S.stat.totalClicks=(S.stat.totalClicks||0)+1;
   earnX('gathering',DB);checkAch();
@@ -888,28 +997,32 @@ function unlockedMat(){const l=skLv('crafting');return MAT_ALL.filter(m=>m.unloc
 
 // ─── BUILD ────────────────────────────────────────────────────────────
 
-function getBaseW(){let w=20+lP('p2');const tmw=towerMsClaimed('width');if(tmw>0)w=Math.floor(w*(1+tmw*0.1));const bwTechs=['bw1','bw2','bw3','bw4','bw5','bw6','bw7','bw8','bw9','bw10','bw11','bw12'];bwTechs.forEach(t=>{if(S.tech[t])w=S.tech[t]});return w}
-function getReinf(){let b=0+lP('p3')*0.03;let bp=0;['rf1','rf2','rf3','rf4','rf5','rf6','rf7','rf8','rf9','rf10'].forEach(id=>{if(S.tech[id])b+=TECH.find(t=>t.id===id).val});['br1','br2','br3','br4'].forEach(id=>{if(S.tech[id])bp+=TECH.find(t=>t.id===id).val});
-  b*=1+tL('f1')*0.1;if(tL('bl3')>0)b*=1+tL('bl3')*0.1;if(tL('bl6')>0)bp+=tL('bl6')*0.2;
+function getBaseW(){let w=20+lP('p2');const tmw=towerMsClaimed('width');if(tmw>0)w=Math.floor(w*(1+tmw*0.1));const bwTechs=['bw1','bw2','bw3','bw4','bw5','bw6','bw7','bw8','bw9','bw10','bw11','bw12','bw13','bw14'];bwTechs.forEach(t=>{if(S.tech[t])w=S.tech[t]});return w}
+function getReinf(){let b=0+lP('p3')*0.03;let bp=0;['rf1','rf2','rf3','rf4','rf5','rf6','rf7','rf8','rf9','rf10','rf11','rf12'].forEach(id=>{if(S.tech[id])b+=TECH.find(t=>t.id===id).val});['br1','br2','br3','br4','br5'].forEach(id=>{if(S.tech[id])bp+=TECH.find(t=>t.id===id).val});
+  b*=1+tL('f1')*0.1;if(tL('bl3')>0)b*=1+tL('bl3')*0.1;if(tL('bl6')>0)bp+=tL('bl6')*0.2;if(tL('bl9')>0)bp+=tL('bl9')*1;if(tL('m5')>0)bp*=1+tL('m5')*0.1;
   if(msG('gathering')>=4||msG('crafting')>=4||msG('building')>=4||msG('general')>=4)b+=0.2;
   if(msG('gathering')>=8||msG('crafting')>=8||msG('building')>=8||msG('general')>=8)b+=0.3;return b}
-function getFound(){let m=1;const tmf=towerMsClaimed('foundation');if(tmf>0)m*=Math.pow(2,tmf);['fd1','fd2','fd3','fd4','fd5','fd6','fd7','fd8'].forEach(id=>{if(S.tech[id])m+=TECH.find(t=>t.id===id).val});return m}
+function getFound(){let m=1;const tmf=towerMsClaimed('foundation');if(tmf>0)m*=Math.pow(2,tmf);['fd1','fd2','fd3','fd4','fd5','fd6','fd7','fd8','fd9','fd10'].forEach(id=>{if(S.tech[id])m+=TECH.find(t=>t.id===id).val});return m}
 function getMatStr(){const m=MAT_ALL.find(x=>x.id===getMatId());return m?m.str:1.0}
 function getStab(){const h=S.tower.rows.length;if(h===0)return{s:100,p:100,m:1};
   const bw=getBaseW(),ri=getReinf(),fd=getFound(),ms=getMatStr();
-  const tpVal=S.tech.tp1||0;const piVal=(S.tech.pi1||0)+(S.tech.pi2||0)+(S.tech.pi3||0)+(S.tech.pi4||0);const dmVal=(S.tech.dm1||0)+(S.tech.dm2||0)+(S.tech.dm3||0);const bMs=msG('building');const maxSafe=bw*5+25+ri*30+fd*10+tpVal+piVal+bMs*2+(tL('bl8')||0)*0.5;if(maxSafe<=0)return{s:0,p:0,m:1};
+  const tpVal=S.tech.tp1||0;const piVal=(S.tech.pi1||0)+(S.tech.pi2||0)+(S.tech.pi3||0)+(S.tech.pi4||0)+(S.tech.pi5||0);const dmVal=(S.tech.dm1||0)+(S.tech.dm2||0)+(S.tech.dm3||0)+(S.tech.dm4||0)+(S.tech.dm5||0);const rsVal=(S.tech.rs1||0)+(S.tech.rs2||0)+(S.tech.rs3||0)+(S.tech.rs4||0)+(S.tech.rs5||0);const bMs=msG('building');const maxSafe=bw*5+25+ri*30+fd*10+tpVal+piVal+bMs*2+(tL('bl8')||0)*0.5+(tL('bl10')||0)*2+rsVal*Math.floor(h/10);if(maxSafe<=0)return{s:0,p:0,m:1};
   const p=Math.max(0,Math.min(100,100-((h/maxSafe)*100)));
   const tms=towerMsClaimed('stability');if(tms>0)p=Math.min(100,p+tms*5);const buildMs=msG('building');if(buildMs>0)p=Math.min(100,p+buildMs*3);const hp=Math.max(0.1,1-p/100);
-  const dampenerFactor=Math.max(0.1,1-(S.tech.dm1||0)-(S.tech.dm2||0)-(S.tech.dm3||0));
+  const dampenerFactor=Math.max(0.05,1-(S.tech.dm1||0)-(S.tech.dm2||0)-(S.tech.dm3||0)-(S.tech.dm4||0)-(S.tech.dm5||0));
   const tmAdj=tL('t2')>0||tL('t4')>0?Math.max(0.5,1-(tL('t2')*0.02+tL('t4')*0.012)):1;const m2b=tL('m2')*0.02;return{s:p,p:p,m:ms*tmAdj*(1+ri+m2b)}}
 function getMatId(){const l=skLv('crafting');const bs=tL('bl7')>0?Math.floor(tL('bl7')*0.1):0;
-  if(l>=38+bs)return'starBrick';if(l>=34+bs)return'dragonBlock';if(l>=30+bs)return'aetherBrick';
-  if(l>=27+bs)return'voidStone';if(l>=23+bs)return'crystalBlock';if(l>=21+bs)return'composite';
-  if(l>=19+bs)return'mithrilBlock';if(l>=18+bs)return'megalith';if(l>=15+bs)return'titaniumPlate';
-  if(l>=13+bs)return'steelBeam';if(l>=12+bs)return'glazedBrick';if(l>=11+bs)return'ironBrick';
-  if(l>=10+bs)return'concrete';if(l>=9+bs)return'sulfurBrick';if(l>=8+bs)return'reinfBrick';
-  if(l>=7+bs)return'charcoalBrick';if(l>=6+bs)return'stoneBlock';if(l>=6+bs)return'ashBrick';
-  if(l>=3+bs)return'firedBrick';return'mudBrick'}
+  if(l>=42+bs)return'timeSpace';if(l>=38+bs)return'starBrick';if(l>=36+bs)return'manaBrick';
+  if(l>=34+bs)return'dragonBlock';if(l>=32+bs)return'voidBrick';if(l>=30+bs)return'aetherBrick';
+  if(l>=28+bs)return'darkBrick';if(l>=27+bs)return'voidStone';if(l>=24+bs)return'lightBrick';
+  if(l>=23+bs)return'crystalBlock';if(l>=21+bs)return'composite';if(l>=20+bs)return'platinumBrick';
+  if(l>=19+bs)return'mithrilBlock';if(l>=18+bs)return'megalith';if(l>=17+bs)return'silverBrick';
+  if(l>=15+bs)return'bronzeBrick';if(l>=14+bs)return'titaniumPlate';if(l>=13+bs)return'tinBrick';
+  if(l>=12+bs)return'copperBrick';if(l>=12+bs)return'glazedBrick';if(l>=11+bs)return'ironBrick';
+  if(l>=10+bs)return'concrete';if(l>=10+bs)return'sinewCord';if(l>=9+bs)return'sulfurBrick';
+  if(l>=8+bs)return'reinfBrick';if(l>=8+bs)return'boneBrick';if(l>=7+bs)return'charcoalBrick';
+  if(l>=6+bs)return'stoneBlock';if(l>=6+bs)return'ashBrick';if(l>=3+bs)return'firedBrick';
+  return'mudBrick'}
 
 
 
@@ -971,7 +1084,7 @@ function tapBuild(){
     brick.st='d';brick.doneT=Date.now();
     S.stat.taps=(S.stat.taps||0)+1;
     S.stat.totalClicks=(S.stat.totalClicks||0)+1;
-    const bGoldMult=1+uL('b1')*1+uL('b2')*2+uL('b3')*4+uL('b4')*8;const tmg=towerMsClaimed('gold');S.stat.gold=(S.stat.gold||0)+Math.floor(Math.random()*3+1)*DB*(tmg>0?2:1);const tmLg=towerMsClaimed('legacy');if(tmLg>0){S.stat.legacy=Math.max(S.stat.legacy||0,Math.floor((S.stat.legacy||0)+Math.random()*0.5*tmLg));}
+    const bGoldMult=1+uL('b1')*1+uL('b2')*2+uL('b3')*4+uL('b4')*8+uL('b5')*16+uL('b6')*32+uL('b7')*64+uL('b8')*128;const tmg=towerMsClaimed('gold');S.stat.gold=(S.stat.gold||0)+Math.floor(Math.random()*3+1)*DB*(tmg>0?2:1);const tmLg=towerMsClaimed('legacy');if(tmLg>0){S.stat.legacy=Math.max(S.stat.legacy||0,Math.floor((S.stat.legacy||0)+Math.random()*0.5*tmLg));}
     earnX('building',2*DB);checkAch();
     showFeed(BLD_COL,RES_COL,GOLD_COL,'+1🧱','+'+(Math.floor(Math.random()*3+1)*DB)+'🪙','+'+2*DB+'🧱XP','+'+(Math.floor(2*DB*0.5))+'⚡XP');
   }
@@ -1401,7 +1514,7 @@ function updateUI(){
     }).join('');
 
   // Tech panel
-  (function(){const gs=[{n:'📐 Width',t:'w',u:TECH.filter(x=>x.t==='w')},{n:'🛡️ Reinforce',t:'r',u:TECH.filter(x=>x.t==='r')},{n:'🏛️ Foundation',t:'f',u:TECH.filter(x=>x.t==='f')},{n:'🔧 Buttress',t:'x',u:TECH.filter(x=>x.t==='x')},{n:'📏 Pillar',t:'p',u:TECH.filter(x=>x.t==='p'||x.t==='d')}];
+  (function(){const gs=[{n:'📐 Width',t:'w',u:TECH.filter(x=>x.t==='w')},{n:'🛡️ Reinforce',t:'r',u:TECH.filter(x=>x.t==='r')},{n:'🏛️ Foundation',t:'f',u:TECH.filter(x=>x.t==='f')},{n:'🔧 Buttress',t:'x',u:TECH.filter(x=>x.t==='x')},{n:'📏 Pillar',t:'p',u:TECH.filter(x=>x.t==='p')},{n:'🛡️ Dampener',t:'d',u:TECH.filter(x=>x.t==='d')},{n:'🎵 Resonance',t:'s',u:TECH.filter(x=>x.t==='s')}];
   const tp=document.getElementById('ttech-panel');
   tp.innerHTML=gs.map(g=>'<div class="tuh">'+g.n+'</div>'+g.u.map(function(ti){const o=S.tech[ti.id];
     const r=(S.stat.gold||0)>=ti.cost;var q=String.fromCharCode(39);return '<div class="tu"><div class="td"><div class="tnm">'+ti.n+'</div><div class="tdc">'+ti.d+'</div></div><span class="tco">ðª'+fmt(ti.cost)+'</span><button onclick='+q+'G.buyTech(\''+ti.id+'\')'+q+(o?'disabled':r?'':'disabled')+'>'+(o?'OWNED':'Buy')+'</button></div>'}).join('')).join('')})();
